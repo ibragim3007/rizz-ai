@@ -18,6 +18,11 @@ final class OnboardingViewModel: ObservableObject {
             title: "Not Getting Enough\nReplies?",
             subtitle: "Messages getting ignored? Let us craft standout replies—no more being left on read!",
             imageName: "phone.mock"
+        )),
+        .init(kind: .feature(
+            title: "Not Getting Enough\nReplies?",
+            subtitle: "Messages getting ignored? Let us craft standout replies—no more being left on read!",
+            imageName: "phone.mock"
         ))
     ]
     

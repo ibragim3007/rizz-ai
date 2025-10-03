@@ -23,10 +23,14 @@ struct OnboardingView: View {
     var body: some View {
         ZStack {
             background
-            content
+            VStack(spacing: 0) {
+//                header
+                pager
+                pageIndicator
+                footerButton.padding(.horizontal, 24)
+            }
             sparklesOverlay
         }
-//        .ignoresSafeArea()
         .preferredColorScheme(.dark)
         .animation(.easeInOut, value: viewModel.currentIndex)
         .accessibilityElement(children: .contain)
@@ -47,43 +51,85 @@ struct OnboardingView: View {
                 endRadius: 420
             )
             .blendMode(.plusLighter)
+            .ignoresSafeArea()
         }
     }
     
-    // MARK: - Content
+    // MARK: - Header (Skip + Page Indicator)
     
-    private var content: some View {
-        VStack(spacing: 20) {
-            Spacer(minLength: 0)
+    private var header: some View {
+        HStack {
+            // Пустой плейсхолдер для центрирования индикатора
+            Color.clear.frame(width: 60, height: 44)
             
-            VStack(spacing: 5) {
-                Text("Not Getting Enough")
-                    .font(.system(size: 32, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white)
-                    .multilineTextAlignment(.center)
-                    .shadow(color: .black.opacity(0.6), radius: 8, x: 0, y: 4)
-                
-                Text("Replies?")
-                    .font(.system(size: 36, weight: .heavy, design: .rounded))
-                    .foregroundStyle(AppTheme.primaryGradient)
-                    .multilineTextAlignment(.center)
-                    .shadow(color: AppTheme.primary.opacity(0.55), radius: 20, x: 0, y: 0)
-                
-                // Подзаголовок
-                Text("Messages getting ignored? Let us craft standout replies no more being left on read!")
-                    .font(.system(size: 16, weight: .regular))
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-                    .frame(maxWidth: 330)
-                    .padding(.top, 14)
-                    .padding(.horizontal, 24)
-                    .padding(.horizontal, 16)
+            pageIndicator
+            
+            Button("Skip") {
+                viewModel.skipToEnd()
             }
-            .padding(.top, 2)
-            
-            // Кнопка
-            PrimaryCTAButton(title: "Get Started", isShimmering: true,fullWidth: true, action: { viewModel.next() })
-                .padding(.horizontal, 24)
+            .font(.system(size: 16, weight: .semibold, design: .rounded))
+            .foregroundStyle(.secondary)
+            .frame(width: 60, height: 44, alignment: .trailing)
+            .accessibilityLabel("Skip onboarding")
+        }
+        .padding(.top, 12)
+    }
+    
+    private var pageIndicator: some View {
+        HStack(spacing: 8) {
+            ForEach(viewModel.steps.indices, id: \.self) { index in
+                let isActive = index == viewModel.currentIndex
+                Capsule()
+                    .fill(isActive ? AppTheme.primary : .white.opacity(0.25))
+                    .frame(width: isActive ? 18 : 6, height: 6)
+                    .animation(.spring(response: 0.35, dampingFraction: 0.8), value: viewModel.currentIndex)
+                    .accessibilityHidden(true)
+            }
+        }
+        .padding(.vertical, 8)
+        .accessibilityLabel("Page \(viewModel.currentIndex + 1) of \(viewModel.steps.count)")
+    }
+    
+    // MARK: - Pager Content
+    
+    private var pager: some View {
+        TabView(selection: $viewModel.currentIndex) {
+            ForEach(viewModel.steps.indices, id: \.self) { index in
+                OnboardingStepView(kind: viewModel.steps[index].kind)
+                    .tag(index) // Match selection type (Int)
+            }
+        }
+        .tabViewStyle(.page(indexDisplayMode: .never))
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+    
+    // MARK: - Footer Button
+    
+    private var footerButton: some View {
+        VStack(spacing: 16) {
+            PrimaryCTAButton(
+                title: buttonTitle,
+                isShimmering: viewModel.currentIndex == 0,
+                fullWidth: true,
+                action: onPrimaryButtonTap
+            )
+        }
+        .padding(.top, 12)
+        .padding(.bottom, 24)
+    }
+    
+    private var buttonTitle: LocalizedStringKey {
+        if viewModel.steps.count <= 1 { return "Get Started" }
+        return viewModel.isLast ? "Finish" : (viewModel.currentIndex == 0 ? "Get Started" : "Next")
+    }
+    
+    private func onPrimaryButtonTap() {
+        if viewModel.isLast {
+            hasSeenOnboarding = true
+        } else {
+            withAnimation(.spring(response: 0.45, dampingFraction: 0.9)) {
+                viewModel.next()
+            }
         }
     }
     
