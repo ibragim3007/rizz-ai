@@ -6,6 +6,9 @@
 //
 
 import SwiftUI
+#if canImport(UIKit)
+import UIKit
+#endif
 
 struct OnboardingHeader: View {
     @ObservedObject var viewModel: OnboardingViewModel
@@ -14,6 +17,9 @@ struct OnboardingHeader: View {
         HStack {
             Spacer()
             Button("Skip") {
+                #if canImport(UIKit)
+                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                #endif
                 viewModel.skipToEnd()
             }
             .buttonStyle(GlassButtonStyle())

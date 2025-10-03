@@ -11,7 +11,7 @@ struct OnboardingView: View {
     
     @StateObject var viewModel = OnboardingViewModel()
     @AppStorage("hasSeenOnboarding") private var hasSeenOnboarding: Bool = false
-
+    
     var body: some View {
         ZStack {
             OnboardingBackground
@@ -33,6 +33,10 @@ struct OnboardingView: View {
     }
     
     func onPrimaryButtonTap() {
+#if canImport(UIKit)
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+#endif
+        
         if viewModel.isLast {
             hasSeenOnboarding = true
         } else {
@@ -41,6 +45,6 @@ struct OnboardingView: View {
             }
         }
     }
-
+    
     
 }
