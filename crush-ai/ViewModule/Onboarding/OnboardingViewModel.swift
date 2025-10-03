@@ -15,12 +15,14 @@ final class OnboardingViewModel: ObservableObject {
     // Для данного дизайна — один шаг. Архитектура сохранена.
     @Published var steps: [OnboardingStep] = [
         .init(kind: .feature(
-            title: "Not Getting Enough\nReplies?",
+            title: "Not Getting Enough",
+            highlightText: "Replies?",
             subtitle: "Messages getting ignored? Let us craft standout replies—no more being left on read!",
             imageName: "phone.mock"
         )),
         .init(kind: .feature(
-            title: "Not Getting Enough\nReplies?",
+            title: "Not Getting Enough",
+            highlightText: "Replies?",
             subtitle: "Messages getting ignored? Let us craft standout replies—no more being left on read!",
             imageName: "phone.mock"
         ))

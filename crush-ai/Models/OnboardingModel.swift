@@ -8,7 +8,7 @@
 import Foundation
 
 enum OnboardingStepKind: Equatable {
-    case feature(title: String, subtitle: String, imageName: String)
+    case feature(title: String, highlightText: String, subtitle: String, imageName: String)
     case permissionNotifications
 }
 
