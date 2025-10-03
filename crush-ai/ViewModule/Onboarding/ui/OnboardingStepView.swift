@@ -16,33 +16,38 @@ struct OnboardingStepView: View {
             Spacer(minLength: 0)
             
             switch kind {
-            case let .feature(title, highlightText, subtitle, imageName):
-                VStack(spacing: 12) {
+            case let .feature(title, highlightText, subtitle, _):
+                VStack(spacing: 0) {
                     // Иллюстрация/мок телефона
+                    if let illustration = illustration {
+                        illustration
+                    }
                     
-                    illustration
+                    Spacer()
                     
-                    Image(imageName)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(maxWidth: 320)
-                        .shadow(color: AppTheme.primary.opacity(0.3), radius: 24, x: 0, y: 12)
-                        .accessibilityHidden(true)
-                    
+//                    if !imageName.isEmpty {
+//                        Image(imageName)
+//                            .resizable()
+//                            .scaledToFit()
+//                            .frame(maxWidth: 320)
+//                            .shadow(color: AppTheme.primary.opacity(0.3), radius: 24, x: 0, y: 12)
+//                            .accessibilityHidden(true)
+//                    }
+//              
                     VStack(spacing: 10) {
                         VStack {
-                        Text(title)
-                            .font(.system(size: 32, weight: .bold, design: .rounded))
-                            .foregroundStyle(.white)
-                            .multilineTextAlignment(.center)
-                            .shadow(color: .black.opacity(0.4), radius: 6, x: 0, y: 4)
-                        
-                        Text(highlightText)
-                            .font(.system(size: 36, weight: .bold, design: .rounded))
-                            .foregroundStyle(AppTheme.primaryGradient)
-                            .multilineTextAlignment(.center)
-                            .shadow(color: .black.opacity(0.6), radius: 8, x: 0, y: 4)
-                            .shadow(color: AppTheme.primary.opacity(0.5), radius: 11)
+                            Text(title)
+                                .font(.system(size: 32, weight: .bold, design: .rounded))
+                                .foregroundStyle(.white)
+                                .multilineTextAlignment(.center)
+                                .shadow(color: .black.opacity(0.4), radius: 6, x: 0, y: 4)
+                            
+                            Text(highlightText)
+                                .font(.system(size: 36, weight: .bold, design: .rounded))
+                                .foregroundStyle(AppTheme.primaryGradient)
+                                .multilineTextAlignment(.center)
+                                .shadow(color: .black.opacity(0.6), radius: 8, x: 0, y: 4)
+                                .shadow(color: AppTheme.primary.opacity(0.5), radius: 11)
                         }
                         
                         Text(subtitle)

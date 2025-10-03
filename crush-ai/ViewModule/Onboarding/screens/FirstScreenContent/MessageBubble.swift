@@ -14,7 +14,7 @@ struct MessageBubble: View {
     let avatarURL: URL?
     
     // Точки настройки
-    private let cornerRadius: CGFloat = 28
+    private let cornerRadius: CGFloat = 50
     private let avatarSize: CGFloat = 64
     private let badgeSize: CGFloat = 36
     
@@ -34,10 +34,10 @@ struct MessageBubble: View {
         HStack(spacing: 16) {
             avatarView
             Text(text)
-                .font(.system(size: 34, weight: .heavy, design: .rounded))
+                .font(.system(size: 24, weight: .heavy, design: .rounded))
                 .foregroundStyle(.white)
                 .lineLimit(2)
-                .minimumScaleFactor(0.7)
+                .minimumScaleFactor(0.5)
             Spacer(minLength: 0)
         }
         .padding(.vertical, 16)
@@ -114,7 +114,7 @@ private struct GlassBackground: View {
             // Лёгкий тинт цветом темы
             .overlay(
                 RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                    .fill(tint.opacity(0.35))
+                    .fill(tint.opacity(0.20))
             )
             // Тонкий «стеклянный» штрих с подсветкой
             .overlay(
@@ -132,8 +132,8 @@ private struct GlassBackground: View {
                     )
             )
             // Глоу от фирменного цвета + мягкая тень вниз
-            .shadow(color: AppTheme.glow.opacity(0.35), radius: 16, x: 0, y: 8)
-            .shadow(color: .black.opacity(0.30), radius: 20, x: 0, y: 12)
+            .shadow(color: AppTheme.glow.opacity(0.15), radius: 16, x: 0, y: 8)
+            .shadow(color: .black.opacity(0.25), radius: 20, x: 0, y: 12)
     }
 }
 
@@ -147,6 +147,7 @@ private struct BadgeView: View {
             .font(.system(size: 16, weight: .bold, design: .rounded))
             .foregroundStyle(.white)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .glassEffect()
             .background(
                 Circle()
                     .fill(AppTheme.primaryGradient)
@@ -155,6 +156,7 @@ private struct BadgeView: View {
                     )
                     .shadow(color: AppTheme.glow.opacity(0.55), radius: 12, x: 0, y: 6)
             )
+   
     }
 }
 
