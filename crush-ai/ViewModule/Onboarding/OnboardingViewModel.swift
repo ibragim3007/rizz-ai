@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import SwiftUI
 
 @MainActor
 final class OnboardingViewModel: ObservableObject {
@@ -14,12 +15,16 @@ final class OnboardingViewModel: ObservableObject {
     
     // Для данного дизайна — один шаг. Архитектура сохранена.
     @Published var steps: [OnboardingStep] = [
-        .init(kind: .feature(
-            title: "Not Getting Enough",
-            highlightText: "Replies?",
-            subtitle: "Messages getting ignored? Let us craft standout replies—no more being left on read!",
-            imageName: "phone.mock"
-        )),
+        .init(
+            kind: .feature(
+                title: "Not Getting Enough",
+                highlightText: "Replies?",
+                subtitle: "Messages getting ignored? Let us craft standout replies—no more being left on read!",
+                imageName: "phone.mock"
+            ),
+            illustration: AnyView(MessageBubbles()),
+            illustrationKey: "MessageBubbles"
+        ),
         .init(kind: .feature(
             title: "Not Getting Enough",
             highlightText: "Replies?",
@@ -39,4 +44,3 @@ final class OnboardingViewModel: ObservableObject {
         currentIndex = steps.count - 1
     }
 }
-

@@ -9,6 +9,7 @@ import SwiftUI
 
 struct OnboardingStepView: View {
     let kind: OnboardingStepKind
+    let illustration: AnyView?
     
     var body: some View {
         VStack(spacing: 20) {
@@ -18,6 +19,9 @@ struct OnboardingStepView: View {
             case let .feature(title, highlightText, subtitle, imageName):
                 VStack(spacing: 12) {
                     // Иллюстрация/мок телефона
+                    
+                    illustration
+                    
                     Image(imageName)
                         .resizable()
                         .scaledToFit()
