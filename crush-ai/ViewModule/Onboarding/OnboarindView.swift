@@ -16,7 +16,7 @@ struct OnboardingView: View {
     var body: some View {
         ZStack {
             OnboardingBackground
-            VStack(spacing: 0) {
+            VStack(spacing: 7) {
                 OnboardingHeader(viewModel: viewModel).padding(.horizontal, 24)
                 OnboardingPager(viewModel: viewModel)
                 PageIndicator(viewModel: viewModel)

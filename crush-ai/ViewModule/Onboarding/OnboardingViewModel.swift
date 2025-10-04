@@ -20,7 +20,7 @@ final class OnboardingViewModel: ObservableObject {
                 title: "Not Getting Enough",
                 highlightText: "Replies?",
                 subtitle: "Messages getting ignored? Let us craft standout replies—no more being left on read!",
-                imageName: "phone.mock"
+                imageName: ""
             ),
             illustration: AnyView(MessageBubbles()),
             illustrationKey: "MessageBubbles"
@@ -29,9 +29,10 @@ final class OnboardingViewModel: ObservableObject {
             title: "Your First Message Is",
             highlightText: "Everything",
             subtitle: "Over 60% of matches never get pass that crucial opener. Don't let yours fall flat",
-            imageName: "phone.mock"
+            imageName: "first-message"
         )),
-        .init(kind: .question(title: "What's your age?", subtitle: "Let us personalize your experiance", variants: ["Under 18", "18-22", "22-31", "32-41", "41-51", "51-56", "over 56"]))
+        .init(kind: .question(title: "What's your age?", subtitle: "Let us personalize your experiance", variants: ["Under 18", "18-22", "22-31", "32-41", "41-51", "51-56", "over 56"])),
+        .init(kind: .question(title: "I'm looking for...", subtitle: "This question will help us determine how to help you ideally", variants: ["🏡 Serious", "🤪 Casual", "💍 Marriage", "😈 Flirt" ,"🤔 Not decided"]))
     ]
     
     func getCurrentPage() -> OnboardingStep {

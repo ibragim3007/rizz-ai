@@ -17,23 +17,23 @@ struct OnboardingStepView: View {
             Spacer(minLength: 0)
             
             switch kind {
-            case let .feature(title, highlightText, subtitle, _):
+            case let .feature(title, highlightText, subtitle, imageName):
                 VStack(spacing: 0) {
                     if let illustration = illustration {
                         illustration
                     }
                     Spacer()
                     
-                    //                    if !imageName.isEmpty {
-                    //                        Image(imageName)
-                    //                            .resizable()
-                    //                            .scaledToFit()
-                    //                            .frame(maxWidth: 320)
-                    //                            .shadow(color: AppTheme.primary.opacity(0.3), radius: 24, x: 0, y: 12)
-                    //                            .accessibilityHidden(true)
-                    //                    }
-                    //
-                    VStack(spacing: 10) {
+                    if !imageName.isEmpty {
+                        Image(imageName)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(maxWidth: 320)
+                            .shadow(color: AppTheme.primary.opacity(0.3), radius: 24, x: 0, y: 12)
+                            .accessibilityHidden(true)
+                    }
+                    
+                    VStack(spacing: 15) {
                         VStack {
                             Text(title)
                                 .font(.system(size: 32, weight: .bold, design: .rounded))

@@ -24,6 +24,7 @@ struct MessageBubbles: View {
                     insertion: .move(edge: .leading).combined(with: .opacity),
                     removal: .opacity
                 ))
+                .rotationEffect(.degrees(2))
             }
             
             if showSecond {
@@ -48,6 +49,7 @@ struct MessageBubbles: View {
                     insertion: .move(edge: .leading).combined(with: .opacity),
                     removal: .opacity
                 ))
+                .rotationEffect(.degrees(-1))
             }
         }
         .scenePadding(.horizontal)
@@ -82,4 +84,5 @@ struct MessageBubbles: View {
 #Preview {
     MessageBubbles()
         .padding(.horizontal, 20)
+        .preferredColorScheme(.dark)
 }
