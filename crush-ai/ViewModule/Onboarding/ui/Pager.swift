@@ -14,13 +14,13 @@ struct OnboardingPager: View {
         TabView(selection: $viewModel.currentIndex) {
             ForEach(viewModel.steps.indices, id: \.self) { index in
                 OnboardingStepView(viewModel: viewModel, kind: viewModel.steps[index].kind, illustration: viewModel.steps[index].illustration)
-                    .tag(index) // Match selection type (Int)
+                    .tag(index)
             }
         }
         .tabViewStyle(.page(indexDisplayMode: .never))
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         // Перехватываем свайпы, чтобы TabView не листался жестами
-        .highPriorityGesture(DragGesture())
+//        .highPriorityGesture(DragGesture())
     }
     
 }

@@ -24,11 +24,13 @@ struct OnboardingStepView: View {
             
             case let .smallLoader(title, duration):
                 SmallLoader(title: title, duration: TimeInterval(duration)) {
+                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
                     viewModel.next()
                 }
 
             case let .question(title, subtitle, variants):
                 QuestionTemplate(title: title, subtext: subtitle, variants: variants)  {variant in
+                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
                     viewModel.next()
                 }
             }
