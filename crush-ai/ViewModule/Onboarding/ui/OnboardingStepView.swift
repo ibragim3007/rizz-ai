@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct OnboardingStepView: View {
+    @ObservedObject var viewModel : OnboardingViewModel
     let kind: OnboardingStepKind
     let illustration: AnyView?
     
@@ -58,10 +59,10 @@ struct OnboardingStepView: View {
                     .padding(.horizontal, 16)
                 }
                 
-//            case .question:
-//                VStack { QuestionTemplate() }
-//                
-//                
+                //            case .question:
+                //                VStack { QuestionTemplate() }
+                //
+                //
             case .permissionNotifications:
                 VStack(spacing: 12) {
                     Image(systemName: "bell.badge.fill")
@@ -85,7 +86,9 @@ struct OnboardingStepView: View {
                 .padding(.horizontal, 16)
                 
             case let .question(title, subtitle, variants):
-                QuestionTemplate()
+                QuestionTemplate(title: title, subtext: subtitle, variants: variants)  {variant in
+                    viewModel.next()
+                }
             }
             
             Spacer(minLength: 0)

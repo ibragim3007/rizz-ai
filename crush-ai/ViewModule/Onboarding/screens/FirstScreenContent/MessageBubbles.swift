@@ -31,7 +31,7 @@ struct MessageBubbles: View {
                     MessageBubble(text: "I swipe for charm. Prove you have it", badgeCount: 12, avatar: Image("girl-2"))
                 }
                 .frame(maxWidth: .infinity, alignment: .trailing)
-                .padding(.leading, 120) // был Spacer(minLength: 120) слева
+                .padding(.leading, 80) // был Spacer(minLength: 120) слева
                 .transition(.asymmetric(
                     insertion: .move(edge: .trailing).combined(with: .opacity),
                     removal: .opacity
@@ -43,7 +43,7 @@ struct MessageBubbles: View {
                     MessageBubble(text: "Your move, heartbreaker!", badgeCount: 1, avatar: Image("girl-3"))
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.trailing, 30) // был Spacer(minLength: 30)
+                .padding(.trailing, 70) // был Spacer(minLength: 30)
                 .transition(.asymmetric(
                     insertion: .move(edge: .leading).combined(with: .opacity),
                     removal: .opacity

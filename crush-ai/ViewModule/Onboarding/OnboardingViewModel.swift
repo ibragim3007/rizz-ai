@@ -34,6 +34,12 @@ final class OnboardingViewModel: ObservableObject {
         .init(kind: .question(title: "What's your age?", subtitle: "Let us personalize your experiance", variants: ["Under 18", "18-22", "22-31", "32-41", "41-51", "51-56", "over 56"]))
     ]
     
+    func getCurrentPage() -> OnboardingStep {
+        let currentPage: OnboardingStep = steps[currentIndex]
+        
+        return currentPage
+    }
+    
     var isLast: Bool { currentIndex == steps.count - 1 }
     
     func next() {

@@ -10,8 +10,8 @@ import SwiftUI
 
 enum OnboardingStepKind: Equatable {
     case feature(title: String, highlightText: String, subtitle: String, imageName: String)
-    case permissionNotifications
     case question(title: String, subtitle: String, variants: [String])
+    case permissionNotifications
 }
 
 struct OnboardingStep: Identifiable, Equatable {

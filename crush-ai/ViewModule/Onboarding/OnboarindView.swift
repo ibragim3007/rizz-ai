@@ -12,6 +12,7 @@ struct OnboardingView: View {
     @StateObject var viewModel = OnboardingViewModel()
     @AppStorage("hasSeenOnboarding") private var hasSeenOnboarding: Bool = false
     
+    
     var body: some View {
         ZStack {
             OnboardingBackground
@@ -19,7 +20,12 @@ struct OnboardingView: View {
                 OnboardingHeader(viewModel: viewModel).padding(.horizontal, 24)
                 OnboardingPager(viewModel: viewModel)
                 PageIndicator(viewModel: viewModel)
-                footerButton.padding(.horizontal, 24)
+                
+                if case .question = viewModel.getCurrentPage().kind {
+                    EmptyView()
+                } else {
+                    footerButton.padding(.horizontal, 24)
+                }
             }
         }
         .preferredColorScheme(.dark)

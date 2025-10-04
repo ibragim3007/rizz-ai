@@ -13,7 +13,7 @@ struct OnboardingPager: View {
     var body: some View {
         TabView(selection: $viewModel.currentIndex) {
             ForEach(viewModel.steps.indices, id: \.self) { index in
-                OnboardingStepView(kind: viewModel.steps[index].kind, illustration: viewModel.steps[index].illustration)
+                OnboardingStepView(viewModel: viewModel, kind: viewModel.steps[index].kind, illustration: viewModel.steps[index].illustration)
                     .tag(index) // Match selection type (Int)
             }
         }
