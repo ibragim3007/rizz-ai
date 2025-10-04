@@ -25,14 +25,23 @@ final class OnboardingViewModel: ObservableObject {
             illustration: AnyView(MessageBubbles()),
             illustrationKey: "MessageBubbles"
         ),
+
         .init(kind: .feature(
             title: "Your First Message Is",
             highlightText: "Everything",
             subtitle: "Over 60% of matches never get pass that crucial opener. Don't let yours fall flat",
-            imageName: "first-message"
-        )),
+            imageName: "",
+        ), illustration: AnyView(SecondScreenContent())),
+
         .init(kind: .question(title: "What's your age?", subtitle: "Let us personalize your experiance", variants: ["Under 18", "18-22", "22-31", "32-41", "41-51", "51-56", "over 56"])),
-        .init(kind: .question(title: "I'm looking for...", subtitle: "This question will help us determine how to help you ideally", variants: ["🏡 Serious", "🤪 Casual", "💍 Marriage", "😈 Flirt" ,"🤔 Not decided"]))
+
+        .init(kind: .question(title: "I'm looking for...", subtitle: "This question will help us determine how to help you ideally", variants: ["🏡 Serious", "🤪 Casual", "💍 Marriage", "😈 Flirt" ,"🤔 Not decided"])),
+
+        .init(kind: .question(title: "How many of your chats get a reply?", subtitle: "", variants: ["💔 Not event 1", "😐 1-3", "🥉 4-6", "🥈 7-12" ,"🥇 13+"])),
+
+        .init(kind: .question(title: "What’s your biggest roadblock in chats?", subtitle: "", variants: ["🤔 I don’t know what to write first", "💭 I get stuck after they reply", "🥱 My questions are boring", "☕️ I move to a date too late" ,"🛟 Other"])),
+        
+        .init(kind: .smallLoader(title: "Analyzing your info"))
     ]
     
     func getCurrentPage() -> OnboardingStep {

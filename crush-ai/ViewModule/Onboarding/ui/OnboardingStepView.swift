@@ -18,73 +18,10 @@ struct OnboardingStepView: View {
             
             switch kind {
             case let .feature(title, highlightText, subtitle, imageName):
-                VStack(spacing: 0) {
-                    if let illustration = illustration {
-                        illustration
-                    }
-                    Spacer()
-                    
-                    if !imageName.isEmpty {
-                        Image(imageName)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(maxWidth: 320)
-                            .shadow(color: AppTheme.primary.opacity(0.3), radius: 24, x: 0, y: 12)
-                            .accessibilityHidden(true)
-                    }
-                    
-                    VStack(spacing: 15) {
-                        VStack {
-                            Text(title)
-                                .font(.system(size: 32, weight: .bold, design: .rounded))
-                                .foregroundStyle(.white)
-                                .multilineTextAlignment(.center)
-                                .shadow(color: .black.opacity(0.4), radius: 6, x: 0, y: 4)
-                            
-                            Text(highlightText)
-                                .font(.system(size: 36, weight: .bold, design: .rounded))
-                                .foregroundStyle(AppTheme.primaryGradient)
-                                .multilineTextAlignment(.center)
-                                .shadow(color: .black.opacity(0.6), radius: 8, x: 0, y: 4)
-                                .shadow(color: AppTheme.primary.opacity(0.5), radius: 11)
-                        }
-                        
-                        Text(subtitle)
-                            .font(.system(size: 16, weight: .regular))
-                            .foregroundStyle(.secondary)
-                            .multilineTextAlignment(.center)
-                            .frame(maxWidth: 330)
-                            .padding(.top, 6)
-                    }
-                    .padding(.horizontal, 16)
-                }
+                FeatureUI(title: title, highlightText: highlightText, subtitle: subtitle, imageName: imageName, illustration: illustration)
                 
-                //            case .question:
-                //                VStack { QuestionTemplate() }
-                //
-                //
-            case .permissionNotifications:
-                VStack(spacing: 12) {
-                    Image(systemName: "bell.badge.fill")
-                        .font(.system(size: 80))
-                        .foregroundStyle(AppTheme.primaryGradient)
-                        .shadow(color: AppTheme.primary.opacity(0.5), radius: 18, x: 0, y: 8)
-                        .accessibilityHidden(true)
-                    
-                    Text("Stay in the loop")
-                        .font(.system(size: 28, weight: .bold, design: .rounded))
-                        .foregroundStyle(.white)
-                        .multilineTextAlignment(.center)
-                    
-                    Text("Enable notifications to get timely tips and replies that boost your conversations.")
-                        .font(.system(size: 16))
-                        .foregroundStyle(.secondary)
-                        .multilineTextAlignment(.center)
-                        .frame(maxWidth: 320)
-                        .padding(.top, 4)
-                }
-                .padding(.horizontal, 16)
-                
+            case .permissionNotifications: PermissionNotification()
+
             case let .question(title, subtitle, variants):
                 QuestionTemplate(title: title, subtext: subtitle, variants: variants)  {variant in
                     viewModel.next()
