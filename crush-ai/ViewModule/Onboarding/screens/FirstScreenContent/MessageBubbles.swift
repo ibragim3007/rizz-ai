@@ -66,14 +66,14 @@ struct MessageBubbles: View {
         withAnimation(.spring(response: 0.5, dampingFraction: 0.85, blendDuration: 0.2)) {
             showFirst = true
         }
-        try? await Task.sleep(nanoseconds: 250_000_000)
+        try? await Task.sleep(nanoseconds: 350_000_000)
         
         withAnimation(.spring(response: 0.5, dampingFraction: 0.85, blendDuration: 0.2)) {
             showSecond = true
         }
-        try? await Task.sleep(nanoseconds: 250_000_000)
+        try? await Task.sleep(nanoseconds: 450_000_000)
         
-        withAnimation(.spring(response: 0.5, dampingFraction: 0.85, blendDuration: 0.2)) {
+        withAnimation(.spring(response: 0.6, dampingFraction: 1, blendDuration: 0.5)) {
             showThird = true
         }
     }

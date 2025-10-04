@@ -18,22 +18,20 @@ struct OnboardingStepView: View {
             switch kind {
             case let .feature(title, highlightText, subtitle, _):
                 VStack(spacing: 0) {
-                    // Иллюстрация/мок телефона
                     if let illustration = illustration {
                         illustration
                     }
-                    
                     Spacer()
                     
-//                    if !imageName.isEmpty {
-//                        Image(imageName)
-//                            .resizable()
-//                            .scaledToFit()
-//                            .frame(maxWidth: 320)
-//                            .shadow(color: AppTheme.primary.opacity(0.3), radius: 24, x: 0, y: 12)
-//                            .accessibilityHidden(true)
-//                    }
-//              
+                    //                    if !imageName.isEmpty {
+                    //                        Image(imageName)
+                    //                            .resizable()
+                    //                            .scaledToFit()
+                    //                            .frame(maxWidth: 320)
+                    //                            .shadow(color: AppTheme.primary.opacity(0.3), radius: 24, x: 0, y: 12)
+                    //                            .accessibilityHidden(true)
+                    //                    }
+                    //
                     VStack(spacing: 10) {
                         VStack {
                             Text(title)
@@ -60,6 +58,10 @@ struct OnboardingStepView: View {
                     .padding(.horizontal, 16)
                 }
                 
+//            case .question:
+//                VStack { QuestionTemplate() }
+//                
+//                
             case .permissionNotifications:
                 VStack(spacing: 12) {
                     Image(systemName: "bell.badge.fill")
@@ -81,6 +83,9 @@ struct OnboardingStepView: View {
                         .padding(.top, 4)
                 }
                 .padding(.horizontal, 16)
+                
+            case let .question(title, subtitle, variants):
+                QuestionTemplate()
             }
             
             Spacer(minLength: 0)

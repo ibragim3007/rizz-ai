@@ -26,11 +26,12 @@ final class OnboardingViewModel: ObservableObject {
             illustrationKey: "MessageBubbles"
         ),
         .init(kind: .feature(
-            title: "Not Getting Enough",
-            highlightText: "Replies?",
-            subtitle: "Messages getting ignored? Let us craft standout replies—no more being left on read!",
+            title: "Your First Message Is",
+            highlightText: "Everything",
+            subtitle: "Over 60% of matches never get pass that crucial opener. Don't let yours fall flat",
             imageName: "phone.mock"
-        ))
+        )),
+        .init(kind: .question(title: "What's your age?", subtitle: "Let us personalize your experiance", variants: ["Under 18", "18-22", "22-31", "32-41", "41-51", "51-56", "over 56"]))
     ]
     
     var isLast: Bool { currentIndex == steps.count - 1 }

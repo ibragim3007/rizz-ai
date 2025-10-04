@@ -49,7 +49,7 @@ struct MessageBubble: View {
             if let badgeCount {
                 BadgeView(text: "+\(badgeCount)")
                     .frame(width: badgeSize, height: badgeSize)
-                    .offset(x: 10, y: -10) // немного выступает за край
+                    .offset(x: 5, y: -5) // немного выступает за край
                     .transition(.scale.combined(with: .opacity))
                     .accessibilityLabel(Text("\(badgeCount) new messages"))
             }
