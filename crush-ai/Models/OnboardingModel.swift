@@ -12,7 +12,7 @@ enum OnboardingStepKind: Equatable {
     case feature(title: String, highlightText: String, subtitle: String, imageName: String)
     case question(title: String, subtitle: String, variants: [String])
     case permissionNotifications
-    case smallLoader (title: String)
+    case smallLoader (title: String, duration: Int)
 }
 
 struct OnboardingStep: Identifiable, Equatable {

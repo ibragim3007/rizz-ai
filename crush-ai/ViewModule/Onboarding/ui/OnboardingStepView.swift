@@ -21,6 +21,11 @@ struct OnboardingStepView: View {
                 FeatureUI(title: title, highlightText: highlightText, subtitle: subtitle, imageName: imageName, illustration: illustration)
                 
             case .permissionNotifications: PermissionNotification()
+            
+            case let .smallLoader(title, duration):
+                SmallLoader(title: title, duration: TimeInterval(duration)) {
+                    viewModel.next()
+                }
 
             case let .question(title, subtitle, variants):
                 QuestionTemplate(title: title, subtext: subtitle, variants: variants)  {variant in

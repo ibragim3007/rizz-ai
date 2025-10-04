@@ -12,18 +12,18 @@ struct OnboardingView: View {
     @StateObject var viewModel = OnboardingViewModel()
     @AppStorage("hasSeenOnboarding") private var hasSeenOnboarding: Bool = false
     
-    
     var body: some View {
         ZStack {
             OnboardingBackground
             VStack(spacing: 7) {
-                OnboardingHeader(viewModel: viewModel).padding(.horizontal, 24)
+//                OnboardingHeader(viewModel: viewModel).padding(.horizontal, 24)
                 OnboardingPager(viewModel: viewModel)
                 PageIndicator(viewModel: viewModel)
                 
-                if case .question = viewModel.getCurrentPage().kind {
+                switch viewModel.getCurrentPage().kind {
+                case .question, .smallLoader:
                     EmptyView()
-                } else {
+                default:
                     footerButton.padding(.horizontal, 24)
                 }
             }
@@ -51,6 +51,5 @@ struct OnboardingView: View {
             }
         }
     }
-    
     
 }

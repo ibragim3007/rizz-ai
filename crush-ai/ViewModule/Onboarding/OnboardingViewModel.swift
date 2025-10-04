@@ -41,7 +41,7 @@ final class OnboardingViewModel: ObservableObject {
 
         .init(kind: .question(title: "What’s your biggest roadblock in chats?", subtitle: "", variants: ["🤔 I don’t know what to write first", "💭 I get stuck after they reply", "🥱 My questions are boring", "☕️ I move to a date too late" ,"🛟 Other"])),
         
-        .init(kind: .smallLoader(title: "Analyzing your info"))
+            .init(kind: .smallLoader(title: "Analyzing your info", duration: 6))
     ]
     
     func getCurrentPage() -> OnboardingStep {
