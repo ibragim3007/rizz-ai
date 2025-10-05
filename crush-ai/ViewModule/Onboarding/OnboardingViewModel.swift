@@ -17,9 +17,9 @@ final class OnboardingViewModel: ObservableObject {
     @Published var steps: [OnboardingStep] = [
         .init(
             kind: .feature(
-                title: "Not Getting Enough",
-                highlightText: "Replies?",
-                subtitle: "Messages getting ignored? Let us craft standout replies—no more being left on read!",
+                title: "Tired of being",
+                highlightText: "left on read?",
+                subtitle: "Keep the energy up with replies that actually move things forward",
                 imageName: ""
             ),
             illustration: AnyView(MessageBubbles()),
@@ -29,7 +29,7 @@ final class OnboardingViewModel: ObservableObject {
         .init(kind: .feature(
             title: "Your First Message Is",
             highlightText: "Everything",
-            subtitle: "Over 60% of matches never get pass that crucial opener. Don't let yours fall flat",
+            subtitle: "Open with a line that sounds like you and gets a real reply.",
             imageName: "",
         ), illustration: AnyView(SecondScreenContent())),
 
