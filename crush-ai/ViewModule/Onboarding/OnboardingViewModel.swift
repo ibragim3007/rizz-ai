@@ -23,7 +23,7 @@ final class OnboardingViewModel: ObservableObject {
         .init(kind: .question(title: "How many of your chats get a reply?", subtitle: "", variants: ["💔 Not event 1", "😐 1-3", "🥉 4-6", "🥈 7-12" ,"🥇 13+"])),
         .init(kind: .question(title: "What’s your biggest roadblock in chats?", subtitle: "", variants: ["🤔 First line?", "💭 Stuck after reply", "🥱 Boring questions", "☕️ Date too late" ,"🛟 Other"])),
         
-        .init(kind: .smallLoader(title: "Analyzing your info", duration: 6))
+        .init(kind: .smallLoader(title: "Analyzing your info", duration: 7))
     ]
     
     func getCurrentPage() -> OnboardingStep {
