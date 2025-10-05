@@ -18,7 +18,7 @@ struct SmallLoader: View {
     @State private var ticker: Task<Void, Never>?
 
     // Частицы для «живости»
-    @State private var particles: [Particle] = Particle.make(count: 18)
+    @State private var particles: [Particle] = Particle.make(count: 16)
 
     init(
         title: String = "Analyzing your answers...",
@@ -72,21 +72,21 @@ struct SmallLoader: View {
 
                     if t >= 1.0 {
                         await MainActor.run {
-                            withAnimation(.easeOut(duration: 0.25)) {
+                            withAnimation(.easeInOut(duration: 1.15)) {
                                 progress = 1.0
                             }
                         }
                         break
                     } else {
                         // Небольшие случайные шажки и паузы — «живая» анимация
-                        let delay = Double.random(in: 0.05...0.18)
-                        let maxStep = 0.10
+                        let delay = Double.random(in: 0.2...0.45)
+                        let maxStep = 0.20
                         let minStep = 0.025
                         let step = CGFloat(Double.random(in: minStep...maxStep))
                         let nextValue = min(CGFloat(target), progress + step)
 
                         await MainActor.run {
-                            withAnimation(.easeOut(duration: delay)) {
+                            withAnimation(.easeInOut(duration: delay)) {
                                 progress = nextValue
                             }
                         }
@@ -114,7 +114,7 @@ struct SmallLoader: View {
 
     // Нелинейная кривая: ease-out (кубическая)
     private func easeOutCubic(_ t: Double) -> Double {
-        1 - pow(1 - t, 3)
+        1 - pow(1 - t, 2)
     }
 }
 
@@ -229,7 +229,7 @@ private struct CapsuleProgressBar: View {
                         .fill(
                             LinearGradient(
                                 colors: [
-                                    .white.opacity(0.35),
+                                    .white.opacity(0.25),
                                     .white.opacity(0.05)
                                 ],
                                 startPoint: .top,
@@ -271,14 +271,14 @@ private struct ShimmerStripe: View {
             // Период движения
             let period: Double = 1.8
             let phase = t.truncatingRemainder(dividingBy: period) / period
-            let stripeWidth = height * 1.2
+            let stripeWidth = height * 1.6
             let travel = width + stripeWidth * 2
             let x = -stripeWidth + travel * phase
 
             LinearGradient(
                 colors: [
                     .white.opacity(0.0),
-                    .white.opacity(0.85),
+                    .white.opacity(0.75),
                     .white.opacity(0.0)
                 ],
                 startPoint: .leading,
@@ -324,7 +324,7 @@ private struct ParticlesLayer: View {
                     var dot = Path(ellipseIn: rect)
 
                     // Лёгкое мерцание
-                    let alpha = 0.25 + 0.35 * (sin(t * (0.8 + p.speed) + p.seed) + 1) / 2
+                    let alpha = 0.55 + 0.75 * (sin(t * (0.8 + p.speed) + p.seed) + 1) / 2
                     let color = AppTheme.primaryLight
                         .opacity(alpha)
 
