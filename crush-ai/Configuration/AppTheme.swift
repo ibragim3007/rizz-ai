@@ -12,12 +12,15 @@ import SwiftUI
 enum AppTheme {
     // Задай здесь любой цвет бренда — всё остальное адаптируется
     static let primaryBase: Color = Color("Primary") // фиолетовый по умолчанию
+    static let backgroundBase: Color = Color("Background")
     
     // Производные оттенки и эффекты
     static var primary: Color { primaryBase }
     static var primaryLight: Color { primaryBase.tune(saturation: -0.15, brightness: 0.20) }
     static var primaryDark: Color { primaryBase.tune(saturation: 0.10, brightness: -0.25) }
     static var glow: Color { primaryBase.tune(saturation: 0.00, brightness: 0.35) }
+    
+    static var background: Color { backgroundBase }
     
     // Градиенты
     static var primaryGradient: LinearGradient {

@@ -21,6 +21,9 @@ struct OnboardingStepView: View {
                 FeatureUI(title: title, highlightText: highlightText, subtitle: subtitle, imageName: imageName, illustration: illustration)
                 
             case .permissionNotifications: PermissionNotification()
+                
+            case let .rateUsPage(title, subtext, icon):
+                RateUsUI(title: title, subtext: subtext, icon: icon)
             
             case let .smallLoader(title, duration):
                 SmallLoader(title: title, duration: TimeInterval(duration)) {

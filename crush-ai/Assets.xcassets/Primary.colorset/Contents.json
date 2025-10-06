@@ -2,7 +2,7 @@
   "colors" : [
     {
       "color" : {
-        "platform" : "watchos",
+        "platform" : "tvos",
         "reference" : "systemPurpleColor"
       },
       "idiom" : "universal"

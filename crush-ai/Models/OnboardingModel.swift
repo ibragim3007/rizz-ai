@@ -12,6 +12,7 @@ enum OnboardingStepKind: Equatable {
     case feature(title: String, highlightText: String, subtitle: String, imageName: String)
     case question(title: String, subtitle: String, variants: [String])
     case permissionNotifications
+    case rateUsPage(title: String, subtext: String, icon: String)
     case smallLoader (title: String, duration: Int)
 }
 

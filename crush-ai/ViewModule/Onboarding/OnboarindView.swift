@@ -30,6 +30,7 @@ struct OnboardingView: View {
                     .animation(.spring(response: 0.45, dampingFraction: 0.9), value: showFooter)
             }
         }
+        .background(AppTheme.background)
         .preferredColorScheme(.dark)
         .animation(.easeInOut, value: viewModel.currentIndex)
         .accessibilityElement(children: .contain)
