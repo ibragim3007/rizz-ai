@@ -18,7 +18,7 @@ struct OnboardingView: View {
             VStack(spacing: 7) {
 //                OnboardingHeader(viewModel: viewModel).padding(.horizontal, 24)
                 OnboardingPager(viewModel: viewModel)
-                PageIndicator(viewModel: viewModel)
+//                PageIndicator(viewModel: viewModel)
                 
                 // Кнопку не удаляем — плавно прячем/показываем
                 footerButton

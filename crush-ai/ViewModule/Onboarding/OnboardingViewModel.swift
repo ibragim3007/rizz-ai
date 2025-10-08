@@ -18,10 +18,10 @@ final class OnboardingViewModel: ObservableObject {
         .init(kind: .feature( title: "Tired of being", highlightText: "left on read?", subtitle: "Keep the energy up with replies that actually move things forward", imageName: "" ), illustration: AnyView(MessageBubbles()), illustrationKey: "MessageBubbles"),
         .init(kind: .feature(title: "Your First Message Is", highlightText: "Everything", subtitle: "Open with a line that sounds like you and gets a real reply.", imageName: "", ), illustration: AnyView(SecondScreenContent())),
         .init(kind: .rateUsPage(title: "Quick check", subtext: "How useful does this look now?", icon: "app-icon")),
-        .init(kind: .question(title: "What's your age?", subtitle: "We’ll tune tone and topics to you.", variants: ["I’m under 18","18-24", "25–34", "35–44", "45–54", "55+"])),
-        .init(kind: .question(title: "I'm looking for...", subtitle: "This question will help us determine how to help you ideally", variants: ["🏡 Serious", "🤪 Casual", "💍 Marriage", "😈 Flirt" ,"🤔 Not decided"])),
+        .init(kind: .question(title: "What's your age?", subtitle: "I’ll adjust your tone and flirty level", variants: ["I’m under 18","18-24", "25–34", "35–44", "45–54", "55+"])),
+        .init(kind: .question(title: "What’s your goal here?", subtitle: "This question will help us determine how to help you ideally", variants: ["💞 Real connection", "😜 Fun & light", "💎 Long-term", "😈 Flirty only" ,"🤔 Not sure yet"])),
         .init(kind: .feature(title: "Make Them Feel", highlightText: "Seen", subtitle: "Paste their message. Get the perfect reply in seconds.", imageName: "", ), illustration: AnyView(BeforeAfterContent())),
-        .init(kind: .question(title: "How many of your chats get a reply?", subtitle: "", variants: ["💔 Not event 1", "😐 1-3", "🥉 4-6", "🥈 7-12" ,"🥇 13+"])),
+        .init(kind: .question(title: "How many of your chats get a reply?", subtitle: "", variants: ["💔 Almost never", "😕 1–3 replies", "🙂 4–6 replies", "😎 7–12 replies" ,"🏆 13+ replies"])),
         .init(kind: .question(title: "What’s your biggest roadblock in chats?", subtitle: "", variants: ["🤔 First line?", "💭 Stuck after reply", "🥱 Boring questions", "☕️ Date too late" ,"🛟 Other"])),
         
         .init(kind: .smallLoader(title: "Analyzing your info", duration: 7))
