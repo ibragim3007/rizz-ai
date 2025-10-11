@@ -23,17 +23,25 @@ struct Header: View {
             
             Spacer(minLength: 12)
             
-            Button {
-                UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                self.showSettings = true
-            } label: {
-                Image(systemName: "gearshape")
-                    .font(.system(size: 18, weight: .semibold))
-                    .foregroundStyle(.white.opacity(0.8))
-            }
-            .buttonStyle(GlassButtonStyle())
-            .accessibilityLabel("Open settings")
+            SettingsButton(showSettings: showSettings)
         }
         
+    }
+}
+
+
+struct SettingsButton: View {
+    @State var showSettings = false
+
+    var body: some View {
+        Button {
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+            self.showSettings = true
+        } label: {
+            Image(systemName: "gearshape")
+                .font(.system(size: 18, weight: .semibold))
+                .foregroundStyle(.white.opacity(0.8))
+        }
+        .accessibilityLabel("Open settings")
     }
 }
