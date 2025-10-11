@@ -22,6 +22,7 @@ struct Home: View {
                     }
                 }
                 .padding(.horizontal, 20)
+                .padding(.vertical, 30)
             }
             .scrollIndicators(.hidden)
             .scrollEdgeEffectStyle(.soft, for: .top)
@@ -29,13 +30,18 @@ struct Home: View {
             .toolbar {
                 ToolbarItem (placement: .topBarLeading) { Logo() }.sharedBackgroundVisibility(.hidden)
                 ToolbarItem { SettingsButton(showSettings: showSettings) }
-                ToolbarItem(placement: .bottomBar) {
-                    Button(action: { print("uoload screenshot button") }) {
-                        Text("Upload Screenshot").fontWeight(.bold)
+                ToolbarItemGroup(placement: .bottomBar) {
+                    Spacer(minLength: 0)
+                    PrimaryCTAButton(
+                        title: "Upload Screenshot",
+                        height: 60,
+                        font: .system(size: 20, weight: .semibold, design: .rounded),
+                        fullWidth: true
+                    ) {
+                        print("upload screenshot button")
                     }
-                    .frame(width: 250)
-                }
-                
+                    .padding(.horizontal, 10)
+                }.sharedBackgroundVisibility(.hidden)
             }
         }
     }
