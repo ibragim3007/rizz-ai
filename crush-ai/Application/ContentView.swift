@@ -8,9 +8,17 @@
 import SwiftUI
 
 struct ContentView: View {
+    
+    @AppStorage("hasSeenOnboarding") private var hasSeenOnboarding = false
+    
     var body: some View {
-        OnboardingView()
-            .preferredColorScheme(.dark)
+        
+        if (hasSeenOnboarding) {
+            MainView()
+        } else {
+            OnboardingView()
+                .preferredColorScheme(.dark)
+        }
     }
 }
 

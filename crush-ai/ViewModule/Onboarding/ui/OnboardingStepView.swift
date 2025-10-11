@@ -11,6 +11,7 @@ struct OnboardingStepView: View {
     @ObservedObject var viewModel : OnboardingViewModel
     let kind: OnboardingStepKind
     let illustration: AnyView?
+    @AppStorage("hasSeenOnboarding") private var hasSeenOnboarding: Bool = false
     
     var body: some View {
         VStack(spacing: 20) {
@@ -28,7 +29,8 @@ struct OnboardingStepView: View {
             case let .smallLoader(title, duration):
                 SmallLoader(title: title, duration: TimeInterval(duration)) {
                     UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                    viewModel.next()
+                    // Завершаем онбординг по окончании загрузки
+                    hasSeenOnboarding = true
                 }
 
             case let .question(title, subtitle, variants):
@@ -42,3 +44,4 @@ struct OnboardingStepView: View {
         }
     }
 }
+
