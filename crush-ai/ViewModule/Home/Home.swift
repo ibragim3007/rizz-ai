@@ -23,23 +23,12 @@ struct Home: View {
                 }
                 .padding(.horizontal, 20)
             }
+            .scrollIndicators(.hidden)
             .scrollEdgeEffectStyle(.soft, for: .top)
+            .scrollEdgeEffectStyle(.soft, for: .bottom)
             .toolbar {
-                ToolbarItem (placement: .topBarLeading) {
-                    Image("app-icon")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 40, height: 40)
-                        .cornerRadius(50)
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 50, style: .circular)
-                                .stroke(AppTheme.primary.opacity(0.5), lineWidth: 1)
-                        }
-                }.sharedBackgroundVisibility(.hidden)
-                ToolbarItem {
-                    SettingsButton(showSettings: showSettings)
-                }
-                
+                ToolbarItem (placement: .topBarLeading) { Logo() }.sharedBackgroundVisibility(.hidden)
+                ToolbarItem { SettingsButton(showSettings: showSettings) }
                 ToolbarItem(placement: .bottomBar) {
                     Button(action: { print("uoload screenshot button") }) {
                         Text("Upload Screenshot").fontWeight(.bold)
@@ -58,13 +47,8 @@ private struct GridTilePlaceholder: View {
     var body: some View {
         GeometryReader { geo in
             let size = geo.size
-            
             RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .fill(.ultraThinMaterial)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 16, style: .continuous)
-                        .fill(AppTheme.primary.opacity(0.12))
-                )
                 .overlay(
                     RoundedRectangle(cornerRadius: 16, style: .continuous)
                         .stroke(
@@ -76,17 +60,15 @@ private struct GridTilePlaceholder: View {
                             lineWidth: 1
                         )
                 )
-                .shadow(color: AppTheme.primary.opacity(0.22), radius: 10, x: 0, y: 6)
-                .overlay(alignment: .bottomLeading) {
-                    // Небольшая маркировка/номер (можно убрать)
+                .overlay(alignment: .bottom) {
                     Text("\(index + 1)")
                         .font(.system(size: 12, weight: .semibold, design: .rounded))
                         .foregroundStyle(.white.opacity(0.6))
                         .padding(6)
                 }
-                .frame(width: size.width, height: size.width) // квадрат
+                .frame(width: size.width, height: size.height) // квадрат
         }
-        .aspectRatio(1, contentMode: .fit)
+        .aspectRatio(0.6, contentMode: .fit)
     }
 }
 
