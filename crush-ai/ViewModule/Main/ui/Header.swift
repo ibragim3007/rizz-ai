@@ -15,9 +15,9 @@ struct Header: View {
                 .resizable()
                 .scaledToFit()
                 .frame(width: 40, height: 40)
-                .clipShape(RoundedRectangle.init(cornerRadius: 10, style: .continuous))
+                .clipShape(RoundedRectangle.init(cornerRadius: 20, style: .continuous))
                 .overlay {
-                    RoundedRectangle(cornerRadius: 10)
+                    RoundedRectangle(cornerRadius: 20)
                         .stroke(AppTheme.primary.opacity(0.5), lineWidth: 1)
                 }
             
@@ -29,17 +29,9 @@ struct Header: View {
             } label: {
                 Image(systemName: "gearshape")
                     .font(.system(size: 18, weight: .semibold))
-                    .foregroundStyle(.white)
-                    .frame(width: 40, height: 40)
-                    .background(
-                        Circle()
-                            .fill(.ultraThinMaterial)
-                            .overlay(
-                                Circle().strokeBorder(.white.opacity(0.18), lineWidth: 1)
-                            )
-                            .shadow(color: AppTheme.glow.opacity(0.35), radius: 12, x: 0, y: 6)
-                    )
+                    .foregroundStyle(.white.opacity(0.8))
             }
+            .buttonStyle(GlassButtonStyle())
             .accessibilityLabel("Open settings")
         }
         

@@ -13,14 +13,7 @@ struct MainView: View {
 
     var body: some View {
         ZStack {
-            // Background
             OnboardingBackground.opacity(0.5)
-
-            VStack(spacing: 0) {
-                Header (showSettings: showSettings)
-                    .padding(.horizontal, 20)
-                    .padding(.top, 8)
-
                 ScrollView {
                     LazyVGrid(columns: columns, spacing: 12) {
                         ForEach(0..<30, id: \.self) { index in
@@ -28,10 +21,7 @@ struct MainView: View {
                         }
                     }
                     .padding(.horizontal, 20)
-                    .padding(.vertical, 16)
-                    .padding(.bottom, 120) // чтобы контент не прятался под кнопкой
                 }
-            }
         }
         // Кнопка поверх контента, внутри safe area
         .safeAreaInset(edge: .bottom) {
@@ -53,6 +43,8 @@ struct MainView: View {
     }
 }
 
+
+
 // Плейсхолдер карточки в сетке
 private struct GridTilePlaceholder: View {
     let index: Int
@@ -65,7 +57,7 @@ private struct GridTilePlaceholder: View {
                 .fill(.ultraThinMaterial)
                 .overlay(
                     RoundedRectangle(cornerRadius: 16, style: .continuous)
-                        .fill(AppTheme.primaryDark.opacity(0.12))
+                        .fill(AppTheme.primary.opacity(0.12))
                 )
                 .overlay(
                     RoundedRectangle(cornerRadius: 16, style: .continuous)
@@ -78,7 +70,7 @@ private struct GridTilePlaceholder: View {
                             lineWidth: 1
                         )
                 )
-                .shadow(color: AppTheme.glow.opacity(0.22), radius: 10, x: 0, y: 6)
+                .shadow(color: AppTheme.primary.opacity(0.22), radius: 10, x: 0, y: 6)
                 .overlay(alignment: .bottomLeading) {
                     // Небольшая маркировка/номер (можно убрать)
                     Text("\(index + 1)")
@@ -91,6 +83,7 @@ private struct GridTilePlaceholder: View {
         .aspectRatio(1, contentMode: .fit)
     }
 }
+
 
 // Заглушка настроек
 private struct SettingsPlaceholderView: View {
