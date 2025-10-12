@@ -65,7 +65,7 @@ struct ScreenShotItem: View {
                     } else if let name = imageName {
                         Image(name)
                             .resizable()
-                            .scaledToFill()
+                            .scaledToFit()
                             .frame(width: size.width, height: size.height)
                             .clipShape(
                                 RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
