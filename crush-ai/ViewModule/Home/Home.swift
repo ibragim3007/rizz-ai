@@ -16,9 +16,9 @@ struct Home: View {
             // Background
             OnboardingBackground.opacity(0.5)
             ScrollView {
-                LazyVGrid(columns: columns, spacing: 12) {
+                LazyVGrid(columns: columns, spacing: 16) {
                     ForEach(0..<30, id: \.self) { index in
-                        GridTilePlaceholder(index: index)
+                        ScreenShotsGrid(index: index, imagePath: "sample-screen", title: "Karla")
                     }
                 }
                 .padding(.horizontal, 20)
@@ -47,36 +47,6 @@ struct Home: View {
     }
 }
 
-private struct GridTilePlaceholder: View {
-    let index: Int
-    
-    var body: some View {
-        GeometryReader { geo in
-            let size = geo.size
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .fill(.ultraThinMaterial)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 16, style: .continuous)
-                        .stroke(
-                            LinearGradient(
-                                colors: [.white.opacity(0.26), .white.opacity(0.10)],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            ),
-                            lineWidth: 1
-                        )
-                )
-                .overlay(alignment: .bottom) {
-                    Text("\(index + 1)")
-                        .font(.system(size: 12, weight: .semibold, design: .rounded))
-                        .foregroundStyle(.white.opacity(0.6))
-                        .padding(6)
-                }
-                .frame(width: size.width, height: size.height) // квадрат
-        }
-        .aspectRatio(0.6, contentMode: .fit)
-    }
-}
 
 
 // Заглушка настроек
