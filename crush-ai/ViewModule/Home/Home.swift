@@ -10,7 +10,7 @@ import PhotosUI
 import SwiftData
 
 struct Home: View {
-    @Environment(\.modelContext) private var modelContext
+
     // Диалоги теперь подтягиваем из SwiftData, чтобы список обновлялся сам
     @Query(sort: \DialogEntity.updatedAt, order: .reverse) private var dialogs: [DialogEntity]
     @StateObject var vmHome = HomeViewModel()
@@ -52,7 +52,7 @@ struct Home: View {
                         font: .system(size: 20, weight: .semibold, design: .rounded),
                         fullWidth: true
                     ) {
-                        uploadScreenshot()
+                        vmHome.uploadScreenshot()
                     }
                     .padding(.horizontal, 10)
                 }
@@ -69,75 +69,11 @@ struct Home: View {
         // Обработка выбранного элемента
         .onChange(of: vmHome.selectedPhotoItem) { _, newItem in
             guard let item = newItem else { return }
-            Task { await handlePickedPhoto(item) }
+            Task { await vmHome.handlePickedPhoto(item) }
         }
     }
 
-    // MARK: - Upload Screenshot Flow
 
-    private func uploadScreenshot() {
-        #if canImport(UIKit)
-        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-        #endif
-        vmHome.showPhotoPicker = true
-    }
-
-    @MainActor
-    private func handlePickedPhoto(_ item: PhotosPickerItem) async {
-        do {
-            // Загружаем данные изображения
-            guard let data = try await item.loadTransferable(type: Data.self) else { return }
-
-            // Сохраняем в файловую систему (Documents)
-            let fileURL = try saveImageDataToDocuments(data: data, suggestedName: await suggestedFilename(from: item))
-
-            // Создаем ImageEntity
-            let imageEntity = ImageEntity(id: UUID().uuidString, localUrl: fileURL.path, remoteUrl: nil, createdAt: .now)
-
-            // Создаем DialogEntity (подставим простой userId; замените на свой источник при наличии)
-            let dialog = DialogEntity(
-                id: UUID().uuidString,
-                userId: "local-user",
-                title: "Unnamed",
-                context: nil,
-                summary: nil,
-                elements: [],
-                createdAt: .now,
-                updatedAt: .now
-            )
-            dialog.image = imageEntity
-
-            // Сохраняем в SwiftData
-            modelContext.insert(imageEntity)
-            modelContext.insert(dialog)
-            try modelContext.save()
-
-        } catch {
-            print("Failed to handle picked photo: \(error)")
-        }
-    }
-
-    private func saveImageDataToDocuments(data: Data, suggestedName: String?) throws -> URL {
-        let fm = FileManager.default
-        let docs = try fm.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
-        let baseName = (suggestedName?.isEmpty == false ? suggestedName! : UUID().uuidString)
-        // По умолчанию используем .jpg
-        var targetURL = docs.appendingPathComponent(baseName).appendingPathExtension("jpg")
-
-        // Если файл существует — добавляем суффикс
-        var counter = 1
-        while fm.fileExists(atPath: targetURL.path) {
-            targetURL = docs.appendingPathComponent("\(baseName)-\(counter)").appendingPathExtension("jpg")
-            counter += 1
-        }
-
-        try data.write(to: targetURL, options: .atomic)
-        return targetURL
-    }
-
-    private func suggestedFilename(from item: PhotosPickerItem) async -> String? {
-        await item.itemIdentifier?.split(separator: "/").last.map(String.init)
-    }
 }
 
 
