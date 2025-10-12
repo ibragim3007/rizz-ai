@@ -31,14 +31,28 @@ struct Home: View {
             }
 
             ScrollView {
-                LazyVGrid(columns: columns, spacing: 16) {
-                    ForEach(dialogs, id: \.self) { dialogGroup in
-                        NavigationLink(destination: DialogGroupView(dialogGroup: dialogGroup )) {
-                            ScreenShotItem(imageURL: dialogGroup.cover?.localFileURL, title: dialogGroup.title)
+                LazyVStack(alignment: .leading, spacing: 24) {
+                    ForEach(sections, id: \.title) { section in
+                        if !section.items.isEmpty {
+                            Section {
+                                LazyVGrid(columns: columns, spacing: 16) {
+                                    ForEach(section.items, id: \.self) { dialogGroup in
+                                        NavigationLink(destination: DialogGroupView(dialogGroup: dialogGroup )) {
+                                            ScreenShotItem(imageURL: dialogGroup.cover?.localFileURL, title: dialogGroup.title)
+                                        }
+                                    }
+                                }
+                                .padding(.horizontal, 20)
+                                .padding(.top, 4)
+                            } header: {
+                                Text(section.title)
+                                    .font(.system(size: 20, weight: .heavy, design: .rounded))
+                                    .foregroundStyle(.white.opacity(0.85))
+                                    .padding(.horizontal, 20)
+                            }
                         }
                     }
                 }
-                .padding(.horizontal, 20)
                 .padding(.vertical, 30)
             }
             .scrollIndicators(.hidden)
@@ -101,7 +115,52 @@ private struct EmptyDialogsView: View {
     }
 }
 
+// MARK: - Sectioning (по аналогии с DialogGroupView)
+
+private struct GroupSection {
+    let title: String
+    let items: [DialogGroupEntity]
+}
+
+private extension Home {
+    var sections: [GroupSection] {
+        let items = dialogs.sorted { $0.updatedAt > $1.updatedAt }
+        return makeSections(from: items)
+    }
+
+    func makeSections(from groups: [DialogGroupEntity]) -> [GroupSection] {
+        var today: [DialogGroupEntity] = []
+        var yesterday: [DialogGroupEntity] = []
+        var last7: [DialogGroupEntity] = []
+        var older: [DialogGroupEntity] = []
+
+        let cal = Calendar.current
+        let now = Date()
+
+        for g in groups {
+            let date = g.updatedAt
+            if cal.isDateInToday(date) {
+                today.append(g)
+            } else if cal.isDateInYesterday(date) {
+                yesterday.append(g)
+            } else if let diff = cal.dateComponents([.day], from: cal.startOfDay(for: date), to: cal.startOfDay(for: now)).day, diff < 7 {
+                last7.append(g)
+            } else {
+                older.append(g)
+            }
+        }
+
+        var result: [GroupSection] = []
+        if !today.isEmpty { result.append(.init(title: NSLocalizedString("Today", comment: ""), items: today)) }
+        if !yesterday.isEmpty { result.append(.init(title: NSLocalizedString("Yesterday", comment: ""), items: yesterday)) }
+        if !last7.isEmpty { result.append(.init(title: NSLocalizedString("Previous 7 Days", comment: ""), items: last7)) }
+        if !older.isEmpty { result.append(.init(title: NSLocalizedString("Older", comment: ""), items: older)) }
+        return result
+    }
+}
+
 #Preview {
-    MainView()
+    Home()
         .preferredColorScheme(.dark)
 }
+
