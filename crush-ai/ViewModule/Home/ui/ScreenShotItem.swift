@@ -8,20 +8,30 @@
 import SwiftUI
 
 struct ScreenShotItem: View {
-    let index: Int
     let id: String
-    let imagePath: String?
+    let imageURL: URL?
+    let imageName: String?
     let title: String?
     
     init(
-        index: Int,
         id: String = UUID().uuidString,
         imagePath: String? = nil,
         title: String?
     ) {
-        self.index = index
         self.id = id
-        self.imagePath = imagePath
+        self.imageURL = nil
+        self.imageName = imagePath
+        self.title = title
+    }
+    
+    init(
+        id: String = UUID().uuidString,
+        imageURL: URL? = nil,
+        title: String?
+    ) {
+        self.id = id
+        self.imageURL = imageURL
+        self.imageName = nil
         self.title = title
     }
     
@@ -33,8 +43,8 @@ struct ScreenShotItem: View {
             RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                 .fill(.ultraThinMaterial)
                 .overlay(alignment: .center) {
-                    if let path = imagePath {
-                        Image(path)
+                    if let url = imageURL, let image = loadImage(from: url) {
+                        image
                             .resizable()
                             .scaledToFill()
                             .frame(width: size.width, height: size.height)
@@ -43,12 +53,33 @@ struct ScreenShotItem: View {
                             )
                             .overlay {
                                 RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                                    .stroke( LinearGradient(
-                                        colors: [.white.opacity(0.25), .white.opacity(0.1)],
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    ),
-                                             lineWidth: 1)
+                                    .stroke(
+                                        LinearGradient(
+                                            colors: [.white.opacity(0.25), .white.opacity(0.1)],
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        ),
+                                        lineWidth: 1
+                                    )
+                            }
+                    } else if let name = imageName {
+                        Image(name)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: size.width, height: size.height)
+                            .clipShape(
+                                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                            )
+                            .overlay {
+                                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                                    .stroke(
+                                        LinearGradient(
+                                            colors: [.white.opacity(0.25), .white.opacity(0.1)],
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        ),
+                                        lineWidth: 1
+                                    )
                             }
                     } else {
                         RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
@@ -78,9 +109,23 @@ struct ScreenShotItem: View {
         }
         .aspectRatio(0.618, contentMode: .fit)
     }
+    
+    private func loadImage(from url: URL) -> Image? {
+        #if canImport(UIKit)
+        if let uiImage = UIImage(contentsOfFile: url.path) {
+            return Image(uiImage: uiImage)
+        }
+        #elseif canImport(AppKit)
+        if let nsImage = NSImage(contentsOf: url) {
+            return Image(nsImage: nsImage)
+        }
+        #endif
+        return nil
+    }
 }
 
 
 #Preview {
-    ScreenShotItem(index: 0, imagePath: "sample-screen", title: "Karla from college").preferredColorScheme(.dark)
+    ScreenShotItem(imagePath: "sample-screen", title: "Karla from college").preferredColorScheme(.dark)
 }
+
