@@ -7,8 +7,6 @@
 import SwiftUI
 
 struct Header: View {
-    @State var showSettings = false
-    
     var body: some View {
         HStack(alignment: .center) {
             Image("app-icon")
@@ -23,25 +21,47 @@ struct Header: View {
             
             Spacer(minLength: 12)
             
-            SettingsButton(showSettings: showSettings)
+            SettingsButton(destination: SettingsPlaceholderView())
         }
         
     }
 }
 
-
-struct SettingsButton: View {
-    @State var showSettings = false
-
+struct SettingsButton<Destination: View>: View {
+    var destination: Destination
+    
     var body: some View {
-        Button {
-            UIImpactFeedbackGenerator(style: .light).impactOccurred()
-            self.showSettings = true
-        } label: {
+        NavigationLink(destination: destination) {
             Image(systemName: "gearshape")
                 .font(.system(size: 18, weight: .semibold))
                 .foregroundStyle(.white.opacity(0.8))
         }
+        .simultaneousGesture(TapGesture().onEnded {
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        })
         .accessibilityLabel("Open settings")
+    }
+}
+
+struct SettingsPlaceholderView: View {
+    var body: some View {
+        
+            List {
+                Section("Settings") {
+                    Text("Coming soon")
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .scrollContentBackground(.hidden)
+            .background(
+                LinearGradient(
+                    colors: [AppTheme.backgroundTop, AppTheme.backgroundBottom],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                .ignoresSafeArea()
+            )
+            .navigationTitle("Settings")
+        
     }
 }

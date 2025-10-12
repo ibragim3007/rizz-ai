@@ -27,6 +27,10 @@ enum AppTheme {
         LinearGradient(colors: [primary, primaryLight], startPoint: .topLeading, endPoint: .bottomTrailing)
     }
     
+    static var borderPrimaryGradient: LinearGradient {
+        LinearGradient(colors: [.white.opacity(0.26), .white.opacity(0.10)], startPoint: .topLeading, endPoint: .bottomTrailing)
+    }
+    
     // Фоновые цвета
     static let backgroundTop = Color.black
     static let backgroundBottom = Color(red: 3/255, green: 3/255, blue: 6/255)

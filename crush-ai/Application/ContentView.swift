@@ -15,7 +15,7 @@ struct ContentView: View {
     var body: some View {
         
         if (hasSeenOnboarding) {
-            MainView()
+            MainView().preferredColorScheme(.dark)
         } else {
             OnboardingView()
                 .preferredColorScheme(.dark)

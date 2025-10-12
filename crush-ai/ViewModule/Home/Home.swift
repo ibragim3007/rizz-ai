@@ -10,9 +10,9 @@ import PhotosUI
 import SwiftData
 
 struct Home: View {
-
+    @Environment(\.modelContext) private var modelContext
     // Диалоги теперь подтягиваем из SwiftData, чтобы список обновлялся сам
-    @Query(sort: \DialogEntity.updatedAt, order: .reverse) private var dialogs: [DialogEntity]
+    @Query(sort: \DialogGroupEntity.updatedAt, order: .reverse) private var dialogs: [DialogGroupEntity]
     @StateObject var vmHome = HomeViewModel()
 
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 12, alignment: .top), count: 3)
@@ -32,8 +32,10 @@ struct Home: View {
 
             ScrollView {
                 LazyVGrid(columns: columns, spacing: 16) {
-                    ForEach(dialogs, id: \.self) { dialog in
-                        ScreenShotItem(imageURL: dialog.image?.localFileURL, title: dialog.title)
+                    ForEach(dialogs, id: \.self) { dialogGroup in
+                        NavigationLink(destination: DialogGroupView(dialogGroup: dialogGroup )) {
+                            ScreenShotItem(imageURL: dialogGroup.cover?.localFileURL, title: dialogGroup.title)
+                        }
                     }
                 }
                 .padding(.horizontal, 20)
@@ -44,7 +46,7 @@ struct Home: View {
             .scrollEdgeEffectStyle(.soft, for: .bottom)
             .toolbar {
                 ToolbarItem (placement: .topBarLeading) { Logo() }.sharedBackgroundVisibility(.hidden)
-                ToolbarItem { SettingsButton(showSettings: vmHome.showSettings) }
+                ToolbarItem { SettingsButton(destination: SettingsPlaceholderView()) }
                 ToolbarItem(placement: .bottomBar) {
                     PrimaryCTAButton(
                         title: "Upload Screenshot",
@@ -67,40 +69,21 @@ struct Home: View {
             preferredItemEncoding: .automatic
         )
         // Обработка выбранного элемента
-        .onChange(of: vmHome.selectedPhotoItem) { _, newItem in
+        .onChange(of: vmHome.selectedPhotoItem) { oldItem, newItem in
             guard let item = newItem else { return }
             Task { await vmHome.handlePickedPhoto(item) }
         }
+        // Inject ModelContext after the view appears
+        .onAppear {
+            vmHome.modelContext = modelContext
+        }
     }
-
-
 }
 
 
 
 // Заглушка настроек
-private struct SettingsPlaceholderView: View {
-    var body: some View {
-        NavigationStack {
-            List {
-                Section("Settings") {
-                    Text("Coming soon")
-                        .foregroundStyle(.secondary)
-                }
-            }
-            .scrollContentBackground(.hidden)
-            .background(
-                LinearGradient(
-                    colors: [AppTheme.backgroundTop, AppTheme.backgroundBottom],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-                .ignoresSafeArea()
-            )
-            .navigationTitle("Settings")
-        }
-    }
-}
+
 
 // Пустое состояние диалогов
 private struct EmptyDialogsView: View {

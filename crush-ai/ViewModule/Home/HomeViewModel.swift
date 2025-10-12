@@ -14,14 +14,25 @@ import SwiftData
 @MainActor
 final class HomeViewModel: ObservableObject {
     
-    @Environment(\.modelContext) private var modelContext
-    
     @Published var showSettings = false
     @Published var showPhotoPicker = false
     @Published var selectedPhotoItem: PhotosPickerItem?
     
+    // Allow late injection from the View
+    var modelContext: ModelContext?
+    
+    init() {}
+    
+    convenience init(modelContext: ModelContext) {
+        self.init()
+        self.modelContext = modelContext
+    }
+    
     func handlePickedPhoto(_ item: PhotosPickerItem) async {
         do {
+            // Ensure we have a context
+            guard let ctx = modelContext else { return }
+            
             // Загружаем данные изображения
             guard let data = try await item.loadTransferable(type: Data.self) else { return }
 
@@ -42,12 +53,19 @@ final class HomeViewModel: ObservableObject {
                 createdAt: .now,
                 updatedAt: .now
             )
-            dialog.image = imageEntity
+            
+            let dialogGroup = DialogGroupEntity(
+                id: UUID().uuidString, userId: "local-user", title: "Unnamed"
+            )
+            
+            dialogGroup.dialogs.append(dialog)
+            dialogGroup.cover = imageEntity
 
             // Сохраняем в SwiftData
-            modelContext.insert(imageEntity)
-            modelContext.insert(dialog)
-            try modelContext.save()
+            ctx.insert(imageEntity)
+            ctx.insert(dialog)
+            ctx.insert(dialogGroup)
+            try ctx.save()
 
         } catch {
             print("Failed to handle picked photo: \(error)")
@@ -89,3 +107,4 @@ final class HomeViewModel: ObservableObject {
 
 
 }
+
