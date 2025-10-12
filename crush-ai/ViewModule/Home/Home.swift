@@ -36,8 +36,8 @@ struct Home: View {
                         if !section.items.isEmpty {
                             Section {
                                 LazyVGrid(columns: columns, spacing: 16) {
-                                    ForEach(section.items, id: \.self) { dialogGroup in
-                                        NavigationLink(destination: DialogGroupView(dialogGroup: dialogGroup )) {
+                                    ForEach(section.items, id: \.id) { dialogGroup in
+                                        NavigationLink(destination: DialogGroupView(dialogGroup: dialogGroup)) {
                                             ScreenShotItem(imageURL: dialogGroup.cover?.localFileURL, title: dialogGroup.title)
                                         }
                                     }
@@ -91,6 +91,8 @@ struct Home: View {
         .onAppear {
             vmHome.modelContext = modelContext
         }
+        // Включаем layout-анимации при изменении источника данных
+        .animation(.snappy, value: dialogs)
     }
 }
 
@@ -163,4 +165,3 @@ private extension Home {
     Home()
         .preferredColorScheme(.dark)
 }
-
