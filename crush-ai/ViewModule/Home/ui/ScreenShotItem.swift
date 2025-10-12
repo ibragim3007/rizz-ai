@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct ScreenShotsGrid: View {
+struct ScreenShotItem: View {
     let index: Int
     let id: String
     let imagePath: String?
@@ -67,7 +67,8 @@ struct ScreenShotsGrid: View {
                     Text(title ?? "Unnamed")
                         .font(.system(size: 12, weight: .semibold, design: .rounded))
                         .foregroundStyle(.white)
-                        .padding(5)
+                        .padding(.horizontal, 3)
+                        .padding(.vertical, 7)
                         .frame(width: (size.width - 10))
                         .background(.ultraThickMaterial)
                         .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
@@ -81,5 +82,5 @@ struct ScreenShotsGrid: View {
 
 
 #Preview {
-    ScreenShotsGrid(index: 0, imagePath: "sample-screen", title: "Karla from college").preferredColorScheme(.dark)
+    ScreenShotItem(index: 0, imagePath: "sample-screen", title: "Karla from college").preferredColorScheme(.dark)
 }

@@ -18,7 +18,7 @@ struct Home: View {
             ScrollView {
                 LazyVGrid(columns: columns, spacing: 16) {
                     ForEach(0..<30, id: \.self) { index in
-                        ScreenShotsGrid(index: index, imagePath: "sample-screen", title: "Karla")
+                        ScreenShotItem(index: index, imagePath: "sample-screen", title: "Karla")
                     }
                 }
                 .padding(.horizontal, 20)
