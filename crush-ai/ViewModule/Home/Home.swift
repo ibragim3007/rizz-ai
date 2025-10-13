@@ -17,6 +17,11 @@ struct Home: View {
 
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 12, alignment: .top), count: 3)
 
+    // Состояния для "Delete All"
+    @State private var showDeleteAllConfirm = false
+    @State private var pendingDeleteItems: [DialogGroupEntity] = []
+    @State private var pendingDeleteTitle: String = ""
+
     var body: some View {
         ZStack {
             OnboardingBackground.opacity(0.5)
@@ -40,15 +45,44 @@ struct Home: View {
                                         NavigationLink(destination: DialogGroupView(dialogGroup: dialogGroup)) {
                                             ScreenShotItem(imageURL: dialogGroup.cover?.localFileURL, title: dialogGroup.title)
                                         }
+                                        .contextMenu {
+                                            Button(role: .destructive) {
+                                                vmHome.delete(dialogGroup)
+                                            } label: {
+                                                Label(NSLocalizedString("Delete - " + dialogGroup.title, comment: "Delete group"), systemImage: "trash")
+                                            }
+                                        }
+                                        .preferredColorScheme(.dark)
                                     }
                                 }
                                 .padding(.horizontal, 20)
                                 .padding(.top, 4)
                             } header: {
-                                Text(section.title)
-                                    .font(.system(size: 20, weight: .heavy, design: .rounded))
-                                    .foregroundStyle(.white.opacity(0.85))
-                                    .padding(.horizontal, 20)
+                                HStack {
+                                    Text(section.title)
+                                        .font(.system(size: 18, weight: .heavy, design: .rounded))
+                                        .foregroundStyle(.white.opacity(0.8))
+
+                                    Spacer()
+
+                                    Button {
+                                        pendingDeleteItems = section.items
+                                        pendingDeleteTitle = section.title
+                                        showDeleteAllConfirm = true
+                                    } label: {
+                                        Label {
+                                            Text(NSLocalizedString("Delete All", comment: "Delete all in section"))
+                                        } icon: {
+                                            Image(systemName: "trash")
+                                        }
+                                    }
+                                    .buttonStyle(.borderless)
+                                    .tint(.white.opacity(0.4))
+                                    .foregroundStyle(.white.opacity(0.4))
+                                    .font(.footnote)
+                                    .accessibilityLabel(Text(NSLocalizedString("Delete all in section", comment: "Delete all in section")))
+                                }
+                                .padding(.horizontal, 20)
                             }
                         }
                     }
@@ -93,6 +127,27 @@ struct Home: View {
         }
         // Включаем layout-анимации при изменении источника данных
         .animation(.snappy, value: dialogs)
+        // Подтверждение удаления всех элементов секции
+        .alert(
+            String(format: NSLocalizedString("Delete all in “%@”?", comment: "Delete all confirmation title"), pendingDeleteTitle),
+            isPresented: $showDeleteAllConfirm
+        ) {
+            Button(NSLocalizedString("Delete All", comment: "Confirm delete all"), role: .destructive) {
+                // Удаляем все группы в выбранной секции через VM (чтобы почистить файлы изображений)
+                for item in pendingDeleteItems {
+                    vmHome.delete(item)
+                }
+                // Сброс состояния
+                pendingDeleteItems.removeAll()
+                pendingDeleteTitle = ""
+            }
+            Button(NSLocalizedString("Cancel", comment: "Cancel"), role: .cancel) {
+                pendingDeleteItems.removeAll()
+                pendingDeleteTitle = ""
+            }
+        } message: {
+            Text(NSLocalizedString("This action cannot be undone.", comment: "Delete all warning"))
+        }
     }
 }
 

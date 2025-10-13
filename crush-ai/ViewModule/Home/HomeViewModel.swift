@@ -82,6 +82,48 @@ final class HomeViewModel: ObservableObject {
         showPhotoPicker = true
     }
 
+    // MARK: - Deletion
+
+    func delete(_ group: DialogGroupEntity) {
+        guard let ctx = modelContext else { return }
+        
+        // Удаляем локальные файлы и сущности изображений, чтобы не оставлять сироты
+        // 1) Cover
+        if let cover = group.cover {
+            deleteImageFileIfExists(from: cover)
+            ctx.delete(cover)
+        }
+        // 2) Изображения у диалогов внутри группы
+        for dialog in group.dialogs {
+            if let image = dialog.image {
+                deleteImageFileIfExists(from: image)
+                ctx.delete(image)
+            }
+        }
+        
+        // Удаляем саму группу (каскадно удалит replies через dialogs; images у dialogs уже почистили вручную)
+        ctx.delete(group)
+        
+        do {
+            try ctx.save()
+        } catch {
+            print("Failed to delete DialogGroupEntity: \(error)")
+        }
+    }
+
+    private func deleteImageFileIfExists(from image: ImageEntity) {
+        guard let path = image.localUrl else { return }
+        let url = URL(fileURLWithPath: path)
+        do {
+            if FileManager.default.fileExists(atPath: url.path) {
+                try FileManager.default.removeItem(at: url)
+            }
+        } catch {
+            print("Failed to remove image file at \(url.path): \(error)")
+        }
+    }
+
+    // MARK: - File saving helpers
 
     func saveImageDataToDocuments(data: Data, suggestedName: String?) throws -> URL {
         let fm = FileManager.default
@@ -104,7 +146,5 @@ final class HomeViewModel: ObservableObject {
     private func suggestedFilename(from item: PhotosPickerItem) async -> String? {
         await item.itemIdentifier?.split(separator: "/").last.map(String.init)
     }
-
-
 }
 
