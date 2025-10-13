@@ -7,12 +7,27 @@
 
 import SwiftUI
 
+private final class ImageMemoryCache {
+    static let shared = ImageMemoryCache()
+#if canImport(UIKit)
+    private let cache = NSCache<NSString, UIImage>()
+    func image(forKey key: String) -> UIImage? { cache.object(forKey: key as NSString) }
+    func set(_ image: UIImage, forKey key: String) { cache.setObject(image, forKey: key as NSString) }
+#elseif canImport(AppKit)
+    private let cache = NSCache<NSString, NSImage>()
+    func image(forKey key: String) -> NSImage? { cache.object(forKey: key as NSString) }
+    func set(_ image: NSImage, forKey key: String) { cache.setObject(image, forKey: key as NSString) }
+#endif
+}
+
 struct ScreenShotItem: View {
     let id: String
     let imageURL: URL?
     let imageName: String?
     let title: String?
     
+    @State private var loadedImage: Image?
+
     init(
         id: String = UUID().uuidString,
         imagePath: String? = nil,
@@ -43,7 +58,7 @@ struct ScreenShotItem: View {
             RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                 .fill(.ultraThinMaterial)
                 .overlay(alignment: .center) {
-                    if let url = imageURL, let image = loadImage(from: url) {
+                    if let image = loadedImage {
                         image
                             .resizable()
                             .scaledToFill()
@@ -62,6 +77,7 @@ struct ScreenShotItem: View {
                                         lineWidth: 1
                                     )
                             }
+                            .transition(.opacity)
                     } else if let name = imageName {
                         Image(name)
                             .resizable()
@@ -101,29 +117,70 @@ struct ScreenShotItem: View {
                         .padding(.horizontal, 3)
                         .padding(.vertical, 7)
                         .frame(width: (size.width - 10))
-                        .background(.ultraThickMaterial)
+                        .background(.ultraThinMaterial)
                         .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
                         .offset(y: -4)
                 }
                 .frame(width: size.width, height: size.height)
         }
         .aspectRatio(0.618, contentMode: .fit)
+        .task(id: imageURL) {
+            await loadIfNeeded()
+        }
+        .onAppear {
+            // Быстрая подстановка из кэша, если есть
+            if loadedImage == nil {
+                Task { await loadIfNeeded() }
+            }
+        }
+        .contentTransition(.opacity)
     }
     
-    private func loadImage(from url: URL) -> Image? {
+    @MainActor
+    private func setLoaded(_ image: Image?) {
+        withAnimation(.easeIn(duration: 0.15)) {
+            self.loadedImage = image
+        }
+    }
+    
+    private func loadIfNeeded() async {
+        guard let url = imageURL else {
+            await MainActor.run { setLoaded(nil) }
+            return
+        }
+        // Попробовать из кэша
         #if canImport(UIKit)
-        if let uiImage = UIImage(contentsOfFile: url.path) {
-            return Image(uiImage: uiImage)
+        if let cached = ImageMemoryCache.shared.image(forKey: url.path) {
+            await MainActor.run { setLoaded(Image(uiImage: cached)) }
+            return
         }
         #elseif canImport(AppKit)
-        if let nsImage = NSImage(contentsOf: url) {
-            return Image(nsImage: nsImage)
+        if let cached = ImageMemoryCache.shared.image(forKey: url.path) {
+            await MainActor.run { setLoaded(Image(nsImage: cached)) }
+            return
         }
         #endif
-        return nil
+        
+        // Загрузка и декодирование вне главного потока
+        let imageResult: Image? = await Task.detached(priority: .userInitiated) { () -> Image? in
+            #if canImport(UIKit)
+            guard let ui = UIImage(contentsOfFile: url.path) else { return nil }
+            ImageMemoryCache.shared.set(ui, forKey: url.path)
+            return Image(uiImage: ui)
+            #elseif canImport(AppKit)
+            guard let ns = NSImage(contentsOf: url) else { return nil }
+            ImageMemoryCache.shared.set(ns, forKey: url.path)
+            return Image(nsImage: ns)
+            #else
+            return nil
+            #endif
+        }.value
+        
+        await MainActor.run {
+            setLoaded(imageResult)
+        }
     }
 }
-
 
 #Preview {
     ScreenShotItem(imagePath: "sample-screen", title: "Karla from college").preferredColorScheme(.dark)

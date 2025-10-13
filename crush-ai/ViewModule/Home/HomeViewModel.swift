@@ -62,10 +62,16 @@ final class HomeViewModel: ObservableObject {
             dialogGroup.cover = imageEntity
 
             // Сохраняем в SwiftData
-            ctx.insert(imageEntity)
-            ctx.insert(dialog)
-            ctx.insert(dialogGroup)
-            try ctx.save()
+            withAnimation(.snappy(duration: 0.32)) {
+                ctx.insert(imageEntity)
+                ctx.insert(dialog)
+                ctx.insert(dialogGroup)
+                do {
+                    try ctx.save()
+                } catch {
+                    print("Failed to save after insert: \(error)")
+                }
+            }
 
         } catch {
             print("Failed to handle picked photo: \(error)")
@@ -102,12 +108,13 @@ final class HomeViewModel: ObservableObject {
         }
         
         // Удаляем саму группу (каскадно удалит replies через dialogs; images у dialogs уже почистили вручную)
-        ctx.delete(group)
-        
-        do {
-            try ctx.save()
-        } catch {
-            print("Failed to delete DialogGroupEntity: \(error)")
+        withAnimation(.snappy(duration: 0.28)) {
+            ctx.delete(group)
+            do {
+                try ctx.save()
+            } catch {
+                print("Failed to delete DialogGroupEntity: \(error)")
+            }
         }
     }
 

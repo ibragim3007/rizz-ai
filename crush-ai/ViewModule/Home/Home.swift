@@ -44,10 +44,14 @@ struct Home: View {
                                     ForEach(section.items, id: \.id) { dialogGroup in
                                         NavigationLink(destination: DialogGroupView(dialogGroup: dialogGroup)) {
                                             ScreenShotItem(imageURL: dialogGroup.cover?.localFileURL, title: dialogGroup.title)
+                                                .contentTransition(.opacity)
+                                                .transition(.asymmetric(insertion: .opacity.combined(with: .scale(scale: 0.98)), removal: .opacity.combined(with: .scale(scale: 0.9))))
                                         }
                                         .contextMenu {
                                             Button(role: .destructive) {
-                                                vmHome.delete(dialogGroup)
+                                                withAnimation(.snappy(duration: 0.28)) {
+                                                    vmHome.delete(dialogGroup)
+                                                }
                                             } label: {
                                                 Label(NSLocalizedString("Delete - " + dialogGroup.title, comment: "Delete group"), systemImage: "trash")
                                             }
@@ -57,6 +61,8 @@ struct Home: View {
                                 }
                                 .padding(.horizontal, 20)
                                 .padding(.top, 4)
+                                // Анимируем только изменения набора ID внутри секции
+                                .animation(.snappy(duration: 0.32), value: section.items.map(\.id))
                             } header: {
                                 SectionHeader(section: section, deleteAllAction: {
                                     pendingDeleteItems = section.items
@@ -103,17 +109,18 @@ struct Home: View {
         .onAppear {
             vmHome.modelContext = modelContext
         }
-        // Включаем layout-анимации при изменении источника данных
-        .animation(.easeIn, value: dialogs)
+        // УБРАНО: глобальная .animation на всё дерево
         // Подтверждение удаления всех элементов секции
         .alert(
             String(format: NSLocalizedString("Delete all in “%@”?", comment: "Delete all confirmation title"), pendingDeleteTitle),
             isPresented: $showDeleteAllConfirm
         ) {
             Button(NSLocalizedString("Delete All", comment: "Confirm delete all"), role: .destructive) {
-                // Удаляем все группы в выбранной секции через VM (чтобы почистить файлы изображений)
-                for item in pendingDeleteItems {
-                    vmHome.delete(item)
+                withAnimation(.snappy(duration: 0.28)) {
+                    // Удаляем все группы в выбранной секции через VM (чтобы почистить файлы изображений)
+                    for item in pendingDeleteItems {
+                        vmHome.delete(item)
+                    }
                 }
                 // Сброс состояния
                 pendingDeleteItems.removeAll()
