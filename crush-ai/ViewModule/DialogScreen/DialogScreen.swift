@@ -10,6 +10,14 @@ import SwiftUI
 struct DialogScreen: View {
     var dialog: DialogEntity
     
+    @StateObject private var dialogScreenVm: DialogScreenViewModel
+    
+    init(dialog: DialogEntity) {
+        self.dialog = dialog
+        let base64 = DialogScreen.makeBase64(from: dialog.image?.localFileURL)
+        _dialogScreenVm = StateObject(wrappedValue: DialogScreenViewModel(currentImageBase64: base64, context: dialog.context))
+    }
+    
     var body: some View {
         ZStack {
             OnboardingBackground.opacity(0.5)
@@ -33,6 +41,16 @@ struct DialogScreen: View {
                     SettingsButton(destination: SettingsPlaceholderView())
                 }
             }
+        }
+    }
+    
+    private static func makeBase64(from url: URL?) -> String {
+        guard let url else { return "" }
+        do {
+            let data = try Data(contentsOf: url)
+            return data.base64EncodedString()
+        } catch {
+            return ""
         }
     }
 }
@@ -63,28 +81,44 @@ struct LargeImageDisplay: View {
         .contentTransition(.opacity)
     }
     
-    @ViewBuilder
+    // Type-erased to keep the compiler happy across branches
     private var content: some View {
         Group {
             if let url = imageEntity.localFileURL, let img = loadImage(from: url) {
-                img.resizable().scaledToFill().frame(width: .infinity)
+                AnyView(
+                    img
+                        .resizable()
+                        .scaledToFill()
+                        .frame(maxWidth: .infinity)
+                )
             } else if let url = imageEntity.remoteHTTPURL {
-                AsyncImage(url: url) { phase in
-                    switch phase {
-                    case .success(let image): image.resizable().scaledToFill()
-                    case .failure: placeholder
-                    case .empty:
-                        ZStack {
-                            RoundedRectangle(cornerRadius: corner, style: .continuous)
-                                .fill(.white.opacity(0.06))
-                            ProgressView()
-                                .tint(.white.opacity(0.85))
+                AnyView(
+                    AsyncImage(url: url) { phase in
+                        switch phase {
+                        case .success(let image):
+                            AnyView(
+                                image
+                                    .resizable()
+                                    .scaledToFill()
+                            )
+                        case .failure:
+                            AnyView(placeholder)
+                        case .empty:
+                            AnyView(
+                                ZStack {
+                                    RoundedRectangle(cornerRadius: corner, style: .continuous)
+                                        .fill(.white.opacity(0.06))
+                                    ProgressView()
+                                        .tint(.white.opacity(0.85))
+                                }
+                            )
+                        @unknown default:
+                            AnyView(placeholder)
                         }
-                    @unknown default: placeholder
                     }
-                }
+                )
             } else {
-                placeholder
+                AnyView(placeholder)
             }
         }
     }

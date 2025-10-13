@@ -14,7 +14,6 @@ struct GetChatTitleReponse: Codable {
 }
 
 
-
 struct AnalyzeScreenshotRequest: Encodable {
     let screenshotBase64: String
     let tone: ToneTypes
