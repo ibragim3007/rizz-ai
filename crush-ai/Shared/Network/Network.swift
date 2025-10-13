@@ -33,6 +33,15 @@ enum NetworkError: Error, LocalizedError {
     }
 }
 
+protocol Endpoint {
+    var baseURL: String { get }
+    var path: String { get }
+    var method: HTTPMethod { get }
+    var headers: [String: String]? { get }
+    var body: Data? { get }
+    var url: URL? { get }
+}
+
 /// Протокол API клиента
 protocol APIClientProtocol {
     func request<T: Decodable>(

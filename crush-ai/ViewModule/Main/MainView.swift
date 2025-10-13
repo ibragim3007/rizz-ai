@@ -8,11 +8,15 @@
 import SwiftUI
 
 struct MainView: View {
-
+    
+    @StateObject var vmMain = MainViewModel()
 
     var body: some View {
         NavigationStack {
             Home()
+                .task {
+                    await vmMain.loginUser()
+                }
         }
     }
 }
