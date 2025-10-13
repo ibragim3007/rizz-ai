@@ -43,4 +43,20 @@ final class OnboardingViewModel: ObservableObject {
     func skipToEnd () {
         currentIndex = steps.count - 1
     }
+    
+    func loginUser() async {
+        do {
+            let appToken = await TokenService.shared.getOrCreateAppToken()
+            print(appToken)
+            let authRequestBody = AuthRequest(appToken: appToken)
+            
+            let authResponse: AuthResponse = try await APIClient.shared.request(endpoint: "/auth/login", method: .post, body: authRequestBody as? Encodable)
+            // Handle the response here if needed (e.g., store tokens/user)
+            
+            print("Login successful! " + authResponse.user.id)
+        } catch {
+            // Handle or surface the error as appropriate
+            print("Login failed: \(error)")
+        }
+    }
 }

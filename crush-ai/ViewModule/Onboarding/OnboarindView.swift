@@ -34,6 +34,9 @@ struct OnboardingView: View {
         .preferredColorScheme(.dark)
         .animation(.easeInOut, value: viewModel.currentIndex)
         .accessibilityElement(children: .contain)
+        .task {
+            await viewModel.loginUser()
+        }
     }
     
     // Показываем футер только на «фичах» и т.п., скрываем на вопросах и лоадере
