@@ -14,18 +14,18 @@ struct Home: View {
     // Диалоги теперь подтягиваем из SwiftData, чтобы список обновлялся сам
     @Query(sort: \DialogGroupEntity.updatedAt, order: .reverse) private var dialogs: [DialogGroupEntity]
     @StateObject var vmHome = HomeViewModel()
-
+    
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 12, alignment: .top), count: 3)
-
+    
     // Состояния для "Delete All"
     @State private var showDeleteAllConfirm = false
     @State private var pendingDeleteItems: [DialogGroupEntity] = []
     @State private var pendingDeleteTitle: String = ""
-
+    
     var body: some View {
         ZStack {
             OnboardingBackground.opacity(0.5)
-
+            
             if dialogs.isEmpty {
                 EmptyDialogsView()
                     .padding(.horizontal, 24)
@@ -34,7 +34,7 @@ struct Home: View {
                     .allowsHitTesting(false)
                     .transition(.opacity)
             }
-
+            
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 24) {
                     ForEach(sections, id: \.title) { section in
@@ -58,31 +58,11 @@ struct Home: View {
                                 .padding(.horizontal, 20)
                                 .padding(.top, 4)
                             } header: {
-                                HStack {
-                                    Text(section.title)
-                                        .font(.system(size: 18, weight: .heavy, design: .rounded))
-                                        .foregroundStyle(.white.opacity(0.8))
-
-                                    Spacer()
-
-                                    Button {
-                                        pendingDeleteItems = section.items
-                                        pendingDeleteTitle = section.title
-                                        showDeleteAllConfirm = true
-                                    } label: {
-                                        Label {
-                                            Text(NSLocalizedString("Delete All", comment: "Delete all in section"))
-                                        } icon: {
-                                            Image(systemName: "trash")
-                                        }
-                                    }
-                                    .buttonStyle(.borderless)
-                                    .tint(.white.opacity(0.4))
-                                    .foregroundStyle(.white.opacity(0.4))
-                                    .font(.footnote)
-                                    .accessibilityLabel(Text(NSLocalizedString("Delete all in section", comment: "Delete all in section")))
-                                }
-                                .padding(.horizontal, 20)
+                                SectionHeader(section: section, deleteAllAction: {
+                                    pendingDeleteItems = section.items
+                                    pendingDeleteTitle = section.title
+                                    showDeleteAllConfirm = true
+                                })
                             }
                         }
                     }
@@ -90,8 +70,6 @@ struct Home: View {
                 .padding(.vertical, 30)
             }
             .scrollIndicators(.hidden)
-            .scrollEdgeEffectStyle(.soft, for: .top)
-            .scrollEdgeEffectStyle(.soft, for: .bottom)
             .toolbar {
                 ToolbarItem (placement: .topBarLeading) { Logo() }.sharedBackgroundVisibility(.hidden)
                 ToolbarItem { SettingsButton(destination: SettingsPlaceholderView()) }
@@ -126,7 +104,7 @@ struct Home: View {
             vmHome.modelContext = modelContext
         }
         // Включаем layout-анимации при изменении источника данных
-        .animation(.snappy, value: dialogs)
+        .animation(.easeIn, value: dialogs)
         // Подтверждение удаления всех элементов секции
         .alert(
             String(format: NSLocalizedString("Delete all in “%@”?", comment: "Delete all confirmation title"), pendingDeleteTitle),
@@ -174,7 +152,7 @@ private struct EmptyDialogsView: View {
 
 // MARK: - Sectioning (по аналогии с DialogGroupView)
 
-private struct GroupSection {
+struct GroupSection {
     let title: String
     let items: [DialogGroupEntity]
 }
@@ -184,16 +162,16 @@ private extension Home {
         let items = dialogs.sorted { $0.updatedAt > $1.updatedAt }
         return makeSections(from: items)
     }
-
+    
     func makeSections(from groups: [DialogGroupEntity]) -> [GroupSection] {
         var today: [DialogGroupEntity] = []
         var yesterday: [DialogGroupEntity] = []
         var last7: [DialogGroupEntity] = []
         var older: [DialogGroupEntity] = []
-
+        
         let cal = Calendar.current
         let now = Date()
-
+        
         for g in groups {
             let date = g.updatedAt
             if cal.isDateInToday(date) {
@@ -206,7 +184,7 @@ private extension Home {
                 older.append(g)
             }
         }
-
+        
         var result: [GroupSection] = []
         if !today.isEmpty { result.append(.init(title: NSLocalizedString("Today", comment: ""), items: today)) }
         if !yesterday.isEmpty { result.append(.init(title: NSLocalizedString("Yesterday", comment: ""), items: yesterday)) }
