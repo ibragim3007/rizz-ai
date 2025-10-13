@@ -106,10 +106,7 @@ struct Home: View {
             Task { await vmHome.handlePickedPhoto(item) }
         }
         // Inject ModelContext after the view appears
-        .onAppear {
-            vmHome.modelContext = modelContext
-        }
-        // УБРАНО: глобальная .animation на всё дерево
+        .onAppear { vmHome.modelContext = modelContext }
         // Подтверждение удаления всех элементов секции
         .alert(
             String(format: NSLocalizedString("Delete all in “%@”?", comment: "Delete all confirmation title"), pendingDeleteTitle),
@@ -136,28 +133,6 @@ struct Home: View {
     }
 }
 
-
-
-// Заглушка настроек
-
-
-// Пустое состояние диалогов
-private struct EmptyDialogsView: View {
-    var body: some View {
-        VStack(spacing: 12) {
-            Image(systemName: "text.bubble")
-                .font(.system(size: 40, weight: .semibold))
-                .foregroundStyle(.secondary)
-            Text("Пока пусто")
-                .font(.system(size: 22, weight: .semibold, design: .rounded))
-            Text("Загрузите скриншот, чтобы начать новый диалог.")
-                .font(.system(.subheadline, design: .rounded))
-                .foregroundStyle(.secondary)
-        }
-    }
-}
-
-// MARK: - Sectioning (по аналогии с DialogGroupView)
 
 struct GroupSection {
     let title: String
