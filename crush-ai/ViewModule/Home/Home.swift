@@ -24,7 +24,7 @@ struct Home: View {
     
     var body: some View {
         ZStack {
-            OnboardingBackground.opacity(0.5)
+            OnboardingBackground.opacity(0.2)
             
             if dialogs.isEmpty {
                 EmptyDialogsView()

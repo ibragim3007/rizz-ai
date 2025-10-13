@@ -58,6 +58,7 @@ final class HomeViewModel: ObservableObject {
                 id: UUID().uuidString, userId: "local-user", title: "Unnamed"
             )
             
+            dialog.image = imageEntity
             dialogGroup.dialogs.append(dialog)
             dialogGroup.cover = imageEntity
 

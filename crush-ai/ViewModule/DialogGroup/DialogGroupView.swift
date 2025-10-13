@@ -10,42 +10,49 @@ import SwiftUI
 struct DialogGroupView: View {
     
     var dialogGroup: DialogGroupEntity
-    var vmHome = HomeViewModel()
     
     var body: some View {
         ZStack {
-            
-            OnboardingBackground.opacity(0.5)
-            
-            ScrollView {
-                LazyVStack(alignment: .leading, spacing: 24) {
-                    ForEach(sections, id: \.title) { section in
-                        if !section.items.isEmpty {
-                            Section {
-                                VStack(spacing: 16) {
-                                    ForEach(section.items, id: \.id) { dialog in
+            backgroundView
+            listView
+        }
+        .navigationTitle(dialogGroup.title)
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem { SettingsButton(destination: SettingsPlaceholderView()) }
+        }
+    }
+    
+    private var backgroundView: some View {
+        OnboardingBackground.opacity(0.5)
+    }
+    
+    private var listView: some View {
+        ScrollView {
+            LazyVStack(alignment: .leading, spacing: 24) {
+                ForEach(sections, id: \.title) { section in
+                    if !section.items.isEmpty {
+                        // Lightweight "section" to reduce generic complexity
+                        VStack(alignment: .leading, spacing: 16) {
+                            Text(section.title)
+                                .font(.system(size: 20, weight: .heavy, design: .rounded))
+                                .foregroundStyle(.white.opacity(0.85))
+                                .padding(.horizontal, 20)
+                            
+                            VStack(spacing: 16) {
+                                ForEach(section.items, id: \.id) { dialog in
+                                    NavigationLink(destination: DialogScreen(dialog: dialog)) {
                                         DialogCardRow(dialog: dialog)
                                     }
                                 }
-                            } header: {
-                                Text(section.title)
-                                    .font(.system(size: 20, weight: .heavy, design: .rounded))
-                                    .foregroundStyle(.white.opacity(0.85))
-                                    .padding(.horizontal, 20)
                             }
                         }
                     }
                 }
-                .padding(.vertical, 8)
             }
-            .navigationTitle(dialogGroup.title)
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem { SettingsButton(destination: SettingsPlaceholderView()) }
-            }
+            .padding(.vertical, 8)
         }
     }
-    
 }
 
 // MARK: - Row
@@ -156,17 +163,7 @@ private struct PreviewImageView: View {
         }
         .frame(width: 90, height: 90)
         .clipShape(RoundedRectangle(cornerRadius: corner, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: corner, style: .continuous)
-                .stroke(
-                    LinearGradient(
-                        colors: [.white.opacity(0.26), .white.opacity(0.10)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    ),
-                    lineWidth: 1
-                )
-        )
+        .overlay(RoundedRectangle(cornerRadius: corner, style: .continuous).stroke(AppTheme.borderPrimaryGradient, lineWidth: 1))
     }
     
     private var placeholder: some View {

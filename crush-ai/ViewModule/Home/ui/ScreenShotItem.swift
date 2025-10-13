@@ -53,10 +53,10 @@ struct ScreenShotItem: View {
     var body: some View {
         GeometryReader { geo in
             let size = geo.size
-            let cornerRadius: CGFloat = 16
+            let cornerRadius: CGFloat = 15
             
             RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                .fill(.ultraThinMaterial)
+                .fill(.white.opacity(0.1))
                 .overlay(alignment: .center) {
                     if let image = loadedImage {
                         image
