@@ -18,6 +18,10 @@ final class HomeViewModel: ObservableObject {
     @Published var showPhotoPicker = false
     @Published var selectedPhotoItem: PhotosPickerItem?
     
+    // Navigation intent to DialogScreen
+    @Published var navigateDialog: DialogEntity?
+    @Published var shouldNavigateToDialog: Bool = false
+    
     // Allow late injection from the View
     var modelContext: ModelContext?
     
@@ -73,6 +77,10 @@ final class HomeViewModel: ObservableObject {
                     print("Failed to save after insert: \(error)")
                 }
             }
+            
+            // Trigger navigation to DialogScreen for the just-created dialog
+            self.navigateDialog = dialog
+            self.shouldNavigateToDialog = true
 
         } catch {
             print("Failed to handle picked photo: \(error)")

@@ -130,6 +130,19 @@ struct Home: View {
         } message: {
             Text(NSLocalizedString("This action cannot be undone.", comment: "Delete all warning"))
         }
+        // Programmatic navigation using modern API (iOS 16+)
+        .navigationDestination(
+            isPresented: Binding(
+                get: { vmHome.shouldNavigateToDialog },
+                set: { vmHome.shouldNavigateToDialog = $0 }
+            )
+        ) {
+            if let dialog = vmHome.navigateDialog {
+                DialogScreen(dialog: dialog)
+            } else {
+                EmptyView()
+            }
+        }
     }
 }
 

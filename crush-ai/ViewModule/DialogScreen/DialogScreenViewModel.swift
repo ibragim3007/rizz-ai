@@ -11,12 +11,24 @@ import Combine
 
 @MainActor
 final class DialogScreenViewModel: ObservableObject {
-    @Published var currentImageBase64: String
+    @Published var currentImageUrl: URL
     @Published var context: String?
     
-    init(currentImageBase64: String, context: String? = nil) {
-        self.currentImageBase64 = currentImageBase64
+    init(currentImageUrl: URL, context: String? = nil) {
+        self.currentImageUrl = currentImageUrl
         self.context = context
+        
+        let base64 = DialogScreenViewModel.makeBase64(from: currentImageUrl)
     }
-
+    
+    
+    static func makeBase64(from url: URL?) -> String {
+        guard let url else { return "" }
+        do {
+            let data = try Data(contentsOf: url)
+            return data.base64EncodedString()
+        } catch {
+            return ""
+        }
+    }
 }

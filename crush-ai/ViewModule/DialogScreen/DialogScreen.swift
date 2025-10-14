@@ -9,13 +9,20 @@ import SwiftUI
 
 struct DialogScreen: View {
     var dialog: DialogEntity
+    var defaultImage = "https://cdsassets.apple.com/live/7WUAS350/images/ios/ios-26-iphone-16-pro-take-a-screenshot-options.png"
     
     @StateObject private var dialogScreenVm: DialogScreenViewModel
     
     init(dialog: DialogEntity) {
         self.dialog = dialog
-        let base64 = DialogScreen.makeBase64(from: dialog.image?.localFileURL)
-        _dialogScreenVm = StateObject(wrappedValue: DialogScreenViewModel(currentImageBase64: base64, context: dialog.context))
+        let fallbackURL = URL(string: defaultImage)! // This is a constant valid URL
+        let currentURL = dialog.image?.localFileURL ?? dialog.image?.remoteHTTPURL ?? fallbackURL
+        _dialogScreenVm = StateObject(
+            wrappedValue: DialogScreenViewModel(
+                currentImageUrl: currentURL,
+                context: dialog.context
+            )
+        )
     }
     
     var body: some View {
@@ -23,18 +30,7 @@ struct DialogScreen: View {
             OnboardingBackground.opacity(0.5)
             
             ScrollView {
-                if let image = dialog.image {
-                    LargeImageDisplay(imageEntity: image)
-                        .padding(.horizontal, 10)
-                } else {
-                    RoundedRectangle(cornerRadius: 24, style: .continuous)
-                        .overlay {
-                            Image(systemName: "photo")
-                                .font(.system(size: 36, weight: .semibold))
-                                .foregroundStyle(.white.opacity(0.85))
-                        }
-                        .padding()
-                }
+                ImageView(image: dialog.image)
             }
             .toolbar {
                 ToolbarItem {
@@ -43,14 +39,23 @@ struct DialogScreen: View {
             }
         }
     }
-    
-    private static func makeBase64(from url: URL?) -> String {
-        guard let url else { return "" }
-        do {
-            let data = try Data(contentsOf: url)
-            return data.base64EncodedString()
-        } catch {
-            return ""
+}
+
+struct ImageView: View {
+    var image: ImageEntity?
+
+    var body: some View {
+        if let img = image {
+            LargeImageDisplay(imageEntity: img)
+                .padding(.horizontal, 10)
+        } else {
+            RoundedRectangle(cornerRadius: 24, style: .continuous)
+                .overlay {
+                    Image(systemName: "photo")
+                        .font(.system(size: 36, weight: .semibold))
+                        .foregroundStyle(.white.opacity(0.85))
+                }
+                .padding()
         }
     }
 }
@@ -88,8 +93,8 @@ struct LargeImageDisplay: View {
                 AnyView(
                     img
                         .resizable()
-                        .scaledToFill()
-                        .frame(maxWidth: .infinity)
+                        .scaledToFit()
+                        .frame(maxWidth: .infinity, maxHeight: 500)
                 )
             } else if let url = imageEntity.remoteHTTPURL {
                 AnyView(
@@ -99,7 +104,8 @@ struct LargeImageDisplay: View {
                             AnyView(
                                 image
                                     .resizable()
-                                    .scaledToFill()
+                                    .scaledToFit()
+                                    .frame(maxWidth: .infinity, maxHeight: 500)
                             )
                         case .failure:
                             AnyView(placeholder)
