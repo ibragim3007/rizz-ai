@@ -9,6 +9,7 @@ import SwiftUI
 import SwiftData
 
 struct DialogScreen: View {
+    @AppStorage("tone") private var currentTone: ToneTypes = .RIZZ
     var dialog: DialogEntity
     var defaultImage = "https://cdsassets.apple.com/live/7WUAS350/images/ios/ios-26-iphone-16-pro-take-a-screenshot-options.png"
     
@@ -51,7 +52,7 @@ struct DialogScreen: View {
                     isLoading: dialogScreenVm.isLoading,
                 ) {
                     guard !dialogScreenVm.isLoading else { return }
-                    Task { await dialogScreenVm.getReply(modelContext: modelContext) }
+                    Task { await dialogScreenVm.getReply(modelContext: modelContext, tone: currentTone) }
                 }
             }
             .sharedBackgroundVisibility(.hidden)

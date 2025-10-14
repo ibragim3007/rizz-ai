@@ -15,6 +15,7 @@ import UIKit
 
 #if canImport(AppKit)
 import AppKit
+import SwiftUI
 #endif
 
 @MainActor
@@ -36,7 +37,7 @@ final class DialogScreenViewModel: ObservableObject {
     }
     
     // MARK: - Public API
-    func getReply(modelContext: ModelContext) async {
+    func getReply(modelContext: ModelContext, tone: ToneTypes) async {
         guard !isLoading else { return }
         isLoading = true
         defer { isLoading = false }
@@ -50,7 +51,7 @@ final class DialogScreenViewModel: ObservableObject {
         
         let body = AnalyzeScreenshotRequest(
             screenshotBase64: base64Image,
-            tone: .RIZZ,
+            tone: tone,
             context: dialog.context
         )
         
