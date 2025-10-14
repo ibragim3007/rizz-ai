@@ -116,16 +116,22 @@ struct DialogScreen: View {
         OnboardingBackground.opacity(0.5)
     }
     
-    // Adds a reply from API response to the current dialog using SwiftData
+    // Adds replies from API response to the current dialog using SwiftData
     private func addReplyToDialog(reply: AnalyzeScreenshotResponse) {
-        let newReply = ReplyEntity(
-            id: UUID().uuidString,
-            content: reply.content,
-            tone: reply.tone
-        )
-        // Establish relationship
-        newReply.dialog = dialog
-        dialog.replies.append(newReply)
+        // Map each returned string into a ReplyEntity
+        let newReplies: [ReplyEntity] = reply.content.map { contentString in
+            let entity = ReplyEntity(
+                id: UUID().uuidString,
+                content: contentString,
+                tone: reply.tone
+            )
+            // Establish relationship
+            entity.dialog = dialog
+            return entity
+        }
+        
+        // Append all replies to the dialog
+        dialog.replies.append(contentsOf: newReplies)
         dialog.updatedAt = Date()
         
         do {
@@ -141,7 +147,13 @@ struct DialogScreen: View {
     private func getReply() async {
         let fallbackURL = URL(string: defaultImage)! // This is a constant valid URL
         let currentURL = dialog.image?.localFileURL ?? dialog.image?.remoteHTTPURL ?? fallbackURL
-        let base64Image = DialogScreenViewModel.makeBase64(from: currentURL)
+        
+        // Сжимаем: даунскейл до 60% и JPEG качество 0.6
+        let base64Image = DialogScreenViewModel.makeBase64(
+            from: currentURL,
+            downscaleFactor: 0.6,
+            jpegQuality: 0.6
+        )
         
         let body = AnalyzeScreenshotRequest(screenshotBase64: base64Image, tone: .RIZZ, context: dialog.context)
         
@@ -153,7 +165,7 @@ struct DialogScreen: View {
             )
             
             print(reply.content)
-            // Persist the reply
+            // Persist the replies
             addReplyToDialog(reply: reply)
         } catch {
             // Handle/log as needed
@@ -293,3 +305,4 @@ struct LargeImageDisplay: View {
     
     return DialogScreen(dialog: dialog).preferredColorScheme(.dark)
 }
+

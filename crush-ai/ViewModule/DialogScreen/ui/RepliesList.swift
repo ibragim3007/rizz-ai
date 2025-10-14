@@ -12,7 +12,7 @@ struct RepliesList: View {
     var replies: [ReplyEntity]
     
     private var sortedReplies: [ReplyEntity] {
-        replies.sorted { $0.createdAt < $1.createdAt }
+        replies.sorted { $0.createdAt > $1.createdAt }
     }
     
     var body: some View {

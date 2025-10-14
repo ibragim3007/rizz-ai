@@ -22,5 +22,5 @@ struct AnalyzeScreenshotRequest: Encodable {
 
 struct AnalyzeScreenshotResponse: Codable {
     let tone: ToneTypes
-    let content: String
+    let content: [String]
 }
