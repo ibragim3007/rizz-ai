@@ -51,6 +51,7 @@ struct DialogScreen: View {
             VStack(alignment: .leading, spacing: 16) {
                 ImageView(image: dialog.image)
 //                Elements
+                RepliesList(replies: dialog.replies)
             }
             .padding(.bottom, 20)
         }
@@ -125,7 +126,7 @@ struct LargeImageDisplay: View {
     var body: some View {
         ZStack {
             content
-//                .clipShape(RoundedRectangle(cornerRadius: corner, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: corner, style: .continuous))
 //                .overlay(RoundedRectangle(cornerRadius: corner, style: .continuous).stroke(AppTheme.borderPrimaryGradient, lineWidth: 1))
             
             if isLoading {
@@ -212,6 +213,15 @@ struct LargeImageDisplay: View {
 #Preview {
     let image = ImageEntity(id: "id", remoteUrl: "https://cdsassets.apple.com/live/7WUAS350/images/ios/ios-26-iphone-16-pro-take-a-screenshot-options.png")
     let dialog = DialogEntity(id: "id2", userId: "u", title: "Test name", elements: ["opener", "test", "profile", "opener", "test", "profile"])
+    
+    let reply1 = ReplyEntity(id: "2", content: "psum is that it has a more-or-less normal distribution", createdAt: Date.now, tone: .RIZZ)
+    let reply2 = ReplyEntity(id: "3", content: "psum is that it has a more-or-less normal distribution", createdAt: Date.now, tone: .NSFW)
+    let reply3 = ReplyEntity(id: "4", content: "psum is that it has a more-or-less normal distribution", createdAt: Date.now, tone: .FLIRT)
+    let reply4 = ReplyEntity(id: "5", content: "psum is that it has a more-or-less normal distribution", createdAt: Date.now, tone: .ROMANTIC)
+    
     dialog.image = image
+    
+    dialog.replies = [reply1, reply2, reply3, reply4]
+    
     return DialogScreen(dialog: dialog).preferredColorScheme(.dark)
 }

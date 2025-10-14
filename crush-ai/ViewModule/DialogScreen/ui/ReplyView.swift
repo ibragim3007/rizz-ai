@@ -12,6 +12,8 @@ struct ReplyView: View {
     var content: String
     var tone: ToneTypes
     
+    @State private var didCopy: Bool = false
+    
     var body: some View {
         Text(content)
             .font(.system(size: 17, weight: .semibold, design: .default))
@@ -44,12 +46,33 @@ struct ReplyView: View {
                 RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                     .strokeBorder(.white.opacity(0.10), lineWidth: 1)
             )
+            // Всплывающий тост «Copied»
+            .overlay(alignment: .topTrailing) {
+                if didCopy {
+                    HStack(spacing: 6) {
+                        Image(systemName: "checkmark.circle.fill")
+                            .symbolRenderingMode(.palette)
+                            .foregroundStyle(.white, .white.opacity(0.35))
+                        Text("Copied")
+                            .font(.footnote.weight(.semibold))
+                            .foregroundStyle(.white)
+                    }
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(.black.opacity(0.25), in: Capsule())
+                    .transition(.opacity.combined(with: .scale(scale: 0.95)))
+                    .padding(10)
+                }
+            }
             // Объёмные тени
             .shadow(color: accentForTone.opacity(0.35), radius: 18, x: 0, y: 12)
             .shadow(color: .black.opacity(0.25), radius: 6, x: 0, y: 2)
             .contentShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+            .onTapGesture(perform: copyToClipboard)
             .accessibilityLabel("Reply")
-            .accessibilityHint("Generated in \(tone.rawValue) tone")
+            .accessibilityHint("Double tap to copy")
+            .accessibilityAddTraits(.isButton)
+            .accessibilityAction(named: "Copy") { copyToClipboard() }
     }
     
     // MARK: - Look & Feel
@@ -81,6 +104,29 @@ struct ReplyView: View {
         case .FLIRT:    return Color(hex: 0xFF5DA2)
         case .ROMANTIC: return Color(hex: 0xFF6B6B)
         case .NSFW:     return Color(hex: 0xFF1E56)
+        }
+    }
+    
+    // MARK: - Copy
+    
+    private func copyToClipboard() {
+        #if canImport(UIKit)
+        UIPasteboard.general.string = content
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        #elseif canImport(AppKit)
+        let pb = NSPasteboard.general
+        pb.clearContents()
+        pb.setString(content, forType: .string)
+        #endif
+        
+        withAnimation(.spring(response: 0.35, dampingFraction: 0.9)) {
+            didCopy = true
+        }
+        // Автоматически скрываем тост
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
+            withAnimation(.easeOut(duration: 0.25)) {
+                didCopy = false
+            }
         }
     }
 }
