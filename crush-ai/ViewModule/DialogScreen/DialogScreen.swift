@@ -39,17 +39,20 @@ struct DialogScreen: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem (placement: .bottomBar) {
-                PrimaryCTAButton(
-                    title: dialogScreenVm.isLoading ? "Getting Reply…" : "Get Reply",
-                    isShimmering: dialogScreenVm.isLoading,
-                    isLoading: dialogScreenVm.isLoading,
+                ToneButtonView()
+            }
+            ToolbarSpacer(.fixed)
+            ToolbarItem (placement: .bottomBar) {
+                GlassButton(
                     action: {
                         guard !dialogScreenVm.isLoading else { return }
                         Task { await dialogScreenVm.getReply(modelContext: modelContext) }
-                    }
+                    },
+                    text: dialogScreenVm.isLoading ? "Getting Reply…" : "Get Reply",
+                    isLoading: dialogScreenVm.isLoading,
                 )
+
             }
-            .sharedBackgroundVisibility(.hidden)
             ToolbarItem {
                 SettingsButton(destination: SettingsPlaceholderView())
             }
