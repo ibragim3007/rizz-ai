@@ -13,6 +13,8 @@ struct DialogScreen: View {
     
     @StateObject private var dialogScreenVm: DialogScreenViewModel
     @State private var selectedChips: Set<String> = []
+    @State private var showingError: Bool = false
+    @State private var errorText: String = ""
     
     init(dialog: DialogEntity) {
         self.dialog = dialog
@@ -43,6 +45,11 @@ struct DialogScreen: View {
             ToolbarItem {
                 SettingsButton(destination: SettingsPlaceholderView())
             }
+        }
+        .alert("Failed to analyze screenshot", isPresented: $showingError) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text(errorText)
         }
     }
     
@@ -93,6 +100,35 @@ struct DialogScreen: View {
     
     private var backgroundView: some View {
         OnboardingBackground.opacity(0.5)
+    }
+    
+    private func addReplyToDialog (reply: AnalyzeScreenshotResponse) async {
+        let reply = ReplyEntity(id: UUID().uuidString, content: reply.content, tone: reply.tone)
+        
+    }
+    
+    private func getReply () async {
+        let fallbackURL = URL(string: defaultImage)! // This is a constant valid URL
+        let currentURL = dialog.image?.localFileURL ?? dialog.image?.remoteHTTPURL ?? fallbackURL
+        let base64Image = DialogScreenViewModel.makeBase64(from: currentURL)
+        
+        let body = AnalyzeScreenshotRequest(screenshotBase64: base64Image, tone: .RIZZ, context: "")
+        
+        do {
+            let reply: AnalyzeScreenshotResponse = try await APIClient.shared.request(
+                endpoint: "/openai/analyze-screenshot",
+                method: .post,
+                body: body
+            )
+            
+            
+            
+        } catch {
+            // Handle/log as needed
+            print("Failed to analyze screenshot: \(error)")
+            errorText = error.localizedDescription
+            showingError = true
+        }
     }
 }
 

@@ -20,7 +20,7 @@ struct AnalyzeScreenshotRequest: Encodable {
     let context: String?
 }
 
-struct AnalyzeScreenshotReponse: Codable {
+struct AnalyzeScreenshotResponse: Codable {
     let tone: ToneTypes
     let content: String
 }
