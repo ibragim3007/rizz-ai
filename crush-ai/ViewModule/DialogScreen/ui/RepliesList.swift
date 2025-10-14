@@ -11,6 +11,8 @@ import SwiftData
 struct RepliesList: View {
     var replies: [ReplyEntity]
     
+    @State private var animateGlow: Bool = false
+    
     private var sortedReplies: [ReplyEntity] {
         replies.sorted { $0.createdAt > $1.createdAt }
     }
@@ -18,16 +20,7 @@ struct RepliesList: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             if sortedReplies.isEmpty {
-                // Плейсхолдер, когда ответов нет
-                HStack(spacing: 8) {
-                    Image(systemName: "bubble.left.and.bubble.right")
-                        .font(.system(size: 16, weight: .semibold))
-                    Text("No replies yet")
-                        .font(.subheadline.weight(.semibold))
-                }
-                .foregroundStyle(.secondary)
-                .frame(maxWidth: .infinity, alignment: .center)
-                .padding(.vertical, 12)
+                placeholderReply
             } else {
                 ForEach(sortedReplies, id: \.id) { reply in
                     ReplyView(content: reply.content, tone: reply.tone)
@@ -38,6 +31,77 @@ struct RepliesList: View {
         .padding(.horizontal, 20)
         .animation(.snappy(duration: 0.28), value: replies.map(\.id))
     }
+    
+    
+    private var placeholderReply: some View {
+        ZStack {
+            // Ambient gradient auras
+            Circle()
+                .fill(
+                    RadialGradient(colors: [AppTheme.primary.opacity(0.35), .clear],
+                                   center: .center, startRadius: 0, endRadius: 180)
+                )
+                .frame(width: 240, height: 230)
+                .offset(x: -90, y: -40)
+                .blur(radius: 20)
+                .opacity(animateGlow ? 0.9 : 0.6)
+                .animation(.easeInOut(duration: 2.2).repeatForever(autoreverses: true), value: animateGlow)
+            
+            Circle()
+                .fill(
+                    RadialGradient(colors: [AppTheme.primaryLight.opacity(0.35), .clear],
+                                   center: .center, startRadius: 0, endRadius: 200)
+                )
+                .frame(width: 280, height: 230)
+                .offset(x: 110, y: 40)
+                .blur(radius: 24)
+                .opacity(animateGlow ? 0.9 : 0.6)
+                .animation(.easeInOut(duration: 2.2).repeatForever(autoreverses: true), value: animateGlow)
+            
+            // Glass card
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .fill(.ultraThinMaterial)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 20, style: .continuous)
+                        .stroke(AppTheme.borderPrimaryGradient, lineWidth: 1)
+                )
+                .shadow(color: Color.black.opacity(0.18), radius: 20, x: 0, y: 10)
+                .overlay {
+                    // Content
+                    VStack(spacing: 10) {
+                        Image(systemName: "bubble.left.and.bubble.right.fill")
+                            .foregroundStyle(
+                                LinearGradient(
+                                    colors: [AppTheme.primary, AppTheme.primaryLight],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                ),
+                                Color.white.opacity(0.35)
+                            )
+                            .font(.system(size: 28, weight: .semibold))
+                            .shadow(color: AppTheme.primary.opacity(0.25), radius: 10, x: 0, y: 6)
+                        
+                        Text("No replies yet")
+                            .font(.headline.weight(.semibold))
+                            .foregroundStyle(.primary)
+                        
+                        Text("Generate the first one and the magic will begin ✨")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal, 10)
+                    }
+                    .padding(.horizontal, 16)
+                }
+        }
+        .frame(maxWidth: .infinity, alignment: .center)
+        .padding(.vertical, 12)
+        .onAppear { animateGlow = true }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("No replies yet")
+        .accessibilityHint("Generate the first reply")
+    }
+    
 }
 
 #Preview {

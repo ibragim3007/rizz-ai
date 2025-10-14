@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import SwiftData
 
 #if canImport(UIKit)
 import UIKit
@@ -18,18 +19,75 @@ import AppKit
 
 @MainActor
 final class DialogScreenViewModel: ObservableObject {
+    // Input/context
     @Published var currentImageUrl: URL
     @Published var context: String?
+    let dialog: DialogEntity
     
-    init(currentImageUrl: URL, context: String? = nil) {
+    // UI state
+    @Published var isLoading: Bool = false
+    @Published var showingError: Bool = false
+    @Published var errorText: String = ""
+    
+    init(dialog: DialogEntity, currentImageUrl: URL, context: String? = nil) {
+        self.dialog = dialog
         self.currentImageUrl = currentImageUrl
         self.context = context
-        
-        let _ = DialogScreenViewModel.makeBase64(from: currentImageUrl)
     }
     
-    func getReply () {
-        print("Get reply")
+    // MARK: - Public API
+    func getReply(modelContext: ModelContext) async {
+        guard !isLoading else { return }
+        isLoading = true
+        defer { isLoading = false }
+        
+        // Сжимаем: даунскейл до 60% и JPEG качество 0.6
+        let base64Image = DialogScreenViewModel.makeBase64(
+            from: currentImageUrl,
+            downscaleFactor: 0.6,
+            jpegQuality: 0.6
+        )
+        
+        let body = AnalyzeScreenshotRequest(
+            screenshotBase64: base64Image,
+            tone: .RIZZ,
+            context: dialog.context
+        )
+        
+        do {
+            let reply: AnalyzeScreenshotResponse = try await APIClient.shared.request(
+                endpoint: "/openai/analyze-screenshot",
+                method: .post,
+                body: body
+            )
+            addReplyToDialog(reply: reply, modelContext: modelContext)
+        } catch {
+            errorText = error.localizedDescription
+            showingError = true
+        }
+    }
+    
+    // MARK: - Persistence
+    private func addReplyToDialog(reply: AnalyzeScreenshotResponse, modelContext: ModelContext) {
+        let newReplies: [ReplyEntity] = reply.content.map { contentString in
+            let entity = ReplyEntity(
+                id: UUID().uuidString,
+                content: contentString,
+                tone: reply.tone
+            )
+            entity.dialog = dialog
+            return entity
+        }
+        
+        dialog.replies.append(contentsOf: newReplies)
+        dialog.updatedAt = Date()
+        
+        do {
+            try modelContext.save()
+        } catch {
+            errorText = "Failed to save reply: \(error.localizedDescription)"
+            showingError = true
+        }
     }
     
     /// Создает Base64-строку из изображения по URL с возможным даунскейлом и JPEG-сжатием.

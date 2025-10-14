@@ -13,6 +13,8 @@ struct ReplyView: View {
     var tone: ToneTypes
     
     @State private var didCopy: Bool = false
+    @State private var wasCopied: Bool = false
+    @State private var shakeTrigger: CGFloat = 0 // триггер для анимации «вздрагивания»
     
     var body: some View {
         Text(content)
@@ -25,7 +27,7 @@ struct ReplyView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(
                 RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                    .fill(gradientForTone)
+                    .fill(gradientForTone).saturation(wasCopied ? 0.5 : 1)
             )
             // Лёгкий «глянец», чтобы пузырёк выглядел живым
             .overlay(
@@ -59,7 +61,7 @@ struct ReplyView: View {
                     }
                     .padding(.horizontal, 10)
                     .padding(.vertical, 6)
-                    .background(.black.opacity(0.25), in: Capsule())
+                    .background(.ultraThinMaterial, in: Capsule())
                     .transition(.opacity.combined(with: .scale(scale: 0.95)))
                     .padding(10)
                 }
@@ -68,6 +70,8 @@ struct ReplyView: View {
             .shadow(color: accentForTone.opacity(0.35), radius: 18, x: 0, y: 12)
             .shadow(color: .black.opacity(0.25), radius: 6, x: 0, y: 2)
             .contentShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+            // Лёгкое «вздрагивание» при копировании
+            .modifier(ShakeEffect(amount: 4, shakesPerUnit: 2, animatableData: shakeTrigger))
             .onTapGesture(perform: copyToClipboard)
             .accessibilityLabel("Reply")
             .accessibilityHint("Double tap to copy")
@@ -119,15 +123,34 @@ struct ReplyView: View {
         pb.setString(content, forType: .string)
         #endif
         
+        // Тост + вздрагивание
         withAnimation(.spring(response: 0.35, dampingFraction: 0.9)) {
             didCopy = true
+            wasCopied = true
         }
+        withAnimation(.easeOut(duration: 0.28)) {
+            shakeTrigger += 1
+        }
+        
         // Автоматически скрываем тост
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
             withAnimation(.easeOut(duration: 0.25)) {
                 didCopy = false
             }
         }
+    }
+}
+
+// MARK: - Shake Effect
+
+private struct ShakeEffect: GeometryEffect {
+    var amount: CGFloat = 8          // амплитуда
+    var shakesPerUnit: CGFloat = 3   // «частота» дрожи
+    var animatableData: CGFloat      // триггер (увеличиваем, чтобы проиграть анимацию)
+
+    func effectValue(size: CGSize) -> ProjectionTransform {
+        let translation = amount * sin(animatableData * .pi * shakesPerUnit)
+        return ProjectionTransform(CGAffineTransform(translationX: translation, y: 0))
     }
 }
 
@@ -159,3 +182,4 @@ struct ReplyView: View {
     )
     .preferredColorScheme(.dark)
 }
+

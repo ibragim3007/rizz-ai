@@ -16,9 +16,6 @@ struct DialogScreen: View {
     
     @StateObject private var dialogScreenVm: DialogScreenViewModel
     @State private var selectedChips: Set<String> = []
-    @State private var showingError: Bool = false
-    @State private var errorText: String = ""
-    @State private var isGettingReply: Bool = false
     
     init(dialog: DialogEntity) {
         self.dialog = dialog
@@ -26,6 +23,7 @@ struct DialogScreen: View {
         let currentURL = dialog.image?.localFileURL ?? dialog.image?.remoteHTTPURL ?? fallbackURL
         _dialogScreenVm = StateObject(
             wrappedValue: DialogScreenViewModel(
+                dialog: dialog,
                 currentImageUrl: currentURL,
                 context: dialog.context
             )
@@ -42,16 +40,12 @@ struct DialogScreen: View {
         .toolbar {
             ToolbarItem (placement: .bottomBar) {
                 PrimaryCTAButton(
-                    title: isGettingReply ? "Getting Reply…" : "Get Reply",
-                    isShimmering: isGettingReply,
-                    isLoading: isGettingReply,
+                    title: dialogScreenVm.isLoading ? "Getting Reply…" : "Get Reply",
+                    isShimmering: dialogScreenVm.isLoading,
+                    isLoading: dialogScreenVm.isLoading,
                     action: {
-                        guard !isGettingReply else { return }
-                        isGettingReply = true
-                        Task {
-                            defer { isGettingReply = false }
-                            await getReply()
-                        }
+                        guard !dialogScreenVm.isLoading else { return }
+                        Task { await dialogScreenVm.getReply(modelContext: modelContext) }
                     }
                 )
             }
@@ -60,10 +54,10 @@ struct DialogScreen: View {
                 SettingsButton(destination: SettingsPlaceholderView())
             }
         }
-        .alert("Failed to analyze screenshot", isPresented: $showingError) {
+        .alert("Failed to analyze screenshot", isPresented: $dialogScreenVm.showingError) {
             Button("OK", role: .cancel) { }
         } message: {
-            Text(errorText)
+            Text(dialogScreenVm.errorText)
         }
     }
     
@@ -114,65 +108,6 @@ struct DialogScreen: View {
     
     private var backgroundView: some View {
         OnboardingBackground.opacity(0.5)
-    }
-    
-    // Adds replies from API response to the current dialog using SwiftData
-    private func addReplyToDialog(reply: AnalyzeScreenshotResponse) {
-        // Map each returned string into a ReplyEntity
-        let newReplies: [ReplyEntity] = reply.content.map { contentString in
-            let entity = ReplyEntity(
-                id: UUID().uuidString,
-                content: contentString,
-                tone: reply.tone
-            )
-            // Establish relationship
-            entity.dialog = dialog
-            return entity
-        }
-        
-        // Append all replies to the dialog
-        dialog.replies.append(contentsOf: newReplies)
-        dialog.updatedAt = Date()
-        
-        do {
-            try modelContext.save()
-        } catch {
-            // Surface the error to the user
-            errorText = "Failed to save reply: \(error.localizedDescription)"
-            showingError = true
-        }
-    }
-    
-    // Example of calling the API and saving the result to SwiftData
-    private func getReply() async {
-        let fallbackURL = URL(string: defaultImage)! // This is a constant valid URL
-        let currentURL = dialog.image?.localFileURL ?? dialog.image?.remoteHTTPURL ?? fallbackURL
-        
-        // Сжимаем: даунскейл до 60% и JPEG качество 0.6
-        let base64Image = DialogScreenViewModel.makeBase64(
-            from: currentURL,
-            downscaleFactor: 0.6,
-            jpegQuality: 0.6
-        )
-        
-        let body = AnalyzeScreenshotRequest(screenshotBase64: base64Image, tone: .RIZZ, context: dialog.context)
-        
-        do {
-            let reply: AnalyzeScreenshotResponse = try await APIClient.shared.request(
-                endpoint: "/openai/analyze-screenshot",
-                method: .post,
-                body: body
-            )
-            
-            print(reply.content)
-            // Persist the replies
-            addReplyToDialog(reply: reply)
-        } catch {
-            // Handle/log as needed
-            print("Failed to analyze screenshot: \(error)")
-            errorText = error.localizedDescription
-            showingError = true
-        }
     }
 }
 
