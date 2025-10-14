@@ -38,7 +38,7 @@ struct RepliesList: View {
             // Ambient gradient auras
             Circle()
                 .fill(
-                    RadialGradient(colors: [AppTheme.primary.opacity(0.35), .clear],
+                    RadialGradient(colors: [AppTheme.primary.opacity(0.25), .clear],
                                    center: .center, startRadius: 0, endRadius: 180)
                 )
                 .frame(width: 240, height: 230)
@@ -49,7 +49,7 @@ struct RepliesList: View {
             
             Circle()
                 .fill(
-                    RadialGradient(colors: [AppTheme.primaryLight.opacity(0.35), .clear],
+                    RadialGradient(colors: [AppTheme.primaryLight.opacity(0.15), .clear],
                                    center: .center, startRadius: 0, endRadius: 200)
                 )
                 .frame(width: 280, height: 230)
@@ -60,11 +60,7 @@ struct RepliesList: View {
             
             // Glass card
             RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .fill(.ultraThinMaterial)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 20, style: .continuous)
-                        .stroke(AppTheme.borderPrimaryGradient, lineWidth: 1)
-                )
+                .fill(.white.opacity(0.1))
                 .shadow(color: Color.black.opacity(0.18), radius: 20, x: 0, y: 10)
                 .overlay {
                     // Content
@@ -112,7 +108,7 @@ struct RepliesList: View {
     ]
     
     return ScrollView {
-        RepliesList(replies: items)
+        RepliesList(replies: [])
             .padding(.vertical)
     }
     .background(

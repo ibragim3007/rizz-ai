@@ -41,18 +41,20 @@ struct DialogScreen: View {
             ToolbarItem (placement: .bottomBar) {
                 ToneButtonView()
             }
-            ToolbarSpacer(.fixed)
+            .sharedBackgroundVisibility(.hidden)
+            
+            ToolbarSpacer(placement: .bottomBar)
+            
             ToolbarItem (placement: .bottomBar) {
-                GlassButton(
-                    action: {
-                        guard !dialogScreenVm.isLoading else { return }
-                        Task { await dialogScreenVm.getReply(modelContext: modelContext) }
-                    },
-                    text: dialogScreenVm.isLoading ? "Getting Reply…" : "Get Reply",
+                PrimaryCTAButton(
+                    title: dialogScreenVm.isLoading ? "Getting Reply…" : "Get Reply",
                     isLoading: dialogScreenVm.isLoading,
-                )
-
+                ) {
+                    guard !dialogScreenVm.isLoading else { return }
+                    Task { await dialogScreenVm.getReply(modelContext: modelContext) }
+                }
             }
+            .sharedBackgroundVisibility(.hidden)
             ToolbarItem {
                 SettingsButton(destination: SettingsPlaceholderView())
             }

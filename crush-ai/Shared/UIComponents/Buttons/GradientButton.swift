@@ -11,11 +11,13 @@ struct PrimaryGradientButtonStyleShimmer: ButtonStyle {
     var isShimmering: Bool = false
     @Environment(\.isEnabled) private var isEnabled
     
+    var cornerRadius: CGFloat = 26
+    
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .foregroundStyle(.white)
             .background(
-                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                     .fill(AppTheme.primaryGradient)
                     .shadow(
                         color: AppTheme.primary.opacity(
@@ -30,7 +32,7 @@ struct PrimaryGradientButtonStyleShimmer: ButtonStyle {
                 ? ShimmerMask()
                     .clipShape(
                         RoundedRectangle(
-                            cornerRadius: 20,
+                            cornerRadius: cornerRadius,
                             style: .continuous
                         )
                     )
