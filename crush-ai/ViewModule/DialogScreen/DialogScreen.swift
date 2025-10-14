@@ -12,6 +12,7 @@ struct DialogScreen: View {
     var defaultImage = "https://cdsassets.apple.com/live/7WUAS350/images/ios/ios-26-iphone-16-pro-take-a-screenshot-options.png"
     
     @StateObject private var dialogScreenVm: DialogScreenViewModel
+    @State private var selectedChips: Set<String> = []
     
     init(dialog: DialogEntity) {
         self.dialog = dialog
@@ -27,17 +28,70 @@ struct DialogScreen: View {
     
     var body: some View {
         ZStack {
-            OnboardingBackground.opacity(0.5)
-            
-            ScrollView {
-                ImageView(image: dialog.image)
+            backgroundView
+            list
+        }
+        .navigationTitle(dialog.title)
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem (placement: .bottomBar) {
+                PrimaryCTAButton(
+                    title: "Get Reply", action: dialogScreenVm.getReply
+                )
             }
-            .toolbar {
-                ToolbarItem {
-                    SettingsButton(destination: SettingsPlaceholderView())
-                }
+            .sharedBackgroundVisibility(.hidden)
+            ToolbarItem {
+                SettingsButton(destination: SettingsPlaceholderView())
             }
         }
+    }
+    
+    private var list: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                ImageView(image: dialog.image)
+//                Elements
+            }
+            .padding(.bottom, 20)
+        }
+    }
+    
+    private var Elements: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            if !dialog.elements.isEmpty {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        Spacer(minLength: 0) // помогает центрировать при контенте меньше ширины
+                        HStack(spacing: 8) {
+                            ForEach(dialog.elements, id: \.self) { element in
+                                SelectableChip(
+                                    title: element,
+                                    isSelected: Binding(
+                                        get: { selectedChips.contains(element) },
+                                        set: { newValue in
+                                            if newValue { selectedChips.insert(element) }
+                                            else { selectedChips.remove(element) }
+                                        }
+                                    )
+                                )
+                            }
+                        }
+                        Spacer(minLength: 0)
+                    }
+                    .frame(maxWidth: .infinity) // чтобы центрирование работало по ширине контейнера
+                    .padding(.vertical, 4)
+                    .padding(.horizontal, 20)
+                }
+            } else {
+                Text("No elements")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+        }
+    }
+    
+    private var backgroundView: some View {
+        OnboardingBackground.opacity(0.5)
     }
 }
 
@@ -47,7 +101,7 @@ struct ImageView: View {
     var body: some View {
         if let img = image {
             LargeImageDisplay(imageEntity: img)
-                .padding(.horizontal, 10)
+                .padding(.horizontal, 20)
         } else {
             RoundedRectangle(cornerRadius: 24, style: .continuous)
                 .overlay {
@@ -71,8 +125,8 @@ struct LargeImageDisplay: View {
     var body: some View {
         ZStack {
             content
-                .clipShape(RoundedRectangle(cornerRadius: corner, style: .continuous))
-                .overlay(RoundedRectangle(cornerRadius: corner, style: .continuous).stroke(AppTheme.borderPrimaryGradient, lineWidth: 1))
+//                .clipShape(RoundedRectangle(cornerRadius: corner, style: .continuous))
+//                .overlay(RoundedRectangle(cornerRadius: corner, style: .continuous).stroke(AppTheme.borderPrimaryGradient, lineWidth: 1))
             
             if isLoading {
                 RoundedRectangle(cornerRadius: corner, style: .continuous)
@@ -157,7 +211,7 @@ struct LargeImageDisplay: View {
 
 #Preview {
     let image = ImageEntity(id: "id", remoteUrl: "https://cdsassets.apple.com/live/7WUAS350/images/ios/ios-26-iphone-16-pro-take-a-screenshot-options.png")
-    let dialog = DialogEntity(id: "id2", userId: "u", title: "Test name")
+    let dialog = DialogEntity(id: "id2", userId: "u", title: "Test name", elements: ["opener", "test", "profile", "opener", "test", "profile"])
     dialog.image = image
     return DialogScreen(dialog: dialog).preferredColorScheme(.dark)
 }

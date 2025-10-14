@@ -21,6 +21,10 @@ final class DialogScreenViewModel: ObservableObject {
         let base64 = DialogScreenViewModel.makeBase64(from: currentImageUrl)
     }
     
+    func getReply () {
+        print("Get reply")
+    }
+    
     
     static func makeBase64(from url: URL?) -> String {
         guard let url else { return "" }
