@@ -6,15 +6,19 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct DialogScreen: View {
     var dialog: DialogEntity
     var defaultImage = "https://cdsassets.apple.com/live/7WUAS350/images/ios/ios-26-iphone-16-pro-take-a-screenshot-options.png"
     
+    @Environment(\.modelContext) private var modelContext
+    
     @StateObject private var dialogScreenVm: DialogScreenViewModel
     @State private var selectedChips: Set<String> = []
     @State private var showingError: Bool = false
     @State private var errorText: String = ""
+    @State private var isGettingReply: Bool = false
     
     init(dialog: DialogEntity) {
         self.dialog = dialog
@@ -38,7 +42,17 @@ struct DialogScreen: View {
         .toolbar {
             ToolbarItem (placement: .bottomBar) {
                 PrimaryCTAButton(
-                    title: "Get Reply", action: dialogScreenVm.getReply
+                    title: isGettingReply ? "Getting Reply…" : "Get Reply",
+                    isShimmering: isGettingReply,
+                    isLoading: isGettingReply,
+                    action: {
+                        guard !isGettingReply else { return }
+                        isGettingReply = true
+                        Task {
+                            defer { isGettingReply = false }
+                            await getReply()
+                        }
+                    }
                 )
             }
             .sharedBackgroundVisibility(.hidden)
@@ -102,17 +116,34 @@ struct DialogScreen: View {
         OnboardingBackground.opacity(0.5)
     }
     
-    private func addReplyToDialog (reply: AnalyzeScreenshotResponse) async {
-        let reply = ReplyEntity(id: UUID().uuidString, content: reply.content, tone: reply.tone)
+    // Adds a reply from API response to the current dialog using SwiftData
+    private func addReplyToDialog(reply: AnalyzeScreenshotResponse) {
+        let newReply = ReplyEntity(
+            id: UUID().uuidString,
+            content: reply.content,
+            tone: reply.tone
+        )
+        // Establish relationship
+        newReply.dialog = dialog
+        dialog.replies.append(newReply)
+        dialog.updatedAt = Date()
         
+        do {
+            try modelContext.save()
+        } catch {
+            // Surface the error to the user
+            errorText = "Failed to save reply: \(error.localizedDescription)"
+            showingError = true
+        }
     }
     
-    private func getReply () async {
+    // Example of calling the API and saving the result to SwiftData
+    private func getReply() async {
         let fallbackURL = URL(string: defaultImage)! // This is a constant valid URL
         let currentURL = dialog.image?.localFileURL ?? dialog.image?.remoteHTTPURL ?? fallbackURL
         let base64Image = DialogScreenViewModel.makeBase64(from: currentURL)
         
-        let body = AnalyzeScreenshotRequest(screenshotBase64: base64Image, tone: .RIZZ, context: "")
+        let body = AnalyzeScreenshotRequest(screenshotBase64: base64Image, tone: .RIZZ, context: dialog.context)
         
         do {
             let reply: AnalyzeScreenshotResponse = try await APIClient.shared.request(
@@ -121,8 +152,9 @@ struct DialogScreen: View {
                 body: body
             )
             
-            
-            
+            print(reply.content)
+            // Persist the reply
+            addReplyToDialog(reply: reply)
         } catch {
             // Handle/log as needed
             print("Failed to analyze screenshot: \(error)")

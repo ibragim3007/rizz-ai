@@ -10,6 +10,7 @@ import SwiftUI
 struct PrimaryCTAButton: View {
     let title: LocalizedStringKey
     let isShimmering: Bool
+    let isLoading: Bool
     let height: CGFloat
     let font: Font
     let fullWidth: Bool
@@ -18,6 +19,7 @@ struct PrimaryCTAButton: View {
     init(
         title: LocalizedStringKey,
         isShimmering: Bool? = nil,
+        isLoading: Bool = false,
         height: CGFloat = 60,
         font: Font = .system(size: 20, weight: .semibold, design: .rounded),
         fullWidth: Bool = true,
@@ -25,6 +27,7 @@ struct PrimaryCTAButton: View {
     ) {
         self.title = title
         self.isShimmering = isShimmering ?? false
+        self.isLoading = isLoading
         self.height = height
         self.font = font
         self.fullWidth = fullWidth
@@ -33,13 +36,23 @@ struct PrimaryCTAButton: View {
 
     var body: some View {
         Button(action: action) {
-            Text(title)
-                .font(font)
-                .frame(maxWidth: fullWidth ? .infinity : nil)
-                .frame(height: height)
-                .contentShape(Rectangle())
+            ZStack {
+                if isLoading {
+                    ProgressView()
+                        .tint(.white)
+                        .accessibilityLabel("Loading")
+                } else {
+                    Text(title)
+                        .font(font)
+                }
+            }
+            .frame(maxWidth: fullWidth ? .infinity : nil)
+            .frame(height: height)
+            .contentShape(Rectangle())
         }
-        .buttonStyle(PrimaryGradientButtonStyleShimmer(isShimmering: isShimmering))
+        .buttonStyle(PrimaryGradientButtonStyleShimmer(isShimmering: isShimmering || isLoading))
+        .disabled(isLoading)
+        .accessibilityHint(isLoading ? "Please wait" : "")
     }
 }
 
@@ -58,6 +71,9 @@ struct PrimaryCTAButton: View {
         ) {
             // preview action
         }
+
+        PrimaryCTAButton(title: "Loading", isShimmering: false, isLoading: true) {}
+            .padding(.horizontal, 20)
     }
     .padding()
     .preferredColorScheme(.dark)
