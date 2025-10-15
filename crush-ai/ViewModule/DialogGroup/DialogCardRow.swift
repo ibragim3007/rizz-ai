@@ -103,7 +103,7 @@ struct DialogCardRow: View {
     private var chevron: some View {
         ZStack {
             Circle()
-                .fill(.ultraThinMaterial)
+                .fill(.white.opacity(0.05))
                 .overlay(
                     Circle().fill(AppTheme.primary.opacity(0.18))
                 )
@@ -111,11 +111,11 @@ struct DialogCardRow: View {
                     Circle().stroke(AppTheme.borderPrimaryGradient, lineWidth: 1)
                 )
                 .frame(width: 32, height: 32)
-                .shadow(color: .black.opacity(0.20), radius: 10, x: 0, y: 6)
+                .shadow(color: .black.opacity(0.15), radius: 10, x: 0, y: 6)
             
             Image(systemName: "chevron.right")
                 .font(.system(size: 14, weight: .bold, design: .rounded))
-                .foregroundStyle(.white.opacity(0.9))
+                .foregroundStyle(.white.opacity(0.8))
         }
         .accessibilityHidden(true)
     }
@@ -132,7 +132,7 @@ struct DialogCardRow: View {
                     .fill(AppTheme.primaryDark.opacity(0.20))
             )
         // Глубина: glow + мягкие тени
-            .shadow(color: AppTheme.primary.opacity(0.14), radius: 16, x: 0, y: 8)
+//            .shadow(color: AppTheme.primary.opacity(0.14), radius: 16, x: 0, y: 8)
     }
     
     private var glossTopHighlight: some View {
@@ -140,7 +140,7 @@ struct DialogCardRow: View {
             .stroke(
                 LinearGradient(
                     colors: [
-                        .white.opacity(0.28),
+                        .white.opacity(0.20),
                         .white.opacity(0.06),
                         .clear
                     ],
@@ -149,7 +149,6 @@ struct DialogCardRow: View {
                 ),
                 lineWidth: 0.8
             )
-            .blendMode(.screen)
             .opacity(0.7)
     }
     
