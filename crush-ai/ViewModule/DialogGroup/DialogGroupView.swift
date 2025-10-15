@@ -15,9 +15,15 @@ struct DialogGroupView: View {
     
     @Environment(\.modelContext) private var modelContext
     @StateObject private var homeVm = HomeViewModel()
+    @StateObject private var groupVm = DialogGroupViewModel()
     
     @State private var showPhotoPicker = false
     @State private var selectedPhotoItem: PhotosPickerItem?
+    
+    // Delete-all confirmation state (like Home.swift)
+    @State private var showDeleteAllConfirm = false
+    @State private var pendingDeleteItems: [DialogEntity] = []
+    @State private var pendingDeleteTitle: String = ""
     
     var body: some View {
         ZStack {
@@ -43,7 +49,6 @@ struct DialogGroupView: View {
                     }
                 }.sharedBackgroundVisibility(.hidden)
             } else {
-                // Fallback on earlier versions
                 ToolbarItem (placement: .bottomBar) {
                     PrimaryCTAButton(
                         title: "Add Screenshot",
@@ -68,9 +73,12 @@ struct DialogGroupView: View {
             }
         }
         .onAppear {
-            // Поздняя инъекция контекста для VM
+            // Late injection of model contexts
             if homeVm.modelContext == nil {
                 homeVm.modelContext = modelContext
+            }
+            if groupVm.modelContext == nil {
+                groupVm.modelContext = modelContext
             }
         }
         // Фото-пикер
@@ -89,6 +97,41 @@ struct DialogGroupView: View {
                 }
             }
         }
+        // Deletion alert (single)
+        .alert("Delete this dialog?", isPresented: $groupVm.showDeleteAlert) {
+            Button("Delete", role: .destructive) {
+                groupVm.confirmDelete(in: dialogGroup)
+            }
+            Button("Cancel", role: .cancel) {
+                groupVm.cancelDelete()
+            }
+        } message: {
+            if let d = groupVm.dialogPendingDeletion {
+                Text("“\(d.title)” will be removed from this group. This action cannot be undone.")
+            } else {
+                Text("This action cannot be undone.")
+            }
+        }
+        // Delete-all confirmation (section)
+        .alert(
+            String(format: NSLocalizedString("Delete all in “%@”?", comment: "Delete all confirmation title"), pendingDeleteTitle),
+            isPresented: $showDeleteAllConfirm
+        ) {
+            Button(NSLocalizedString("Delete All", comment: "Confirm delete all"), role: .destructive) {
+                withAnimation(.snappy(duration: 0.28)) {
+                    groupVm.deleteAll(pendingDeleteItems, in: dialogGroup)
+                }
+                // Reset state
+                pendingDeleteItems.removeAll()
+                pendingDeleteTitle = ""
+            }
+            Button(NSLocalizedString("Cancel", comment: "Cancel"), role: .cancel) {
+                pendingDeleteItems.removeAll()
+                pendingDeleteTitle = ""
+            }
+        } message: {
+            Text(NSLocalizedString("This action cannot be undone.", comment: "Delete all warning"))
+        }
     }
     
     private var backgroundView: some View {
@@ -100,17 +143,53 @@ struct DialogGroupView: View {
             LazyVStack(alignment: .leading, spacing: 24) {
                 ForEach(sections, id: \.title) { section in
                     if !section.items.isEmpty {
-                        // Lightweight "section" to reduce generic complexity
-                        VStack(alignment: .leading, spacing: 16) {
+                        // Header with delete-all button (right-aligned), like Home.SectionHeader
+                        HStack {
                             Text(section.title)
                                 .font(.system(size: 20, weight: .heavy, design: .rounded))
                                 .foregroundStyle(.white.opacity(0.85))
-                                .padding(.horizontal, 20)
                             
-                            VStack(spacing: 16) {
-                                ForEach(section.items, id: \.id) { dialog in
-                                    NavigationLink(destination: DialogScreen(dialog: dialog, dialogGroup: dialogGroup)) {
-                                        DialogCardRow(dialog: dialog)
+                            Spacer()
+                            
+                            Button {
+                                pendingDeleteItems = section.items
+                                pendingDeleteTitle = section.title
+                                showDeleteAllConfirm = true
+                            } label: {
+                                Label {
+                                    Text(NSLocalizedString("Delete All", comment: "Delete all in section"))
+                                } icon: {
+                                    Image(systemName: "trash")
+                                }
+                            }
+                            .buttonStyle(.borderless)
+                            .tint(.white.opacity(0.4))
+                            .foregroundStyle(.white.opacity(0.4))
+                            .font(.footnote)
+                            .accessibilityLabel(Text(NSLocalizedString("Delete all in section", comment: "Delete all in section")))
+                        }
+                        .padding(.horizontal, 20)
+                        
+                        VStack(spacing: 16) {
+                            ForEach(section.items, id: \.id) { dialog in
+                                NavigationLink(destination: DialogScreen(dialog: dialog, dialogGroup: dialogGroup)) {
+                                    DialogCardRow(dialog: dialog)
+                                }
+                                // Long-press to delete
+                                .simultaneousGesture(
+                                    LongPressGesture(minimumDuration: 0.5).onEnded { _ in
+#if canImport(UIKit)
+                                        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+#endif
+                                        groupVm.requestDelete(dialog)
+                                    }
+                                )
+                                // Optional: context menu alternative
+                                .contextMenu {
+                                    Button(role: .destructive) {
+                                        groupVm.requestDelete(dialog)
+                                    } label: {
+                                        Label("Delete", systemImage: "trash")
                                     }
                                 }
                             }
@@ -186,3 +265,4 @@ private extension DialogGroupView {
             .preferredColorScheme(.dark)
     }
 }
+
