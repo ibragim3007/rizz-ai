@@ -70,7 +70,8 @@ struct Home: View {
                         }
                     }
                 }
-                .navigationTitle("Home")
+                .navigationTitle("Crush AI")
+                .navigationBarTitleDisplayMode(.inline)
         }
         // Презентация PhotosPicker
         .photosPicker(
