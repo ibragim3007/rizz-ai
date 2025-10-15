@@ -33,20 +33,14 @@ struct ReplyView: View {
             .overlay(
                 LinearGradient(
                     colors: [
-                        .white.opacity(0.28),
-                        .white.opacity(0.10),
+                        .white.opacity(0.1),
+                        .white.opacity(0.15),
                         .clear
                     ],
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 )
-                .blendMode(.softLight)
                 .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
-            )
-            // Едва заметная обводка для глубины
-            .overlay(
-                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                    .strokeBorder(.white.opacity(0.10), lineWidth: 1)
             )
             // Всплывающий тост «Copied»
             .overlay(alignment: .topTrailing) {
@@ -54,7 +48,7 @@ struct ReplyView: View {
                     HStack(spacing: 6) {
                         Image(systemName: "checkmark.circle.fill")
                             .symbolRenderingMode(.palette)
-                            .foregroundStyle(.white, .white.opacity(0.35))
+                            .foregroundStyle(.white, .white.opacity(0.45))
                         Text("Copied")
                             .font(.footnote.weight(.semibold))
                             .foregroundStyle(.white)
@@ -62,16 +56,15 @@ struct ReplyView: View {
                     .padding(.horizontal, 10)
                     .padding(.vertical, 6)
                     .background(.ultraThinMaterial, in: Capsule())
-                    .transition(.opacity.combined(with: .scale(scale: 0.95)))
+                    .transition(.opacity.combined(with: .scale(scale: 0.6)))
                     .padding(10)
                 }
             }
             // Объёмные тени
-            .shadow(color: accentForTone.opacity(0.35), radius: 18, x: 0, y: 12)
             .shadow(color: .black.opacity(0.25), radius: 6, x: 0, y: 2)
             .contentShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
             // Лёгкое «вздрагивание» при копировании
-            .modifier(ShakeEffect(amount: 4, shakesPerUnit: 2, animatableData: shakeTrigger))
+            .modifier(ShakeEffect(amount: 3, shakesPerUnit: 2, animatableData: shakeTrigger))
             .onTapGesture(perform: copyToClipboard)
             .accessibilityLabel("Reply")
             .accessibilityHint("Double tap to copy")

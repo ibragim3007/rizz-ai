@@ -10,6 +10,7 @@ import Combine
 import SwiftUI
 import _PhotosUI_SwiftUI
 import SwiftData
+import ImageIO
 
 @MainActor
 final class HomeViewModel: ObservableObject {
@@ -37,16 +38,25 @@ final class HomeViewModel: ObservableObject {
             // Ensure we have a context
             guard let ctx = modelContext else { return }
             
-            // Загружаем данные изображения
-            guard let data = try await item.loadTransferable(type: Data.self) else { return }
+            // Загружаем исходные байты
+            guard let originalData = try await item.loadTransferable(type: Data.self) else { return }
+
+            // Перекодируем и даунскейлим (уменьшает "Documents" кратно)
+            let jpegData = Self.reencodeImageToJPEG(originalData,
+                                                    maxDimension: 1024,
+                                                    quality: 0.6) ?? originalData
 
             // Сохраняем в файловую систему (Documents)
-            let fileURL = try saveImageDataToDocuments(data: data, suggestedName: await suggestedFilename(from: item))
+            let fileURL = try saveImageDataToDocuments(
+                data: jpegData,
+                suggestedName: await suggestedFilename(from: item),
+                forceExtension: "jpg"
+            )
 
             // Создаем ImageEntity
             let imageEntity = ImageEntity(id: UUID().uuidString, localUrl: fileURL.path, remoteUrl: nil, createdAt: .now)
 
-            // Создаем DialogEntity (подставим простой userId; замените на свой источник при наличии)
+            // Создаем DialogEntity
             let dialog = DialogEntity(
                 id: UUID().uuidString,
                 userId: "local-user",
@@ -63,6 +73,7 @@ final class HomeViewModel: ObservableObject {
             )
             
             dialog.image = imageEntity
+            dialog.group = dialogGroup
             dialogGroup.dialogs.append(dialog)
             dialogGroup.cover = imageEntity
 
@@ -102,21 +113,24 @@ final class HomeViewModel: ObservableObject {
     func delete(_ group: DialogGroupEntity) {
         guard let ctx = modelContext else { return }
         
-        // Удаляем локальные файлы и сущности изображений, чтобы не оставлять сироты
-        // 1) Cover
+        // Собираем все уникальные ImageEntity, чтобы не удалить один и тот же объект дважды
+        var imagesToDelete = [String: ImageEntity]()
         if let cover = group.cover {
-            deleteImageFileIfExists(from: cover)
-            ctx.delete(cover)
+            imagesToDelete[cover.id] = cover
         }
-        // 2) Изображения у диалогов внутри группы
         for dialog in group.dialogs {
             if let image = dialog.image {
-                deleteImageFileIfExists(from: image)
-                ctx.delete(image)
+                imagesToDelete[image.id] = image
             }
         }
         
-        // Удаляем саму группу (каскадно удалит replies через dialogs; images у dialogs уже почистили вручную)
+        // Сначала удаляем файлы и сущности изображений (каждую ровно один раз)
+        for (_, image) in imagesToDelete {
+            deleteImageFileIfExists(from: image)
+            ctx.delete(image)
+        }
+        
+        // Затем удаляем саму группу (каскадно удалит replies через dialogs; ссылки на images уже обнулены удалением)
         withAnimation(.snappy(duration: 0.28)) {
             ctx.delete(group)
             do {
@@ -125,6 +139,9 @@ final class HomeViewModel: ObservableObject {
                 print("Failed to delete DialogGroupEntity: \(error)")
             }
         }
+        
+        // На всякий случай — убрать возможных сирот (если были сложные сценарии привязок)
+        Task { await cleanupOrphanImages() }
     }
 
     private func deleteImageFileIfExists(from image: ImageEntity) {
@@ -141,17 +158,17 @@ final class HomeViewModel: ObservableObject {
 
     // MARK: - File saving helpers
 
-    func saveImageDataToDocuments(data: Data, suggestedName: String?) throws -> URL {
+    func saveImageDataToDocuments(data: Data, suggestedName: String?, forceExtension: String? = nil) throws -> URL {
         let fm = FileManager.default
         let docs = try fm.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
         let baseName = (suggestedName?.isEmpty == false ? suggestedName! : UUID().uuidString)
-        // По умолчанию используем .jpg
-        var targetURL = docs.appendingPathComponent(baseName).appendingPathExtension("jpg")
+        let ext = forceExtension ?? "jpg"
+        var targetURL = docs.appendingPathComponent(baseName).appendingPathExtension(ext)
 
         // Если файл существует — добавляем суффикс
         var counter = 1
         while fm.fileExists(atPath: targetURL.path) {
-            targetURL = docs.appendingPathComponent("\(baseName)-\(counter)").appendingPathExtension("jpg")
+            targetURL = docs.appendingPathComponent("\(baseName)-\(counter)").appendingPathExtension(ext)
             counter += 1
         }
 
@@ -161,6 +178,54 @@ final class HomeViewModel: ObservableObject {
 
     private func suggestedFilename(from item: PhotosPickerItem) async -> String? {
         await item.itemIdentifier?.split(separator: "/").last.map(String.init)
+    }
+    
+    // MARK: - Image recompression
+    
+    /// Перекодирует входные байты изображения в JPEG c даунскейлом через ImageIO.
+    /// Гарантирует, что длинная сторона будет <= maxDimension (в пикселях).
+    static func reencodeImageToJPEG(_ data: Data, maxDimension: CGFloat = 2200, quality: CGFloat = 0.75) -> Data? {
+        guard let src = CGImageSourceCreateWithData(data as CFData, nil) else { return nil }
+        let options: [CFString: Any] = [
+            kCGImageSourceCreateThumbnailFromImageAlways: true,
+            kCGImageSourceThumbnailMaxPixelSize: Int(maxDimension),
+            kCGImageSourceCreateThumbnailWithTransform: true
+        ]
+        guard let thumb = CGImageSourceCreateThumbnailAtIndex(src, 0, options as CFDictionary) else { return nil }
+        
+        #if canImport(UIKit)
+        let ui = UIImage(cgImage: thumb)
+        return ui.jpegData(compressionQuality: quality)
+        #elseif canImport(AppKit)
+        let rep = NSBitmapImageRep(cgImage: thumb)
+        return rep.representation(using: .jpeg, properties: [.compressionFactor: quality])
+        #else
+        return nil
+        #endif
+    }
+    
+    // MARK: - Orphan cleanup
+    
+    /// Удаляет ImageEntity, на которые никто не ссылается, вместе с их файлами.
+    func cleanupOrphanImages() async {
+        guard let ctx = modelContext else { return }
+        do {
+            let descriptor = FetchDescriptor<ImageEntity>()
+            let images = try ctx.fetch(descriptor)
+            var removed = 0
+            for img in images {
+                if img.dialog == nil && img.dialogGroup == nil {
+                    deleteImageFileIfExists(from: img)
+                    ctx.delete(img)
+                    removed += 1
+                }
+            }
+            if removed > 0 {
+                try ctx.save()
+            }
+        } catch {
+            print("Failed to cleanup orphan images: \(error)")
+        }
     }
 }
 

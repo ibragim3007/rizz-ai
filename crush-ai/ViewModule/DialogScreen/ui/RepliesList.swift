@@ -108,7 +108,7 @@ struct RepliesList: View {
     ]
     
     return ScrollView {
-        RepliesList(replies: [])
+        RepliesList(replies: items)
             .padding(.vertical)
     }
     .background(

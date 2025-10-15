@@ -147,7 +147,6 @@ struct LargeImageDisplay: View {
     var body: some View {
         ZStack {
             content
-                .clipShape(RoundedRectangle(cornerRadius: corner, style: .continuous))
 //                .overlay(RoundedRectangle(cornerRadius: corner, style: .continuous).stroke(AppTheme.borderPrimaryGradient, lineWidth: 1))
             
             if isLoading {
@@ -170,7 +169,8 @@ struct LargeImageDisplay: View {
                     img
                         .resizable()
                         .scaledToFit()
-                        .frame(maxWidth: .infinity, maxHeight: 500)
+                        .clipShape(RoundedRectangle(cornerRadius: corner, style: .continuous))
+                        .frame(maxWidth: .infinity, maxHeight: 450)
                 )
             } else if let url = imageEntity.remoteHTTPURL {
                 AnyView(
@@ -197,7 +197,7 @@ struct LargeImageDisplay: View {
                         @unknown default:
                             AnyView(placeholder)
                         }
-                    }
+                    } .clipShape(RoundedRectangle(cornerRadius: corner, style: .continuous))
                 )
             } else {
                 AnyView(placeholder)
