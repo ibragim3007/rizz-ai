@@ -111,9 +111,13 @@ struct ScreenShotItem: View {
                 }
                 .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
                 .overlay(alignment: .bottom) {
-                    Text(title ?? "Unnamed")
+                    let hasTitle = !(title?.isEmpty ?? true)
+                    let displayTitle = hasTitle ? title! : "Not named"
+                    
+                    Text(displayTitle)
                         .font(.system(size: 12, weight: .semibold, design: .rounded))
                         .foregroundStyle(.white)
+                        .opacity(hasTitle ? 1.0 : 0.5)
                         .padding(.horizontal, 3)
                         .padding(.vertical, 7)
                         .frame(width: (size.width - 10))
@@ -185,4 +189,3 @@ struct ScreenShotItem: View {
 #Preview {
     ScreenShotItem(imagePath: "sample-screen", title: "Karla from college").preferredColorScheme(.dark)
 }
-

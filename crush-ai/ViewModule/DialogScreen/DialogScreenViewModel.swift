@@ -80,6 +80,8 @@ final class DialogScreenViewModel: ObservableObject {
             return entity
         }
         
+        dialog.title = reply.dialogTitle
+        dialog.group?.title = reply.nikname
         dialog.replies.append(contentsOf: newReplies)
         dialog.updatedAt = Date()
         

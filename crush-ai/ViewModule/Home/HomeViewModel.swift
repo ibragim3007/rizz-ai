@@ -61,7 +61,7 @@ final class HomeViewModel: ObservableObject {
             let dialog = DialogEntity(
                 id: UUID().uuidString,
                 userId: "local-user",
-                title: "Unnamed",
+                title: "",
                 context: nil,
                 summary: nil,
                 elements: [],
@@ -70,7 +70,7 @@ final class HomeViewModel: ObservableObject {
             )
             
             let dialogGroup = DialogGroupEntity(
-                id: UUID().uuidString, userId: "local-user", title: "Unnamed"
+                id: UUID().uuidString, userId: "local-user", title: ""
             )
             
             dialog.image = imageEntity
@@ -130,7 +130,7 @@ final class HomeViewModel: ObservableObject {
             let dialog = DialogEntity(
                 id: UUID().uuidString,
                 userId: "local-user",
-                title: "Unnamed",
+                title: "",
                 context: nil,
                 summary: nil,
                 elements: [],

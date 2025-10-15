@@ -20,14 +20,14 @@ struct DialogCardRow: View {
             
             VStack(alignment: .leading, spacing: 6) {
                 Text(dialog.title)
-                    .font(.system(size: 22, weight: .heavy, design: .rounded))
+                    .font(.system(size: 20, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
                     .lineLimit(2)
                     .minimumScaleFactor(0.75)
                 
                 Text(dateSubtitle(for: dialog.updatedAt))
-                    .font(.system(size: 16, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.white.opacity(0.6))
+                    .font(.system(size: 14, weight: .regular, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.5))
             }
             
             Spacer()
@@ -62,7 +62,7 @@ struct DialogCardRow: View {
             .fill(.ultraThinMaterial)
             .overlay(
                 RoundedRectangle(cornerRadius: corner, style: .continuous)
-                    .fill(AppTheme.primaryDark.opacity(0.14))
+                    .fill(AppTheme.primary.opacity(0.15))
             )
             .overlay(
                 RoundedRectangle(cornerRadius: corner, style: .continuous)
@@ -79,5 +79,17 @@ struct DialogCardRow: View {
         df.locale = .current
         df.setLocalizedDateFormatFromTemplate("EEEE, HH:mm") // Friday, 16:53
         return df.string(from: date)
+    }
+}
+
+
+#Preview {
+    // Пример превью с фиктивными данными
+    let cover = ImageEntity(id: "img1", localUrl: "girl-3", remoteUrl: "girl-3")
+    let d1 = DialogEntity(id: "1", userId: "u", title: "Home screen opener prep", createdAt: .now.addingTimeInterval(-3600), updatedAt: .now.addingTimeInterval(-3600))
+    
+    return NavigationStack {
+        DialogCardRow(dialog: d1)
+            .preferredColorScheme(.dark)
     }
 }
