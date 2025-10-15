@@ -20,6 +20,7 @@ struct DialogScreen: View {
     
     @StateObject private var dialogScreenVm: DialogScreenViewModel
     @State private var selectedChips: Set<String> = []
+    @FocusState private var isContextFocused: Bool
     
     init(dialog: DialogEntity, dialogGroup: DialogGroupEntity) {
         self.dialog = dialog
@@ -40,6 +41,9 @@ struct DialogScreen: View {
             backgroundView
             list
         }
+        // Тап по пустому фону закрывает клавиатуру
+        .contentShape(Rectangle())
+        .onTapGesture { isContextFocused = false }
         .navigationTitle(dialog.title)
         .navigationBarTitleDisplayMode(.automatic)
         .toolbar {
@@ -119,7 +123,8 @@ struct DialogScreen: View {
                     text: Binding(
                         get: { dialogScreenVm.context ?? "" },
                         set: { dialogScreenVm.context = $0 }
-                    )
+                    ),
+                    isFocused: $isContextFocused
                 )
                 .padding(.horizontal, 20)
                 
@@ -128,6 +133,8 @@ struct DialogScreen: View {
             }
             .padding(.bottom, 50)
         }
+        // Тап по прокрутке вне инпута тоже закрывает клавиатуру
+        .simultaneousGesture(TapGesture().onEnded { isContextFocused = false })
     }
     
     private var Elements: some View {
@@ -165,7 +172,11 @@ struct DialogScreen: View {
     }
     
     private var backgroundView: some View {
-        OnboardingBackground.opacity(0.5)
+        OnboardingBackground
+            .opacity(0.5)
+            // Тап по фону закрывает клавиатуру
+            .contentShape(Rectangle())
+            .simultaneousGesture(TapGesture().onEnded { isContextFocused = false })
     }
 }
 
@@ -387,53 +398,6 @@ private struct CornerMarks: Shape {
 
 // MARK: - Context Input Card
 
-private struct ContextInputCard: View {
-    @Binding var text: String
-    @FocusState private var focused: Bool
-    private let corner: CGFloat = 20
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Extra context")
-                .font(.footnote.weight(.semibold))
-                .foregroundStyle(.secondary)
-                .padding(.leading, 6)
-                .accessibilityHidden(true)
-            
-            ZStack(alignment: .topLeading) {
-                // Background
-                RoundedRectangle(cornerRadius: corner, style: .continuous)
-                    .fill(.ultraThinMaterial.opacity(0.6))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: corner, style: .continuous)
-                            .stroke(AppTheme.borderPrimaryGradient, lineWidth: 1)
-                    )
-                    .shadow(color: Color.black.opacity(0.18), radius: 20, x: 0, y: 10)
-                
-                // TextEditor
-                TextEditor(text: $text)
-                    .focused($focused)
-                    .font(.system(size: 16, weight: .regular, design: .rounded))
-                    .foregroundStyle(.primary)
-                    .scrollContentBackground(.hidden)
-                    .padding(12)
-                    .frame(minHeight: 80, maxHeight: 150, alignment: .topLeading)
-                    .accessibilityLabel("Extra context")
-                
-                // Placeholder
-                if text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                    Text("Add any details to help generate a better reply…")
-                        .font(.system(size: 16, weight: .regular, design: .rounded))
-                        .foregroundStyle(.secondary)
-                        .padding(16)
-                        .allowsHitTesting(false)
-                        .accessibilityHidden(true)
-                }
-            }
-            .onTapGesture { focused = true }
-        }
-    }
-}
 
 #Preview {
     let image = ImageEntity(id: "id", remoteUrl: "https://cdsassets.apple.com/live/7WUAS350/images/ios/ios-26-iphone-16-pro-take-a-screenshot-options.png")
@@ -455,3 +419,4 @@ private struct ContextInputCard: View {
     
     return DialogScreen(dialog: dialog, dialogGroup: dialogGroup).preferredColorScheme(.dark)
 }
+
