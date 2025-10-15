@@ -80,7 +80,7 @@ struct DialogScreen: View {
 //                Elements
                 RepliesList(replies: dialog.replies)
             }
-            .padding(.bottom, 20)
+            .padding(.bottom, 50)
         }
     }
     

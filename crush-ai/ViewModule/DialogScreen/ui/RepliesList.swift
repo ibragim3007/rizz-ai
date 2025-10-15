@@ -35,32 +35,8 @@ struct RepliesList: View {
     
     private var placeholderReply: some View {
         ZStack {
-            // Ambient gradient auras
-            Circle()
-                .fill(
-                    RadialGradient(colors: [AppTheme.primary.opacity(0.25), .clear],
-                                   center: .center, startRadius: 0, endRadius: 180)
-                )
-                .frame(width: 240, height: 230)
-                .offset(x: -90, y: -40)
-                .blur(radius: 20)
-                .opacity(animateGlow ? 0.9 : 0.6)
-                .animation(.easeInOut(duration: 2.2).repeatForever(autoreverses: true), value: animateGlow)
-            
-            Circle()
-                .fill(
-                    RadialGradient(colors: [AppTheme.primaryLight.opacity(0.15), .clear],
-                                   center: .center, startRadius: 0, endRadius: 200)
-                )
-                .frame(width: 280, height: 230)
-                .offset(x: 110, y: 40)
-                .blur(radius: 24)
-                .opacity(animateGlow ? 0.9 : 0.6)
-                .animation(.easeInOut(duration: 2.2).repeatForever(autoreverses: true), value: animateGlow)
-            
-            // Glass card
             RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .fill(.white.opacity(0.1))
+                .fill(.white.opacity(0.05))
                 .shadow(color: Color.black.opacity(0.18), radius: 20, x: 0, y: 10)
                 .overlay {
                     // Content
@@ -90,7 +66,7 @@ struct RepliesList: View {
                     .padding(.horizontal, 16)
                 }
         }
-        .frame(maxWidth: .infinity, alignment: .center)
+        .frame(maxWidth: .infinity, minHeight: 200)
         .padding(.vertical, 12)
         .onAppear { animateGlow = true }
         .accessibilityElement(children: .combine)
@@ -108,7 +84,7 @@ struct RepliesList: View {
     ]
     
     return ScrollView {
-        RepliesList(replies: items)
+        RepliesList(replies: [])
             .padding(.vertical)
     }
     .background(
