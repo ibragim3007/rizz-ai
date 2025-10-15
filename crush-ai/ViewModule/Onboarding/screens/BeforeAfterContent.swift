@@ -112,13 +112,13 @@ private struct CapsuleLabel: View {
                 .foregroundStyle(.white)
                 .padding(.horizontal, 15)
                 .padding(.vertical, 7)
-                .background(.ultraThinMaterial)
-            //            .background(
-            //                Capsule(style: .continuous)
-            //                    .fill(tint.opacity(0.25))
-            //                    .background(.ultraThinMaterial)
-            //                    .cornerRadius(20)
-            //            )
+//                .background(.ultraThinMaterial)
+                        .background(
+                            Capsule(style: .continuous)
+                                .fill(tint.opacity(0.25))
+                                .background(.ultraThinMaterial)
+                                .cornerRadius(20)
+                        )
         }
     }
 }

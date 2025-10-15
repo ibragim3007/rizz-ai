@@ -46,10 +46,6 @@ struct DialogScreen: View {
                     ToneButtonView()
                 }
                 .sharedBackgroundVisibility(.hidden)
-            } else {
-                ToolbarItem (placement: .bottomBar) {
-                    ToneButtonView()
-                }
             }
             
             if #available(iOS 26.0, *) {
@@ -59,24 +55,13 @@ struct DialogScreen: View {
                 ToolbarItem (placement: .bottomBar) {
                     PrimaryCTAButton(
                         title: dialogScreenVm.isLoading ? "Getting Reply…" : "Get Reply",
-                        isLoading: dialogScreenVm.isLoading,
+                        isLoading: dialogScreenVm.isLoading
                     ) {
                         guard !dialogScreenVm.isLoading else { return }
                         Task { await dialogScreenVm.getReply(modelContext: modelContext, tone: currentTone) }
                     }
                 }
                 .sharedBackgroundVisibility(.hidden)
-            } else {
-                // Fallback on earlier versions
-                ToolbarItem (placement: .bottomBar) {
-                    PrimaryCTAButton(
-                        title: dialogScreenVm.isLoading ? "Getting Reply…" : "Get Reply",
-                        isLoading: dialogScreenVm.isLoading,
-                    ) {
-                        guard !dialogScreenVm.isLoading else { return }
-                        Task { await dialogScreenVm.getReply(modelContext: modelContext, tone: currentTone) }
-                    }
-                }
             }
             ToolbarItem {
                 SettingsButton(destination: SettingsPlaceholderView())
@@ -92,6 +77,29 @@ struct DialogScreen: View {
             Button("OK", role: .cancel) { }
         } message: {
             Text(dialogScreenVm.errorText)
+        }
+        // На iOS < 26 рисуем свою нижнюю панель, чтобы кнопка заняла всю ширину.
+        .safeAreaInset(edge: .bottom) {
+            if #available(iOS 26.0, *) {
+                // Ничего не добавляем — на iOS 26+ используется Toolbar
+                EmptyView()
+            } else {
+                HStack(spacing: 12) {
+                    ToneButtonView()
+                    PrimaryCTAButton(
+                        title: dialogScreenVm.isLoading ? "Getting Reply…" : "Get Reply",
+                        isLoading: dialogScreenVm.isLoading,
+                        fullWidth: true
+                    ) {
+                        guard !dialogScreenVm.isLoading else { return }
+                        Task { await dialogScreenVm.getReply(modelContext: modelContext, tone: currentTone) }
+                    }
+                    .frame(maxWidth: .infinity)
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 10)
+                .background(.bar) // визуально как тулбар
+            }
         }
     }
     
