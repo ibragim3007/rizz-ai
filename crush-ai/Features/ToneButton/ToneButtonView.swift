@@ -18,6 +18,10 @@ struct ToneButtonView: View {
     @State private var isAnimatingTap = false
     @State private var shakeProgress: CGFloat = 0 // триггер для "тряски"
     
+    // Tooltip
+    @State private var showTooltip = false
+    @State private var tooltipTask: Task<Void, Never>?
+    
     var body: some View {
         Button(action: {
             // Легкая вибрация
@@ -27,6 +31,9 @@ struct ToneButtonView: View {
             
             // Смена тона
             cycleTone()
+            
+            // Показать тултип с выбранным режимом
+            showToneTooltip()
             
             // Анимации: пружинящий скейл/поворот + "тряска"
             animateTap()
@@ -41,6 +48,7 @@ struct ToneButtonView: View {
                 .animation(.spring(response: 0.28, dampingFraction: 0.6, blendDuration: 0.2), value: isAnimatingTap)
                 // Легкая "тряска" по оси X
                 .modifier(ShakeEffect(amount: 6, shakesPerUnit: 3, animatableData: shakeProgress))
+                .shadow(color: .black.opacity(0.2), radius: 5)
         }
         .buttonStyle(.plain)
         .background(
@@ -58,6 +66,21 @@ struct ToneButtonView: View {
             }
         )
         .clipShape(Circle())
+        // Tooltip над кнопкой
+        .overlay(alignment: .top) {
+            if showTooltip {
+                TooltipBubble(text: accessibilityToneName(for: currentTone))
+                    .offset(x: 20, y: -40) // немного над кнопкой
+                    .transition(
+                        .asymmetric(
+                            insertion: .offset(y: 6).combined(with: .opacity),
+                            removal: .opacity
+                        )
+                    )
+                    .animation(.easeOut(duration: 0.25), value: showTooltip)
+                    .accessibilityHidden(true)
+            }
+        }
         .shadow(color: AppTheme.primary.opacity(0.25), radius: 8, x: 0, y: 4)
         .accessibilityLabel("Change tone")
         .accessibilityValue(accessibilityToneName(for: currentTone))
@@ -80,6 +103,23 @@ struct ToneButtonView: View {
                 withAnimation(.spring(response: 0.28, dampingFraction: 0.7, blendDuration: 0.2)) {
                     isAnimatingTap = false
                 }
+            }
+        }
+    }
+    
+    private func showToneTooltip() {
+        // Отменяем предыдущий таймер скрытия, если быстро тапают
+//        tooltipTask?.cancel()
+        
+        withAnimation(.easeOut(duration: 0.20)) {
+            showTooltip = true
+        }
+        
+        tooltipTask = Task { @MainActor in
+            // Держим подсказку немного видимой
+            try? await Task.sleep(nanoseconds: 1_250_000_000) // ~1.15s
+            withAnimation(.easeIn(duration: 0.20)) {
+                showTooltip = false
             }
         }
     }
@@ -128,15 +168,35 @@ private struct ShakeEffect: GeometryEffect {
     }
 }
 
+// Лёгкий пузырь-подсказка
+private struct TooltipBubble: View {
+    let text: String
+    
+    var body: some View {
+        Text(text)
+            .font(.system(size: 14, weight: .semibold, design: .rounded))
+            .foregroundStyle(.white)
+            .frame(width: 70)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 6)
+            .background(.ultraThinMaterial.opacity(0.5), in: Capsule())
+            .overlay(
+                Capsule()
+                    .stroke(AppTheme.primary.opacity(0.25), lineWidth: 1)
+            )
+            .shadow(color: .black.opacity(0.35), radius: 8, x: 0, y: 6)
+            .shadow(color: AppTheme.primary.opacity(0.25), radius: 12, x: 0, y: 0)
+            .accessibilityHidden(true)
+    }
+}
+
 #Preview {
     ZStack {
         OnboardingBackground
-        HStack {
+        HStack(spacing: 16) {
             ToneButtonView()
-            
-            PrimaryCTAButton(title: "Hello world") {
-                
-            }
+            PrimaryCTAButton(title: "Hello world") { }
         }
+        .padding()
     }
 }
