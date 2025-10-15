@@ -88,10 +88,10 @@ struct Home: View {
                     ) {
                         vmHome.uploadScreenshot()
                     }
-//                    .padding(.horizontal, 10)
                 }
                 .sharedBackgroundVisibility(.hidden)
             }
+            .navigationTitle("Home")
         }
         // Презентация PhotosPicker
         .photosPicker(
