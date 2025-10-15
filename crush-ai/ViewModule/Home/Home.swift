@@ -24,12 +24,12 @@ struct Home: View {
     
     var body: some View {
         ZStack {
-            OnboardingBackground.opacity(0.2)
+
+            MeshedGradient()
             
             if dialogs.isEmpty {
                 EmptyDialogsView()
                     .padding(.horizontal, 24)
-                    .multilineTextAlignment(.center)
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
                     .allowsHitTesting(false)
                     .transition(.opacity)
