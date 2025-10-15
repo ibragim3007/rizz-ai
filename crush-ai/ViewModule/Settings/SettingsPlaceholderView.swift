@@ -14,52 +14,47 @@ struct SettingsPlaceholderView: View {
     @AppStorage("tone") private var currentTone: ToneTypes = .RIZZ
 
     var body: some View {
-        List {
-            Section("Settings") {
-                // Язык
-                Picker(selection: $replyLanguage) {
-                    ForEach(languageOptions) { option in
-                        Text(option.title).tag(option.id)
-                    }
-                } label: {
-                    Text(NSLocalizedString("Response language", comment: "Response language"))
-                }
-                
-                // Тон
-                Picker(selection: $currentTone) {
-                    ForEach(ToneTypes.allCases, id: \.self) { tone in
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(toneTitle(for: tone))
-                                .font(.body)
-                            Text(toneDescription(for: tone))
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                                .lineLimit(1)
+        ZStack {
+            MeshedGradient().opacity(0.5)
+            List {
+                Section("Settings") {
+                    // Язык
+                    Picker(selection: $replyLanguage) {
+                        ForEach(languageOptions) { option in
+                            Text(option.title).tag(option.id)
                         }
-                        .tag(tone)
+                    } label: {
+                        Text(NSLocalizedString("Response language", comment: "Response language"))
                     }
-                } label: {
-                    Text(NSLocalizedString("Tone", comment: "Response tone"))
+                    
+                    // Тон
+                    Picker(selection: $currentTone) {
+                        ForEach(ToneTypes.allCases, id: \.self) { tone in
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(toneTitle(for: tone))
+                                    .font(.body)
+                                Text(toneDescription(for: tone))
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                    .lineLimit(1)
+                            }
+                            .tag(tone)
+                        }
+                    } label: {
+                        Text(NSLocalizedString("Tone", comment: "Response tone"))
+                    }
+                    
+                    Text("Coming soon")
+                        .foregroundStyle(.secondary)
                 }
                 
-                Text("Coming soon")
-                    .foregroundStyle(.secondary)
+                Section("Storage") {
+                    StorageSection()
+                }
             }
-            
-            Section("Storage") {
-                StorageSection()
-            }
+            .scrollContentBackground(.hidden)
+            .navigationTitle("Settings")
         }
-        .scrollContentBackground(.hidden)
-        .background(
-            LinearGradient(
-                colors: [AppTheme.backgroundTop, AppTheme.backgroundBottom],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-            .ignoresSafeArea()
-        )
-        .navigationTitle("Settings")
     }
     
     
