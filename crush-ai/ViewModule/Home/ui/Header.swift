@@ -48,6 +48,7 @@ struct SettingsButton<Destination: View>: View {
 
 struct SettingsPlaceholderView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.appActions) private var appActions
     
     @State private var storeSizeBytes: Int64 = 0
     @State private var imagesSizeBytes: Int64 = 0
@@ -261,7 +262,11 @@ struct SettingsPlaceholderView: View {
             }
         }
         
-        // 3) Пересчитываем размеры после очистки
+        // 3) Полный reset стора: закрыть, удалить файлы .sqlite/-wal/-shm, пересоздать контейнер
+        await appActions.resetStore()
+        
+        // 4) Пересчитываем размеры после очистки
         await recomputeSizes()
     }
 }
+
