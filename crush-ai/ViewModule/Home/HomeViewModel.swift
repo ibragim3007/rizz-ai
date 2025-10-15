@@ -98,6 +98,74 @@ final class HomeViewModel: ObservableObject {
         }
     }
     
+    /// Создает новый диалог в уже существующей группе, добавляет фото, обновляет cover и дату обновления группы.
+    func handlePickedPhoto(_ item: PhotosPickerItem, for group: DialogGroupEntity) async {
+        do {
+            guard let ctx = modelContext else { return }
+            
+            // 1) Загрузка и перекодирование изображения
+            guard let originalData = try await item.loadTransferable(type: Data.self) else { return }
+            let jpegData = Self.reencodeImageToJPEG(originalData,
+                                                    maxDimension: 1024,
+                                                    quality: 0.6) ?? originalData
+            
+            // 2) Сохранение файла в Documents
+            let fileURL = try saveImageDataToDocuments(
+                data: jpegData,
+                suggestedName: await suggestedFilename(from: item),
+                forceExtension: "jpg"
+            )
+            
+            // 3) Создание сущностей
+            let now = Date()
+            let imageEntity = ImageEntity(
+                id: UUID().uuidString,
+                localUrl: fileURL.path,
+                remoteUrl: nil,
+                createdAt: now
+            )
+            
+            let dialog = DialogEntity(
+                id: UUID().uuidString,
+                userId: "local-user",
+                title: "Unnamed",
+                context: nil,
+                summary: nil,
+                elements: [],
+                createdAt: now,
+                updatedAt: now
+            )
+            
+            // 4) Установка связей
+            dialog.image = imageEntity
+            dialog.group = group
+            group.dialogs.append(dialog)
+            
+            // Обновляем обложку и дату обновления группы
+            group.cover = imageEntity
+            group.updatedAt = now
+            
+            // 5) Сохранение
+            withAnimation(.snappy(duration: 0.32)) {
+                ctx.insert(imageEntity)
+                ctx.insert(dialog)
+                // Группа уже существует в контексте, повторно вставлять не нужно
+                do {
+                    try ctx.save()
+                } catch {
+                    print("Failed to save new dialog into existing group: \(error)")
+                }
+            }
+            
+            // 6) Навигация к новому диалогу
+            self.navigateDialog = dialog
+            self.shouldNavigateToDialog = true
+            
+        } catch {
+            print("Failed to handle picked photo for existing group: \(error)")
+        }
+    }
+    
     
     // MARK: - Upload Screenshot Flow
 

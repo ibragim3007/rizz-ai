@@ -6,10 +6,18 @@
 //
 
 import SwiftUI
+import _PhotosUI_SwiftUI
+import SwiftData
 
 struct DialogGroupView: View {
     
     var dialogGroup: DialogGroupEntity
+    
+    @Environment(\.modelContext) private var modelContext
+    @StateObject private var homeVm = HomeViewModel()
+    
+    @State private var showPhotoPicker = false
+    @State private var selectedPhotoItem: PhotosPickerItem?
     
     var body: some View {
         ZStack {
@@ -20,6 +28,49 @@ struct DialogGroupView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem { SettingsButton(destination: SettingsPlaceholderView()) }
+            ToolbarItem (placement: .bottomBar) {
+                PrimaryCTAButton(
+                    title: "Add Screenshot",
+                    height: 60,
+                    font: .system(size: 20, weight: .semibold, design: .rounded),
+                    fullWidth: true
+                ) {
+                    #if canImport(UIKit)
+                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                    #endif
+                    showPhotoPicker = true
+                }
+            }.sharedBackgroundVisibility(.hidden)
+        }
+        // Программная навигация к новосозданному диалогу
+        .navigationDestination(isPresented: $homeVm.shouldNavigateToDialog) {
+            if let dialog = homeVm.navigateDialog {
+                DialogScreen(dialog: dialog)
+            } else {
+                EmptyView()
+            }
+        }
+        .onAppear {
+            // Поздняя инъекция контекста для VM
+            if homeVm.modelContext == nil {
+                homeVm.modelContext = modelContext
+            }
+        }
+        // Фото-пикер
+        .photosPicker(
+            isPresented: $showPhotoPicker,
+            selection: $selectedPhotoItem,
+            matching: .images
+        )
+        .onChange(of: selectedPhotoItem) { _, newItem in
+            guard let item = newItem else { return }
+            Task {
+                await homeVm.handlePickedPhoto(item, for: dialogGroup)
+                // Сбрасываем выбор, чтобы можно было выбрать то же фото снова при желании
+                await MainActor.run {
+                    selectedPhotoItem = nil
+                }
+            }
         }
     }
     

@@ -88,7 +88,7 @@ struct Home: View {
                     ) {
                         vmHome.uploadScreenshot()
                     }
-                    .padding(.horizontal, 10)
+//                    .padding(.horizontal, 10)
                 }
                 .sharedBackgroundVisibility(.hidden)
             }
