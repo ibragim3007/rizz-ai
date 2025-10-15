@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		1FA748542EA05D3300477944 /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = 1FA748532EA05D3300477944 /* RevenueCat */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		1F91AA252E8E07410048E4F7 /* crush-ai.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "crush-ai.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -23,6 +27,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1FA748542EA05D3300477944 /* RevenueCat in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,6 +70,7 @@
 			);
 			name = "crush-ai";
 			packageProductDependencies = (
+				1FA748532EA05D3300477944 /* RevenueCat */,
 			);
 			productName = "crush-ai";
 			productReference = 1F91AA252E8E07410048E4F7 /* crush-ai.app */;
@@ -94,6 +100,9 @@
 			);
 			mainGroup = 1F91AA1C2E8E07410048E4F7;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				1FA748522EA05D3300477944 /* XCRemoteSwiftPackageReference "purchases-ios-spm" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 1F91AA262E8E07410048E4F7 /* Products */;
 			projectDirPath = "";
@@ -338,6 +347,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		1FA748522EA05D3300477944 /* XCRemoteSwiftPackageReference "purchases-ios-spm" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/RevenueCat/purchases-ios-spm.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.44.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		1FA748532EA05D3300477944 /* RevenueCat */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1FA748522EA05D3300477944 /* XCRemoteSwiftPackageReference "purchases-ios-spm" */;
+			productName = RevenueCat;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 1F91AA1D2E8E07410048E4F7 /* Project object */;
 }

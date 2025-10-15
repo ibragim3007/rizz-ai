@@ -22,7 +22,6 @@ struct ContentView: View {
     }
     
     var body: some View {
-        
         Group {
             if (hasSeenOnboarding) {
                 MainView().preferredColorScheme(.dark)

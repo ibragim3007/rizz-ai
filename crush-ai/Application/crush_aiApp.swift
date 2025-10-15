@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SwiftData
+import RevenueCat
 
 // MARK: - AppActions environment (для системных действий приложения, напр. Reset Store)
 struct AppActions {
@@ -26,7 +27,6 @@ extension EnvironmentValues {
 
 @main
 struct crush_aiApp: App {
-    
     // Делаем контейнер заменяемым, чтобы можно было пересоздать после wipe
     @State private var container: ModelContainer = crush_aiApp.makeContainer()
     
@@ -45,6 +45,15 @@ struct crush_aiApp: App {
         let cfg = ModelConfiguration(isStoredInMemoryOnly: true)
         let container = try! ModelContainer(for: schema, configurations: [cfg])
         return container
+    }
+    
+    
+    
+    init () {
+        // инициализация revenuecat
+        Purchases.logLevel = .debug
+        Purchases.configure(withAPIKey: "appl_LwbkcAhtxVUApPlwfEPnGaftWRc")
+        
     }
     
     var body: some Scene {
