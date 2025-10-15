@@ -28,7 +28,15 @@ struct SettingsPlaceholderView: View {
                 // Тон
                 Picker(selection: $currentTone) {
                     ForEach(ToneTypes.allCases, id: \.self) { tone in
-                        Text(toneTitle(for: tone)).tag(tone)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(toneTitle(for: tone))
+                                .font(.body)
+                            Text(toneDescription(for: tone))
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                                .lineLimit(1)
+                        }
+                        .tag(tone)
                     }
                 } label: {
                     Text(NSLocalizedString("Tone", comment: "Response tone"))
@@ -78,7 +86,7 @@ struct SettingsPlaceholderView: View {
     }
     
     private func toneTitle(for tone: ToneTypes) -> String {
-        var toneEmoji: String = getToneName(tone: tone)
+        let toneEmoji: String = getToneName(tone: tone)
         switch tone {
         case .RIZZ:
             return toneEmoji + " " + NSLocalizedString("Rizz", comment: "Tone: Rizz")
@@ -88,6 +96,19 @@ struct SettingsPlaceholderView: View {
             return toneEmoji + " " + NSLocalizedString("Romantic", comment: "Tone: Romantic")
         case .NSFW:
             return toneEmoji + " " + NSLocalizedString("NSFW", comment: "Tone: NSFW")
+        }
+    }
+    
+    private func toneDescription(for tone: ToneTypes) -> String {
+        switch tone {
+        case .RIZZ:
+            return NSLocalizedString("Confident, witty, and bold — charismatic one‑liners with swagger.", comment: "Description for RIZZ tone")
+        case .FLIRT:
+            return NSLocalizedString("Playful teasing and light compliments — fun, casual, and cheeky.", comment: "Description for FLIRT tone")
+        case .ROMANTIC:
+            return NSLocalizedString("Warm, sincere, and affectionate — sweet lines with deeper feelings.", comment: "Description for ROMANTIC tone")
+        case .NSFW:
+            return NSLocalizedString("Explicit and daring — adult‑oriented replies. Use with caution.", comment: "Description for NSFW tone")
         }
     }
 }
