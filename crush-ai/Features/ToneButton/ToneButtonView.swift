@@ -7,6 +7,20 @@
 
 import SwiftUI
 
+
+func getToneName(tone: ToneTypes) -> String {
+    switch tone {
+    case .RIZZ:
+        return "🔥"
+    case .ROMANTIC:
+        return "💘"
+    case .FLIRT:
+        return "😉"
+    case .NSFW:
+        return "🔞"
+    }
+}
+
 struct ToneButtonView: View {
     
     @AppStorage("tone") private var currentTone: ToneTypes = .RIZZ
@@ -130,19 +144,6 @@ struct ToneButtonView: View {
             currentTone = nextIndex < orderedTones.endIndex ? orderedTones[nextIndex] : orderedTones.first!
         } else {
             currentTone = orderedTones.first!
-        }
-    }
-    
-    func getToneName(tone: ToneTypes) -> String {
-        switch tone {
-        case .RIZZ:
-            return "😎"
-        case .ROMANTIC:
-            return "💕"
-        case .FLIRT:
-            return "🫦"
-        case .NSFW:
-            return "😈"
         }
     }
     
