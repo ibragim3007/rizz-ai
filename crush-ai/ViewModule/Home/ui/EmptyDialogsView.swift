@@ -8,6 +8,13 @@
 import SwiftUI
 
 struct EmptyDialogsView: View {
+    // Пошаговая анимация появления
+    @State private var showHeader = false
+    @State private var showStep1 = false
+    @State private var showStep2 = false
+    @State private var showStep3 = false
+    @State private var showFooter = false
+    
     var body: some View {
         ScrollView(showsIndicators: false) {
             VStack(spacing: 24) {
@@ -25,10 +32,6 @@ struct EmptyDialogsView: View {
                                 endPoint: .bottomTrailing
                             )
                         )
-//                        .overlay(
-//                            RoundedRectangle(cornerRadius: 24, style: .continuous)
-//                                .stroke(AppTheme.borderPrimaryGradient, lineWidth: 1)
-//                        )
                     
                     HStack(spacing: 18) {
                         Image("girl-4")
@@ -50,6 +53,10 @@ struct EmptyDialogsView: View {
                     }
                     .padding(10)
                 }
+                // Анимация появления хедера
+                .opacity(showHeader ? 1 : 0)
+                .offset(y: showHeader ? 0 : 16)
+                .animation(.snappy(duration: 0.6), value: showHeader)
                 
                 // Steps
                 VStack(spacing: 16) {
@@ -59,6 +66,10 @@ struct EmptyDialogsView: View {
                         subtitle: "Choose or drag & drop a screenshot to start a new dialog.",
                         systemImage: "photo.on.rectangle.angled"
                     )
+                    .opacity(showStep1 ? 1 : 0)
+                    .offset(y: showStep1 ? 0 : 14)
+                    .scaleEffect(showStep1 ? 1.0 : 0.98)
+                    .animation(.snappy(duration: 0.55), value: showStep1)
                     
                     StepCard(
                         number: 2,
@@ -66,6 +77,10 @@ struct EmptyDialogsView: View {
                         subtitle: "We’ll analyze the content and prepare a tailored response.",
                         systemImage: "sparkles"
                     )
+                    .opacity(showStep2 ? 1 : 0)
+                    .offset(y: showStep2 ? 0 : 14)
+                    .scaleEffect(showStep2 ? 1.0 : 0.98)
+                    .animation(.snappy(duration: 0.55), value: showStep2)
                     
                     StepCard(
                         number: 3,
@@ -73,6 +88,10 @@ struct EmptyDialogsView: View {
                         subtitle: "Review, refine, and continue the conversation effortlessly.",
                         systemImage: "face.smiling"
                     )
+                    .opacity(showStep3 ? 1 : 0)
+                    .offset(y: showStep3 ? 0 : 14)
+                    .scaleEffect(showStep3 ? 1.0 : 0.98)
+                    .animation(.snappy(duration: 0.55), value: showStep3)
                 }
                 
                 // Footer hint
@@ -82,9 +101,43 @@ struct EmptyDialogsView: View {
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 24)
                     .padding(.top, 4)
+                    .opacity(showFooter ? 1 : 0)
+                    .offset(y: showFooter ? 0 : 10)
+                    .animation(.snappy(duration: 0.5), value: showFooter)
             }
             .padding(.vertical, 28)
         }
+        .task {
+            // Запускаем «каскад» появления с небольшими задержками
+            await animateSequence()
+        }
+    }
+    
+    // MARK: - Animation sequence
+    
+    private func animateSequence() async {
+        // Сброс (на случай повторного входа)
+        showHeader = false
+        showStep1 = false
+        showStep2 = false
+        showStep3 = false
+        showFooter = false
+        
+        // Небольшая пауза после появления экрана
+        try? await Task.sleep(nanoseconds: 150_000_000)
+        withAnimation(.snappy(duration: 0.6)) { showHeader = true }
+        
+        try? await Task.sleep(nanoseconds: 120_000_000)
+        withAnimation(.snappy(duration: 0.55)) { showStep1 = true }
+        
+        try? await Task.sleep(nanoseconds: 120_000_000)
+        withAnimation(.snappy(duration: 0.55)) { showStep2 = true }
+        
+        try? await Task.sleep(nanoseconds: 120_000_000)
+        withAnimation(.snappy(duration: 0.55)) { showStep3 = true }
+        
+        try? await Task.sleep(nanoseconds: 140_000_000)
+        withAnimation(.snappy(duration: 0.5)) { showFooter = true }
     }
 }
 
@@ -105,14 +158,14 @@ private struct StepCard: View {
                     if #available(iOS 18.0, *) {
                         Image(systemName: systemImage)
                             .font(.system(size: 16, weight: .semibold))
-                        //                        .foregroundStyle(AppTheme.primary)
+                            //                        .foregroundStyle(AppTheme.primary)
                             .accessibilityHidden(true)
                             .symbolRenderingMode(.monochrome)
                             .symbolEffect(.wiggle.up)
                     } else {
                         Image(systemName: systemImage)
                             .font(.system(size: 16, weight: .semibold))
-                        //                        .foregroundStyle(AppTheme.primary)
+                            //                        .foregroundStyle(AppTheme.primary)
                             .accessibilityHidden(true)
                             .symbolRenderingMode(.monochrome)
                     }
@@ -174,4 +227,3 @@ private struct NumberBadge: View {
         .accessibilityHidden(true)
     }
 }
-
