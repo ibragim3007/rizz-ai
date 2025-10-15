@@ -138,7 +138,8 @@ struct Home: View {
                                 pendingDeleteItems = section.items
                                 pendingDeleteTitle = section.title
                                 showDeleteAllConfirm = true
-                            }
+                            },
+                            onTogglePin: { vmHome.togglePin($0) }
                         )
                     }
                 }
@@ -153,16 +154,21 @@ private struct DialogsSectionView: View {
     let columns: [GridItem]
     let onDeleteSingle: (DialogGroupEntity) -> Void
     let onDeleteAllTap: () -> Void
+    let onTogglePin: (DialogGroupEntity) -> Void
     
     var body: some View {
         Section {
             LazyVGrid(columns: columns, spacing: 16) {
                 ForEach(section.items, id: \.id) { dialogGroup in
-                    DialogGroupItemView(dialogGroup: dialogGroup, onDelete: {
-                        withAnimation(.snappy(duration: 0.28)) {
-                            onDeleteSingle(dialogGroup)
-                        }
-                    })
+                    DialogGroupItemView(
+                        dialogGroup: dialogGroup,
+                        onDelete: {
+                            withAnimation(.snappy(duration: 0.28)) {
+                                onDeleteSingle(dialogGroup)
+                            }
+                        },
+                        onTogglePin: { onTogglePin(dialogGroup) }
+                    )
                 }
             }
             .padding(.horizontal, 20)
@@ -178,6 +184,7 @@ private struct DialogsSectionView: View {
 private struct DialogGroupItemView: View {
     let dialogGroup: DialogGroupEntity
     let onDelete: () -> Void
+    let onTogglePin: () -> Void
     
     var body: some View {
         NavigationLink(destination: DialogGroupView(dialogGroup: dialogGroup)) {
@@ -187,6 +194,19 @@ private struct DialogGroupItemView: View {
                                         removal: .opacity.combined(with: .scale(scale: 0.9))))
         }
         .contextMenu {
+            // Pin / Unpin
+            Button(action: {
+                withAnimation(.snappy(duration: 0.22)) {
+                    onTogglePin()
+                }
+            }) {
+                if dialogGroup.pinned {
+                    Label(NSLocalizedString("Unpin", comment: "Unpin group"), systemImage: "pin.slash")
+                } else {
+                    Label(NSLocalizedString("Pin", comment: "Pin group"), systemImage: "pin.fill")
+                }
+            }
+            // Delete
             Button(role: .destructive, action: onDelete) {
                 Label(NSLocalizedString("Delete - " + dialogGroup.title, comment: "Delete group"), systemImage: "trash")
             }
@@ -207,6 +227,11 @@ private extension Home {
     }
     
     func makeSections(from groups: [DialogGroupEntity]) -> [GroupSection] {
+        // Секция "Pinned"
+        let pinnedItems = groups.filter { $0.pinned }.sorted { $0.updatedAt > $1.updatedAt }
+        // Остальные — по датам
+        let nonPinned = groups.filter { !$0.pinned }
+        
         var today: [DialogGroupEntity] = []
         var yesterday: [DialogGroupEntity] = []
         var last7: [DialogGroupEntity] = []
@@ -215,7 +240,7 @@ private extension Home {
         let cal = Calendar.current
         let now = Date()
         
-        for g in groups {
+        for g in nonPinned {
             let date = g.updatedAt
             if cal.isDateInToday(date) {
                 today.append(g)
@@ -229,6 +254,7 @@ private extension Home {
         }
         
         var result: [GroupSection] = []
+        if !pinnedItems.isEmpty { result.append(.init(title: NSLocalizedString("Pinned", comment: ""), items: pinnedItems)) }
         if !today.isEmpty { result.append(.init(title: NSLocalizedString("Today", comment: ""), items: today)) }
         if !yesterday.isEmpty { result.append(.init(title: NSLocalizedString("Yesterday", comment: ""), items: yesterday)) }
         if !last7.isEmpty { result.append(.init(title: NSLocalizedString("Previous 7 Days", comment: ""), items: last7)) }

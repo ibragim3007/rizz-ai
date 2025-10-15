@@ -179,6 +179,18 @@ final class HomeViewModel: ObservableObject {
         showPhotoPicker = true
     }
 
+    // MARK: - Pin / Unpin
+
+    func togglePin(_ group: DialogGroupEntity) {
+        guard let ctx = modelContext else { return }
+        group.pinned.toggle()
+        do {
+            try ctx.save()
+        } catch {
+            print("Failed to save pin toggle: \(error)")
+        }
+    }
+
     // MARK: - Deletion
 
     func delete(_ group: DialogGroupEntity) {

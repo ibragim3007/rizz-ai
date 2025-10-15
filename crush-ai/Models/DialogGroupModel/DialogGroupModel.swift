@@ -108,6 +108,7 @@ final class DialogGroupEntity {
     var title: String
     var createdAt: Date
     var updatedAt: Date
+    var pinned: Bool
 
     @Relationship(deleteRule: .cascade, inverse: \DialogEntity.group)
     var dialogs: [DialogEntity] = []
@@ -121,5 +122,6 @@ final class DialogGroupEntity {
         self.title = title
         self.createdAt = createdAt
         self.updatedAt = updatedAt
+        self.pinned = false
     }
 }
