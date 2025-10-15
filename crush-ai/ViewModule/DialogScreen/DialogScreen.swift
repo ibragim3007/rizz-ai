@@ -11,6 +11,7 @@ import SwiftData
 struct DialogScreen: View {
     @AppStorage("tone") private var currentTone: ToneTypes = .RIZZ
     var dialog: DialogEntity
+    var dialogGroup: DialogGroupEntity
     var defaultImage = "https://cdsassets.apple.com/live/7WUAS350/images/ios/ios-26-iphone-16-pro-take-a-screenshot-options.png"
     
     @Environment(\.modelContext) private var modelContext
@@ -18,8 +19,9 @@ struct DialogScreen: View {
     @StateObject private var dialogScreenVm: DialogScreenViewModel
     @State private var selectedChips: Set<String> = []
     
-    init(dialog: DialogEntity) {
+    init(dialog: DialogEntity, dialogGroup: DialogGroupEntity) {
         self.dialog = dialog
+        self.dialogGroup = dialogGroup
         let fallbackURL = URL(string: defaultImage)! // This is a constant valid URL
         let currentURL = dialog.image?.localFileURL ?? dialog.image?.remoteHTTPURL ?? fallbackURL
         _dialogScreenVm = StateObject(
@@ -58,6 +60,10 @@ struct DialogScreen: View {
             .sharedBackgroundVisibility(.hidden)
             ToolbarItem {
                 SettingsButton(destination: SettingsPlaceholderView())
+            }
+            ToolbarSpacer(.fixed)
+            ToolbarItem {
+                AddNewDialogButton(dialogGroup: dialogGroup)
             }
         }
         .alert("Failed to analyze screenshot", isPresented: $dialogScreenVm.showingError) {
@@ -346,5 +352,10 @@ private struct CornerMarks: Shape {
     
     dialog.replies = [reply1, reply2, reply3, reply4]
     
-    return DialogScreen(dialog: dialog).preferredColorScheme(.dark)
+    let dialogGroup = DialogGroupEntity(id: "asd", userId: "i", title: "Test")
+    
+    dialogGroup.cover = image
+    dialogGroup.dialogs = [dialog]
+    
+    return DialogScreen(dialog: dialog, dialogGroup: dialogGroup).preferredColorScheme(.dark)
 }

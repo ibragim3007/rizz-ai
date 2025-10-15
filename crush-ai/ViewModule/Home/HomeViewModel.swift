@@ -21,6 +21,7 @@ final class HomeViewModel: ObservableObject {
     
     // Navigation intent to DialogScreen
     @Published var navigateDialog: DialogEntity?
+    @Published var navigateDialogGroup: DialogGroupEntity?
     @Published var shouldNavigateToDialog: Bool = false
     
     // Allow late injection from the View
@@ -91,6 +92,7 @@ final class HomeViewModel: ObservableObject {
             
             // Trigger navigation to DialogScreen for the just-created dialog
             self.navigateDialog = dialog
+            self.navigateDialogGroup = dialogGroup
             self.shouldNavigateToDialog = true
 
         } catch {
@@ -159,6 +161,7 @@ final class HomeViewModel: ObservableObject {
             
             // 6) Навигация к новому диалогу
             self.navigateDialog = dialog
+            self.navigateDialogGroup = group
             self.shouldNavigateToDialog = true
             
         } catch {

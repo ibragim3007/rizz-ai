@@ -45,7 +45,7 @@ struct DialogGroupView: View {
         // Программная навигация к новосозданному диалогу
         .navigationDestination(isPresented: $homeVm.shouldNavigateToDialog) {
             if let dialog = homeVm.navigateDialog {
-                DialogScreen(dialog: dialog)
+                DialogScreen(dialog: dialog, dialogGroup: dialogGroup)
             } else {
                 EmptyView()
             }
@@ -92,7 +92,7 @@ struct DialogGroupView: View {
                             
                             VStack(spacing: 16) {
                                 ForEach(section.items, id: \.id) { dialog in
-                                    NavigationLink(destination: DialogScreen(dialog: dialog)) {
+                                    NavigationLink(destination: DialogScreen(dialog: dialog, dialogGroup: dialogGroup)) {
                                         DialogCardRow(dialog: dialog)
                                     }
                                 }

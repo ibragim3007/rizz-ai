@@ -137,8 +137,8 @@ struct Home: View {
                 set: { vmHome.shouldNavigateToDialog = $0 }
             )
         ) {
-            if let dialog = vmHome.navigateDialog {
-                DialogScreen(dialog: dialog)
+            if let dialog = vmHome.navigateDialog, let group = vmHome.navigateDialogGroup {
+                DialogScreen(dialog: dialog, dialogGroup: group)
             } else {
                 EmptyView()
             }
