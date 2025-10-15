@@ -64,7 +64,7 @@ final class DialogEntity {
     @Relationship(deleteRule: .cascade, inverse: \ReplyEntity.dialog)
     var replies: [ReplyEntity] = []
 
-    @Relationship(deleteRule: .nullify)
+    @Relationship(deleteRule: .cascade)
     var image: ImageEntity?
 
     // Specify inverse only on one side to avoid circular macro resolution.
@@ -112,7 +112,7 @@ final class DialogGroupEntity {
     @Relationship(deleteRule: .cascade, inverse: \DialogEntity.group)
     var dialogs: [DialogEntity] = []
 
-    @Relationship(deleteRule: .nullify)
+    @Relationship(deleteRule: .cascade)
     var cover: ImageEntity?
 
     init(id: String, userId: String, title: String, createdAt: Date = .now, updatedAt: Date = .now) {
