@@ -70,7 +70,7 @@ struct DialogScreen: View {
     private var list: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-                ImageView(image: dialog.image)
+                ImageView(image: dialog.image, isLoading: dialogScreenVm.isLoading)
 //                Elements
                 RepliesList(replies: dialog.replies)
             }
@@ -119,10 +119,11 @@ struct DialogScreen: View {
 
 struct ImageView: View {
     var image: ImageEntity?
+    var isLoading: Bool
 
     var body: some View {
         if let img = image {
-            LargeImageDisplay(imageEntity: img)
+            LargeImageDisplay(isLoading: isLoading, imageEntity: img)
                 .padding(.horizontal, 20)
         } else {
             RoundedRectangle(cornerRadius: 24, style: .continuous)
@@ -144,6 +145,9 @@ struct LargeImageDisplay: View {
 
     private let corner: CGFloat = 24
     
+    // Состояние анимации «сканирования»
+    @State private var startScan = false
+    
     var body: some View {
         ZStack {
             content
@@ -153,8 +157,72 @@ struct LargeImageDisplay: View {
                 RoundedRectangle(cornerRadius: corner, style: .continuous)
                     .fill(.black.opacity(0.25))
                     .overlay {
-                        ProgressView()
-                            .tint(.white)
+                        ZStack {
+                            // Лёгкая сетка как намёк на «анализ»
+                            GeometryReader { geo in
+                                let spacing: CGFloat = 22
+                                Canvas { context, size in
+                                    var path = Path()
+                                    // Вертикальные линии
+                                    var x: CGFloat = 0
+                                    while x <= size.width {
+                                        path.move(to: CGPoint(x: x, y: 0))
+                                        path.addLine(to: CGPoint(x: x, y: size.height))
+                                        x += spacing
+                                    }
+                                    // Горизонтальные линии
+                                    var y: CGFloat = 0
+                                    while y <= size.height {
+                                        path.move(to: CGPoint(x: 0, y: y))
+                                        path.addLine(to: CGPoint(x: size.width, y: y))
+                                        y += spacing
+                                    }
+                                    context.stroke(path, with: .color(.white.opacity(0.08)), lineWidth: 0.5)
+                                }
+                                .blendMode(.plusLighter)
+                                .allowsHitTesting(false)
+                                
+                                // Двигающийся «луч» сканирования
+                                let beamHeight = max(40, geo.size.height * 0.18)
+                                LinearGradient(
+                                    colors: [
+                                        .clear,
+                                        .white.opacity(0.35),
+                                        .white.opacity(0.55),
+                                        .white.opacity(0.35),
+                                        .clear
+                                    ],
+                                    startPoint: .top,
+                                    endPoint: .bottom
+                                )
+                                .frame(height: beamHeight)
+                                .blur(radius: 6)
+                                .mask(
+                                    RoundedRectangle(cornerRadius: corner, style: .continuous)
+                                        .fill(.white)
+                                )
+                                .offset(y: startScan ? geo.size.height + beamHeight : -beamHeight)
+                                .animation(
+                                    .easeInOut(duration: 1.6)
+                                        .repeatForever(autoreverses: false),
+                                    value: startScan
+                                )
+                            }
+                            
+                            // Угловые маркеры
+                            CornerMarks(cornerRadius: corner)
+                                .stroke(.white.opacity(0.9), style: StrokeStyle(lineWidth: 2, lineCap: .round))
+                                .shadow(color: .white.opacity(0.25), radius: 2, x: 0, y: 0)
+                                .blendMode(.plusLighter)
+                            
+                            // Центр. индикатор
+                            ProgressView()
+                                .tint(.white)
+                                .scaleEffect(1.1)
+                                .shadow(color: .black.opacity(0.4), radius: 4, x: 0, y: 2)
+                        }
+                        .clipShape(RoundedRectangle(cornerRadius: corner, style: .continuous))
+                        .onAppear { startScan = true }
                     }
             }
         }
@@ -230,6 +298,40 @@ struct LargeImageDisplay: View {
     }
 }
 
+// Декоративные угловые маркеры для состояния загрузки
+private struct CornerMarks: Shape {
+    var cornerRadius: CGFloat
+    var inset: CGFloat = 6
+    var length: CGFloat = 24
+    
+    func path(in rect: CGRect) -> Path {
+        var p = Path()
+        let r = cornerRadius
+        _ = r // зарезервировано на случай будущей логики, сейчас не влияет на форму
+        
+        // Top-left
+        p.move(to: CGPoint(x: rect.minX + inset, y: rect.minY + inset + length))
+        p.addLine(to: CGPoint(x: rect.minX + inset, y: rect.minY + inset))
+        p.addLine(to: CGPoint(x: rect.minX + inset + length, y: rect.minY + inset))
+        
+        // Top-right
+        p.move(to: CGPoint(x: rect.maxX - inset - length, y: rect.minY + inset))
+        p.addLine(to: CGPoint(x: rect.maxX - inset, y: rect.minY + inset))
+        p.addLine(to: CGPoint(x: rect.maxX - inset, y: rect.minY + inset + length))
+        
+        // Bottom-right
+        p.move(to: CGPoint(x: rect.maxX - inset, y: rect.maxY - inset - length))
+        p.addLine(to: CGPoint(x: rect.maxX - inset, y: rect.maxY - inset))
+        p.addLine(to: CGPoint(x: rect.maxX - inset - length, y: rect.maxY - inset))
+        
+        // Bottom-left
+        p.move(to: CGPoint(x: rect.minX + inset + length, y: rect.maxY - inset))
+        p.addLine(to: CGPoint(x: rect.minX + inset, y: rect.maxY - inset))
+        p.addLine(to: CGPoint(x: rect.minX + inset, y: rect.maxY - inset - length))
+        
+        return p
+    }
+}
 
 #Preview {
     let image = ImageEntity(id: "id", remoteUrl: "https://cdsassets.apple.com/live/7WUAS350/images/ios/ios-26-iphone-16-pro-take-a-screenshot-options.png")
@@ -246,4 +348,3 @@ struct LargeImageDisplay: View {
     
     return DialogScreen(dialog: dialog).preferredColorScheme(.dark)
 }
-
