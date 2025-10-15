@@ -35,63 +35,42 @@ struct Home: View {
                     .transition(.opacity)
             }
             
-            ScrollView {
-                LazyVStack(alignment: .leading, spacing: 24) {
-                    ForEach(sections, id: \.title) { section in
-                        if !section.items.isEmpty {
-                            Section {
-                                LazyVGrid(columns: columns, spacing: 16) {
-                                    ForEach(section.items, id: \.id) { dialogGroup in
-                                        NavigationLink(destination: DialogGroupView(dialogGroup: dialogGroup)) {
-                                            ScreenShotItem(imageURL: dialogGroup.cover?.localFileURL, title: dialogGroup.title)
-                                                .contentTransition(.opacity)
-                                                .transition(.asymmetric(insertion: .opacity.combined(with: .scale(scale: 0.98)), removal: .opacity.combined(with: .scale(scale: 0.9))))
-                                        }
-                                        .contextMenu {
-                                            Button(role: .destructive) {
-                                                withAnimation(.snappy(duration: 0.28)) {
-                                                    vmHome.delete(dialogGroup)
-                                                }
-                                            } label: {
-                                                Label(NSLocalizedString("Delete - " + dialogGroup.title, comment: "Delete group"), systemImage: "trash")
-                                            }
-                                        }
-                                        .preferredColorScheme(.dark)
-                                    }
-                                }
-                                .padding(.horizontal, 20)
-                                .padding(.top, 4)
-                                // Анимируем только изменения набора ID внутри секции
-                                .animation(.snappy(duration: 0.32), value: section.items.map(\.id))
-                            } header: {
-                                SectionHeader(section: section, deleteAllAction: {
-                                    pendingDeleteItems = section.items
-                                    pendingDeleteTitle = section.title
-                                    showDeleteAllConfirm = true
-                                })
+            contentList
+                .scrollIndicators(.hidden)
+                .toolbar {
+                    if #available(iOS 26.0, *) {
+                        ToolbarItem (placement: .topBarLeading) { Logo() } .sharedBackgroundVisibility(.hidden)
+                    } else {
+                        ToolbarItem (placement: .topBarLeading) { Logo() }
+                    }
+                    ToolbarItem { SettingsButton(destination: SettingsPlaceholderView()) }
+                    if #available(iOS 26.0, *) {
+                        ToolbarItem(placement: .bottomBar) {
+                            PrimaryCTAButton(
+                                title: "Upload Screenshot",
+                                height: 60,
+                                font: .system(size: 20, weight: .semibold, design: .rounded),
+                                fullWidth: true
+                            ) {
+                                vmHome.uploadScreenshot()
+                            }
+                        }
+                        .sharedBackgroundVisibility(.hidden)
+                    } else {
+                        // Fallback on earlier versions
+                        ToolbarItem(placement: .bottomBar) {
+                            PrimaryCTAButton(
+                                title: "Upload Screenshot",
+                                height: 60,
+                                font: .system(size: 20, weight: .semibold, design: .rounded),
+                                fullWidth: true
+                            ) {
+                                vmHome.uploadScreenshot()
                             }
                         }
                     }
                 }
-                .padding(.vertical, 30)
-            }
-            .scrollIndicators(.hidden)
-            .toolbar {
-                ToolbarItem (placement: .topBarLeading) { Logo() }.sharedBackgroundVisibility(.hidden)
-                ToolbarItem { SettingsButton(destination: SettingsPlaceholderView()) }
-                ToolbarItem(placement: .bottomBar) {
-                    PrimaryCTAButton(
-                        title: "Upload Screenshot",
-                        height: 60,
-                        font: .system(size: 20, weight: .semibold, design: .rounded),
-                        fullWidth: true
-                    ) {
-                        vmHome.uploadScreenshot()
-                    }
-                }
-                .sharedBackgroundVisibility(.hidden)
-            }
-            .navigationTitle("Home")
+                .navigationTitle("Home")
         }
         // Презентация PhotosPicker
         .photosPicker(
@@ -144,8 +123,76 @@ struct Home: View {
             }
         }
     }
+    
+    private var contentList: some View {
+        ScrollView {
+            LazyVStack(alignment: .leading, spacing: 24) {
+                ForEach(sections, id: \.title) { section in
+                    if !section.items.isEmpty {
+                        DialogsSectionView(
+                            section: section,
+                            columns: columns,
+                            onDeleteSingle: { vmHome.delete($0) },
+                            onDeleteAllTap: {
+                                pendingDeleteItems = section.items
+                                pendingDeleteTitle = section.title
+                                showDeleteAllConfirm = true
+                            }
+                        )
+                    }
+                }
+            }
+            .padding(.vertical, 30)
+        }
+    }
 }
 
+private struct DialogsSectionView: View {
+    let section: GroupSection
+    let columns: [GridItem]
+    let onDeleteSingle: (DialogGroupEntity) -> Void
+    let onDeleteAllTap: () -> Void
+    
+    var body: some View {
+        Section {
+            LazyVGrid(columns: columns, spacing: 16) {
+                ForEach(section.items, id: \.id) { dialogGroup in
+                    DialogGroupItemView(dialogGroup: dialogGroup, onDelete: {
+                        withAnimation(.snappy(duration: 0.28)) {
+                            onDeleteSingle(dialogGroup)
+                        }
+                    })
+                }
+            }
+            .padding(.horizontal, 20)
+            .padding(.top, 4)
+            // Анимируем только изменения набора ID внутри секции
+            .animation(.snappy(duration: 0.32), value: section.items.map(\.id))
+        } header: {
+            SectionHeader(section: section, deleteAllAction: onDeleteAllTap)
+        }
+    }
+}
+
+private struct DialogGroupItemView: View {
+    let dialogGroup: DialogGroupEntity
+    let onDelete: () -> Void
+    
+    var body: some View {
+        NavigationLink(destination: DialogGroupView(dialogGroup: dialogGroup)) {
+            ScreenShotItem(imageURL: dialogGroup.cover?.localFileURL, title: dialogGroup.title)
+                .contentTransition(.opacity)
+                .transition(.asymmetric(insertion: .opacity.combined(with: .scale(scale: 0.98)),
+                                        removal: .opacity.combined(with: .scale(scale: 0.9))))
+        }
+        .contextMenu {
+            Button(role: .destructive, action: onDelete) {
+                Label(NSLocalizedString("Delete - " + dialogGroup.title, comment: "Delete group"), systemImage: "trash")
+            }
+        }
+        .preferredColorScheme(.dark)
+    }
+}
 
 struct GroupSection {
     let title: String
@@ -188,6 +235,7 @@ private extension Home {
         return result
     }
 }
+
 
 #Preview {
     Home()

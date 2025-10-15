@@ -16,7 +16,7 @@ struct MainView: View {
             Home()
                 .task {
                     await vmMain.loginUser()
-                }
+                }.tint(AppTheme.primary)
         }
     }
 }

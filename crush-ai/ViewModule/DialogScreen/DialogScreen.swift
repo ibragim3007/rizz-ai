@@ -41,27 +41,49 @@ struct DialogScreen: View {
         .navigationTitle(dialog.title)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem (placement: .bottomBar) {
-                ToneButtonView()
-            }
-            .sharedBackgroundVisibility(.hidden)
-            
-            ToolbarSpacer(placement: .bottomBar)
-            
-            ToolbarItem (placement: .bottomBar) {
-                PrimaryCTAButton(
-                    title: dialogScreenVm.isLoading ? "Getting Reply…" : "Get Reply",
-                    isLoading: dialogScreenVm.isLoading,
-                ) {
-                    guard !dialogScreenVm.isLoading else { return }
-                    Task { await dialogScreenVm.getReply(modelContext: modelContext, tone: currentTone) }
+            if #available(iOS 26.0, *) {
+                ToolbarItem (placement: .bottomBar) {
+                    ToneButtonView()
+                }
+                .sharedBackgroundVisibility(.hidden)
+            } else {
+                ToolbarItem (placement: .bottomBar) {
+                    ToneButtonView()
                 }
             }
-            .sharedBackgroundVisibility(.hidden)
+            
+            if #available(iOS 26.0, *) {
+                ToolbarSpacer(placement: .bottomBar)
+            }
+            if #available(iOS 26.0, *) {
+                ToolbarItem (placement: .bottomBar) {
+                    PrimaryCTAButton(
+                        title: dialogScreenVm.isLoading ? "Getting Reply…" : "Get Reply",
+                        isLoading: dialogScreenVm.isLoading,
+                    ) {
+                        guard !dialogScreenVm.isLoading else { return }
+                        Task { await dialogScreenVm.getReply(modelContext: modelContext, tone: currentTone) }
+                    }
+                }
+                .sharedBackgroundVisibility(.hidden)
+            } else {
+                // Fallback on earlier versions
+                ToolbarItem (placement: .bottomBar) {
+                    PrimaryCTAButton(
+                        title: dialogScreenVm.isLoading ? "Getting Reply…" : "Get Reply",
+                        isLoading: dialogScreenVm.isLoading,
+                    ) {
+                        guard !dialogScreenVm.isLoading else { return }
+                        Task { await dialogScreenVm.getReply(modelContext: modelContext, tone: currentTone) }
+                    }
+                }
+            }
             ToolbarItem {
                 SettingsButton(destination: SettingsPlaceholderView())
             }
-            ToolbarSpacer(.fixed)
+            if #available(iOS 26.0, *) {
+                ToolbarSpacer(.fixed)
+            }
             ToolbarItem {
                 AddNewDialogButton(dialogGroup: dialogGroup)
             }
@@ -77,7 +99,7 @@ struct DialogScreen: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 ImageView(image: dialog.image, isLoading: dialogScreenVm.isLoading)
-//                Elements
+                //                Elements
                 RepliesList(replies: dialog.replies)
             }
             .padding(.bottom, 50)
@@ -126,7 +148,7 @@ struct DialogScreen: View {
 struct ImageView: View {
     var image: ImageEntity?
     var isLoading: Bool
-
+    
     var body: some View {
         if let img = image {
             LargeImageDisplay(isLoading: isLoading, imageEntity: img)
@@ -148,7 +170,7 @@ struct LargeImageDisplay: View {
     
     var isLoading: Bool = false
     var imageEntity: ImageEntity
-
+    
     private let corner: CGFloat = 24
     
     // Состояние анимации «сканирования»
@@ -157,7 +179,7 @@ struct LargeImageDisplay: View {
     var body: some View {
         ZStack {
             content
-//                .overlay(RoundedRectangle(cornerRadius: corner, style: .continuous).stroke(AppTheme.borderPrimaryGradient, lineWidth: 1))
+            //                .overlay(RoundedRectangle(cornerRadius: corner, style: .continuous).stroke(AppTheme.borderPrimaryGradient, lineWidth: 1))
             
             if isLoading {
                 RoundedRectangle(cornerRadius: corner, style: .continuous)
@@ -210,7 +232,7 @@ struct LargeImageDisplay: View {
                                 .offset(y: startScan ? geo.size.height + beamHeight : -beamHeight)
                                 .animation(
                                     .easeInOut(duration: 1.6)
-                                        .repeatForever(autoreverses: false),
+                                    .repeatForever(autoreverses: false),
                                     value: startScan
                                 )
                             }
@@ -295,11 +317,11 @@ struct LargeImageDisplay: View {
     }
     
     private func loadImage(from url: URL) -> Image? {
-        #if canImport(UIKit)
+#if canImport(UIKit)
         if let ui = UIImage(contentsOfFile: url.path) { return Image(uiImage: ui) }
-        #elseif canImport(AppKit)
+#elseif canImport(AppKit)
         if let ns = NSImage(contentsOf: url) { return Image(nsImage: ns) }
-        #endif
+#endif
         return nil
     }
 }

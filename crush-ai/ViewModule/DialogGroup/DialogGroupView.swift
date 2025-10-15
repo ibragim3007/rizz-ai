@@ -28,19 +28,36 @@ struct DialogGroupView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem { SettingsButton(destination: SettingsPlaceholderView()) }
-            ToolbarItem (placement: .bottomBar) {
-                PrimaryCTAButton(
-                    title: "Add Screenshot",
-                    height: 60,
-                    font: .system(size: 20, weight: .semibold, design: .rounded),
-                    fullWidth: true
-                ) {
-                    #if canImport(UIKit)
-                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                    #endif
-                    showPhotoPicker = true
+            if #available(iOS 26.0, *) {
+                ToolbarItem (placement: .bottomBar) {
+                    PrimaryCTAButton(
+                        title: "Add Screenshot",
+                        height: 60,
+                        font: .system(size: 20, weight: .semibold, design: .rounded),
+                        fullWidth: true
+                    ) {
+#if canImport(UIKit)
+                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+#endif
+                        showPhotoPicker = true
+                    }
+                }.sharedBackgroundVisibility(.hidden)
+            } else {
+                // Fallback on earlier versions
+                ToolbarItem (placement: .bottomBar) {
+                    PrimaryCTAButton(
+                        title: "Add Screenshot",
+                        height: 60,
+                        font: .system(size: 20, weight: .semibold, design: .rounded),
+                        fullWidth: true
+                    ) {
+#if canImport(UIKit)
+                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+#endif
+                        showPhotoPicker = true
+                    }
                 }
-            }.sharedBackgroundVisibility(.hidden)
+            }
         }
         // Программная навигация к новосозданному диалогу
         .navigationDestination(isPresented: $homeVm.shouldNavigateToDialog) {

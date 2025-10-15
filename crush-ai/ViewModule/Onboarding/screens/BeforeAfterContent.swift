@@ -93,18 +93,33 @@ private struct CapsuleLabel: View {
         self.tint = tint
     }
     var body: some View {
-        Text(text.uppercased())
-            .font(.system(size: 18, weight: .bold, design: .rounded))
-            .foregroundStyle(.white)
-            .padding(.horizontal, 15)
-            .padding(.vertical, 7)
-        //            .background(
-        //                Capsule(style: .continuous)
-        //                    .fill(tint.opacity(0.25))
-        //                    .background(.ultraThinMaterial)
-        //                    .cornerRadius(20)
-        //            )
-            .glassEffect()
+        if #available(iOS 26.0, *) {
+            Text(text.uppercased())
+                .font(.system(size: 18, weight: .bold, design: .rounded))
+                .foregroundStyle(.white)
+                .padding(.horizontal, 15)
+                .padding(.vertical, 7)
+            //            .background(
+            //                Capsule(style: .continuous)
+            //                    .fill(tint.opacity(0.25))
+            //                    .background(.ultraThinMaterial)
+            //                    .cornerRadius(20)
+            //            )
+                .glassEffect()
+        } else {
+            Text(text.uppercased())
+                .font(.system(size: 18, weight: .bold, design: .rounded))
+                .foregroundStyle(.white)
+                .padding(.horizontal, 15)
+                .padding(.vertical, 7)
+                .background(.ultraThinMaterial)
+            //            .background(
+            //                Capsule(style: .continuous)
+            //                    .fill(tint.opacity(0.25))
+            //                    .background(.ultraThinMaterial)
+            //                    .cornerRadius(20)
+            //            )
+        }
     }
 }
 
