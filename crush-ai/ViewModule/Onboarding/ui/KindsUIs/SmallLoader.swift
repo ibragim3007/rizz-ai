@@ -321,7 +321,7 @@ private struct ParticlesLayer: View {
                         height: p.size
                     )
 
-                    var dot = Path(ellipseIn: rect)
+                    let dot = Path(ellipseIn: rect)
 
                     // Лёгкое мерцание
                     let alpha = 0.55 + 0.75 * (sin(t * (0.8 + p.speed) + p.seed) + 1) / 2

@@ -10,14 +10,14 @@ import SwiftData
 
 struct SettingsPlaceholderView: View {
     
-    @AppStorage("appLanguage") private var appLanguage: String = "auto"
+    @AppStorage("replyLanguage") private var replyLanguage: String = "auto"
     @AppStorage("tone") private var currentTone: ToneTypes = .RIZZ
 
     var body: some View {
         List {
             Section("Settings") {
                 // Язык
-                Picker(selection: $appLanguage) {
+                Picker(selection: $replyLanguage) {
                     ForEach(languageOptions) { option in
                         Text(option.title).tag(option.id)
                     }

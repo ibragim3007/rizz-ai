@@ -10,6 +10,8 @@ import SwiftData
 
 struct DialogScreen: View {
     @AppStorage("tone") private var currentTone: ToneTypes = .RIZZ
+    @AppStorage("replyLanguage") private var replyLanguage: String = "auto"
+    
     var dialog: DialogEntity
     var dialogGroup: DialogGroupEntity
     var defaultImage = "https://cdsassets.apple.com/live/7WUAS350/images/ios/ios-26-iphone-16-pro-take-a-screenshot-options.png"
@@ -39,7 +41,7 @@ struct DialogScreen: View {
             list
         }
         .navigationTitle(dialog.title)
-        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarTitleDisplayMode(.automatic)
         .toolbar {
             if #available(iOS 26.0, *) {
                 ToolbarItem (placement: .bottomBar) {
@@ -58,7 +60,7 @@ struct DialogScreen: View {
                         isLoading: dialogScreenVm.isLoading
                     ) {
                         guard !dialogScreenVm.isLoading else { return }
-                        Task { await dialogScreenVm.getReply(modelContext: modelContext, tone: currentTone) }
+                        Task { await dialogScreenVm.getReply(modelContext: modelContext, tone: currentTone, replyLanguage: replyLanguage) }
                     }
                 }
                 .sharedBackgroundVisibility(.hidden)
@@ -92,7 +94,7 @@ struct DialogScreen: View {
                         fullWidth: true
                     ) {
                         guard !dialogScreenVm.isLoading else { return }
-                        Task { await dialogScreenVm.getReply(modelContext: modelContext, tone: currentTone) }
+                        Task { await dialogScreenVm.getReply(modelContext: modelContext, tone: currentTone,replyLanguage: replyLanguage) }
                     }
                     .frame(maxWidth: .infinity)
                 }

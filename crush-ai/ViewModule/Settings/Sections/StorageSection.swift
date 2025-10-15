@@ -133,8 +133,8 @@ struct StorageSection: View {
         do {
             let images = try modelContext.fetch(FetchDescriptor<ImageEntity>())
             for img in images {
-                if let path = img.localUrl {
-                    imagesBytes += fileSize(at: URL(fileURLWithPath: path))
+                if let url = img.localFileURL {
+                    imagesBytes += fileSize(at: url)
                 }
             }
         } catch {
@@ -166,12 +166,9 @@ struct StorageSection: View {
         do {
             let images = try modelContext.fetch(FetchDescriptor<ImageEntity>())
             for image in images {
-                if let path = image.localUrl {
-                    let url = URL(fileURLWithPath: path)
-                    if FileManager.default.fileExists(atPath: url.path) {
-                        do { try FileManager.default.removeItem(at: url) }
-                        catch { /* пропускаем отдельные ошибки удаления */ }
-                    }
+                if let url = image.localFileURL, FileManager.default.fileExists(atPath: url.path) {
+                    do { try FileManager.default.removeItem(at: url) }
+                    catch { /* пропускаем отдельные ошибки удаления */ }
                 }
             }
         } catch {
@@ -215,3 +212,4 @@ struct StorageSection: View {
 }
     
     
+

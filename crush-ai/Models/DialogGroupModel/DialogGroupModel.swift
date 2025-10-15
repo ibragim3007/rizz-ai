@@ -11,6 +11,7 @@ import SwiftData
 @Model
 final class ImageEntity {
     @Attribute(.unique) var id: String
+    // Сохраняем ТОЛЬКО относительное имя файла (например, "abc.jpg")
     var localUrl: String?
     var remoteUrl: String?
     var createdAt: Date
@@ -25,7 +26,29 @@ final class ImageEntity {
         self.remoteUrl = remoteUrl
         self.createdAt = createdAt
     }
-    var localFileURL: URL? { localUrl.map(URL.init(fileURLWithPath:)) }
+    
+    // Абсолютный URL собираем из текущего Documents + относительного имени файла.
+    // При этом поддерживаем старые записи с абсолютным путём (на случай миграции):
+    var localFileURL: URL? {
+        guard let stored = localUrl, !stored.isEmpty else { return nil }
+        let fm = FileManager.default
+        
+        // Если строка выглядит как абсолютный путь и файл существует — вернём как есть,
+        // чтобы не ломать старые данные до миграции.
+        if stored.hasPrefix("/") {
+            let absolute = URL(fileURLWithPath: stored)
+            if fm.fileExists(atPath: absolute.path) {
+                return absolute
+            }
+        }
+        
+        // Иначе считаем, что это относительное имя файла в Documents
+        if let docs = try? fm.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false) {
+            return docs.appendingPathComponent((stored as NSString).lastPathComponent)
+        }
+        return nil
+    }
+    
     var remoteHTTPURL: URL? { remoteUrl.flatMap(URL.init(string:)) }
 }
 
@@ -125,3 +148,4 @@ final class DialogGroupEntity {
         self.pinned = false
     }
 }
+

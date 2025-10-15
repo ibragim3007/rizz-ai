@@ -36,7 +36,6 @@ final class HomeViewModel: ObservableObject {
     
     func handlePickedPhoto(_ item: PhotosPickerItem) async {
         do {
-            // Ensure we have a context
             guard let ctx = modelContext else { return }
             
             // Загружаем исходные байты
@@ -54,8 +53,13 @@ final class HomeViewModel: ObservableObject {
                 forceExtension: "jpg"
             )
 
-            // Создаем ImageEntity
-            let imageEntity = ImageEntity(id: UUID().uuidString, localUrl: fileURL.path, remoteUrl: nil, createdAt: .now)
+            // Сохраняем в модель ТОЛЬКО имя файла (relative)
+            let imageEntity = ImageEntity(
+                id: UUID().uuidString,
+                localUrl: fileURL.lastPathComponent,
+                remoteUrl: nil,
+                createdAt: .now
+            )
 
             // Создаем DialogEntity
             let dialog = DialogEntity(
@@ -122,7 +126,7 @@ final class HomeViewModel: ObservableObject {
             let now = Date()
             let imageEntity = ImageEntity(
                 id: UUID().uuidString,
-                localUrl: fileURL.path,
+                localUrl: fileURL.lastPathComponent, // сохраняем только имя файла
                 remoteUrl: nil,
                 createdAt: now
             )
@@ -228,8 +232,7 @@ final class HomeViewModel: ObservableObject {
     }
 
     private func deleteImageFileIfExists(from image: ImageEntity) {
-        guard let path = image.localUrl else { return }
-        let url = URL(fileURLWithPath: path)
+        guard let url = image.localFileURL else { return }
         do {
             if FileManager.default.fileExists(atPath: url.path) {
                 try FileManager.default.removeItem(at: url)
@@ -260,7 +263,7 @@ final class HomeViewModel: ObservableObject {
     }
 
     private func suggestedFilename(from item: PhotosPickerItem) async -> String? {
-        await item.itemIdentifier?.split(separator: "/").last.map(String.init)
+        item.itemIdentifier?.split(separator: "/").last.map(String.init)
     }
     
     // MARK: - Image recompression

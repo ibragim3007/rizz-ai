@@ -11,13 +11,13 @@ import SwiftData
 struct ContentView: View {
     
     @AppStorage("hasSeenOnboarding") private var hasSeenOnboarding = false
-    @AppStorage("appLanguage") private var appLanguage: String = "auto"
+    @AppStorage("replyLanguage") private var replyLanguage: String = "auto"
     
     private var selectedLocale: Locale {
-        if appLanguage == "auto" {
+        if replyLanguage == "auto" {
             return .autoupdatingCurrent
         } else {
-            return Locale(identifier: appLanguage)
+            return Locale(identifier: replyLanguage)
         }
     }
     

@@ -37,7 +37,7 @@ final class DialogScreenViewModel: ObservableObject {
     }
     
     // MARK: - Public API
-    func getReply(modelContext: ModelContext, tone: ToneTypes) async {
+    func getReply(modelContext: ModelContext, tone: ToneTypes, replyLanguage: String?) async {
         guard !isLoading else { return }
         isLoading = true
         defer { isLoading = false }
@@ -52,7 +52,8 @@ final class DialogScreenViewModel: ObservableObject {
         let body = AnalyzeScreenshotRequest(
             screenshotBase64: base64Image,
             tone: tone,
-            context: dialog.context
+            context: dialog.context,
+            language: replyLanguage
         )
         
         do {

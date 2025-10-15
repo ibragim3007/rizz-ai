@@ -18,6 +18,7 @@ struct AnalyzeScreenshotRequest: Encodable {
     let screenshotBase64: String
     let tone: ToneTypes
     let context: String?
+    let language: String?
 }
 
 struct AnalyzeScreenshotResponse: Codable {
