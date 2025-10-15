@@ -149,71 +149,8 @@ struct Home: View {
     }
 }
 
-private struct DialogsSectionView: View {
-    let section: GroupSection
-    let columns: [GridItem]
-    let onDeleteSingle: (DialogGroupEntity) -> Void
-    let onDeleteAllTap: () -> Void
-    let onTogglePin: (DialogGroupEntity) -> Void
-    
-    var body: some View {
-        Section {
-            LazyVGrid(columns: columns, spacing: 16) {
-                ForEach(section.items, id: \.id) { dialogGroup in
-                    DialogGroupItemView(
-                        dialogGroup: dialogGroup,
-                        onDelete: {
-                            withAnimation(.snappy(duration: 0.28)) {
-                                onDeleteSingle(dialogGroup)
-                            }
-                        },
-                        onTogglePin: { onTogglePin(dialogGroup) }
-                    )
-                }
-            }
-            .padding(.horizontal, 20)
-            .padding(.top, 4)
-            // Анимируем только изменения набора ID внутри секции
-            .animation(.snappy(duration: 0.32), value: section.items.map(\.id))
-        } header: {
-            SectionHeader(section: section, deleteAllAction: onDeleteAllTap)
-        }
-    }
-}
 
-private struct DialogGroupItemView: View {
-    let dialogGroup: DialogGroupEntity
-    let onDelete: () -> Void
-    let onTogglePin: () -> Void
-    
-    var body: some View {
-        NavigationLink(destination: DialogGroupView(dialogGroup: dialogGroup)) {
-            ScreenShotItem(imageURL: dialogGroup.cover?.localFileURL, title: dialogGroup.title)
-                .contentTransition(.opacity)
-                .transition(.asymmetric(insertion: .opacity.combined(with: .scale(scale: 0.98)),
-                                        removal: .opacity.combined(with: .scale(scale: 0.9))))
-        }
-        .contextMenu {
-            // Pin / Unpin
-            Button(action: {
-                withAnimation(.snappy(duration: 0.22)) {
-                    onTogglePin()
-                }
-            }) {
-                if dialogGroup.pinned {
-                    Label(NSLocalizedString("Unpin", comment: "Unpin group"), systemImage: "pin.slash")
-                } else {
-                    Label(NSLocalizedString("Pin", comment: "Pin group"), systemImage: "pin.fill")
-                }
-            }
-            // Delete
-            Button(role: .destructive, action: onDelete) {
-                Label(NSLocalizedString("Delete - " + dialogGroup.title, comment: "Delete group"), systemImage: "trash")
-            }
-        }
-        .preferredColorScheme(.dark)
-    }
-}
+
 
 struct GroupSection {
     let title: String
@@ -222,8 +159,8 @@ struct GroupSection {
 
 private extension Home {
     var sections: [GroupSection] {
-        let items = dialogs.sorted { $0.updatedAt > $1.updatedAt }
-        return makeSections(from: items)
+//        let items = dialogs.sorted { $0.updatedAt > $1.updatedAt }
+        return makeSections(from: dialogs)
     }
     
     func makeSections(from groups: [DialogGroupEntity]) -> [GroupSection] {
