@@ -56,6 +56,8 @@ struct crush_aiApp: App {
         
     }
     
+    @StateObject var paywallViewModel = PaywallViewModel()
+    
     var body: some Scene {
         WindowGroup {
             ContentView()
@@ -64,6 +66,7 @@ struct crush_aiApp: App {
         .environment(\.appActions, AppActions(resetStore: { [weak _container = containerRef] in
             await resetStore()
         }))
+        .environmentObject(paywallViewModel)
         // Хак: захват ссылки на self.container в замыкании environment
         .onChange(of: container) { _, _ in
             // no-op, просто держим State живым

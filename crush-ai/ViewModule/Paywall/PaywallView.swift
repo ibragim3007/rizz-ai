@@ -21,6 +21,9 @@ struct PaywallView: View {
     
     @State var currentOffering: Offering?
     
+    // Purchasing state
+    @State private var isProcessing: Bool = false
+    @State private var alertMessage: String?
     
     // Моковые цены/тексты (заменишь на реальные из RevenueCat/StoreKit)
     private let annualSubtitle = "Most Popular – Annual Plan\nJust $0.57 / week"
@@ -35,8 +38,7 @@ struct PaywallView: View {
     
     var body: some View {
         ZStack {
-            AppTheme.background
-                .ignoresSafeArea()
+            MeshedGradient().opacity(0.7)
             
             ScrollView {
                 VStack(spacing: 18) {
@@ -73,6 +75,8 @@ struct PaywallView: View {
                     continueButton
                         .padding(.horizontal, 20)
                         .padding(.top, 8)
+                        .disabled(isProcessing)
+                        .opacity(isProcessing ? 0.8 : 1.0)
                     
                     footerLinks
                         .padding(.top, 4)
@@ -88,6 +92,14 @@ struct PaywallView: View {
                     currentOffering = offer
                 }
             }
+        }
+        .alert("Oops", isPresented: Binding(
+            get: { alertMessage != nil },
+            set: { if !$0 { alertMessage = nil } }
+        )) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text(alertMessage ?? "")
         }
     }
     
@@ -249,28 +261,70 @@ struct PaywallView: View {
         .accessibilityHint(Text(isSelected ? "Selected" : "Tap to select"))
     }
     
-    // MARK: - Continue
+    // MARK: - Continue (Purchase)
     
     private var continueButton: some View {
         Button {
 #if canImport(UIKit)
             UIImpactFeedbackGenerator(style: .light).impactOccurred()
 #endif
-            onContinue?()
+            startPurchase()
         } label: {
-            Text("Continue")
-                .font(.system(size: 20, weight: .bold, design: .rounded))
-                .foregroundStyle(.white)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 16)
-                .background(
-                    RoundedRectangle(cornerRadius: 18, style: .continuous)
-                        .fill(AppTheme.primaryGradient)
-                        .shadow(color: AppTheme.glow.opacity(0.45), radius: 18, x: 0, y: 10)
-                )
+            ZStack {
+                Text(isProcessing ? "Processing..." : "Continue")
+                    .font(.system(size: 20, weight: .bold, design: .rounded))
+                    .foregroundStyle(.white)
+                    .opacity(isProcessing ? 0 : 1)
+                
+                if isProcessing {
+                    ProgressView()
+                        .progressViewStyle(.circular)
+                        .tint(.white)
+                }
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 16)
+            .background(
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .fill(AppTheme.primaryGradient)
+                    .shadow(color: AppTheme.glow.opacity(0.45), radius: 18, x: 0, y: 10)
+            )
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("Continue")
+        .accessibilityLabel(isProcessing ? "Processing" : "Continue")
+    }
+    
+    private func startPurchase() {
+        guard !isProcessing else { return }
+        guard let pkg = package(for: selected) else {
+            alertMessage = "No product available for the selected plan. Please try again later."
+            return
+        }
+        isProcessing = true
+        
+        Task {
+            do {
+                let result = try await Purchases.shared.purchase(package: pkg)
+                // You can check entitlements here if you want to validate access.
+                // For example:
+                // let customerInfo = result.customerInfo
+                // if customerInfo.entitlements.active["pro"] != nil { ... }
+                
+                isProcessing = false
+                onContinue?() // Notify caller about success
+                onDismiss?()  // Optionally dismiss paywall after success
+            } catch {
+                isProcessing = false
+                // User cancellations are thrown as ErrorCode.purchaseCancelledError by the SDK.
+                // Suppress alert for cancellations.
+                let nsError = error as NSError
+                if nsError.code == ErrorCode.purchaseCancelledError.rawValue {
+                    // Silent cancellation
+                } else {
+                    alertMessage = error.localizedDescription
+                }
+            }
+        }
     }
     
     // MARK: - Footer
@@ -283,13 +337,29 @@ struct PaywallView: View {
 #if canImport(UIKit)
                 UIImpactFeedbackGenerator(style: .light).impactOccurred()
 #endif
-                onRestore?()
+                restorePurchases()
             }
             .buttonStyle(.plain)
         }
         .font(.system(size: 15, weight: .semibold, design: .rounded))
         .foregroundStyle(.white.opacity(0.85))
         .padding(.vertical, 6)
+    }
+    
+    private func restorePurchases() {
+        guard !isProcessing else { return }
+        isProcessing = true
+        Task {
+            do {
+                _ = try await Purchases.shared.restorePurchases()
+                isProcessing = false
+                onRestore?()
+                onDismiss?()
+            } catch {
+                isProcessing = false
+                alertMessage = error.localizedDescription
+            }
+        }
     }
 }
 

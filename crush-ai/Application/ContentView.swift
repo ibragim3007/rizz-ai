@@ -35,6 +35,7 @@ struct ContentView: View {
 }
 
 #Preview {
+    @Previewable @StateObject var paywallViewModel = PaywallViewModel()
     
     let container: ModelContainer = {
         let schema = Schema([ImageEntity.self, ReplyEntity.self, DialogEntity.self, DialogGroupEntity.self])
@@ -45,5 +46,6 @@ struct ContentView: View {
     
     ContentView()
         .modelContainer(container)
+        .environmentObject(paywallViewModel)
 }
 

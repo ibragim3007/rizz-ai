@@ -12,12 +12,20 @@ struct SettingsPlaceholderView: View {
     
     @AppStorage("replyLanguage") private var replyLanguage: String = "auto"
     @AppStorage("tone") private var currentTone: ToneTypes = .RIZZ
+    @State private var showPaywall: Bool = false
+    @EnvironmentObject private var paywallViewModel: PaywallViewModel
 
     var body: some View {
         ZStack {
             MeshedGradient().opacity(0.5)
             List {
+                // Premium section with a beautiful subscribe button
+                Section("Premium") {
+                    PremiumSection(showPaywall: $showPaywall)
+                }
+                
                 Section("Settings") {
+                                    
                     // Язык
                     Picker(selection: $replyLanguage) {
                         ForEach(languageOptions) { option in
@@ -43,9 +51,6 @@ struct SettingsPlaceholderView: View {
                     } label: {
                         Text(NSLocalizedString("Tone", comment: "Response tone"))
                     }
-                    
-                    Text("Coming soon")
-                        .foregroundStyle(.secondary)
                 }
                 
                 Section("Storage") {
@@ -54,6 +59,20 @@ struct SettingsPlaceholderView: View {
             }
             .scrollContentBackground(.hidden)
             .navigationTitle("Settings")
+            .sheet(isPresented: $showPaywall) {
+                PaywallView(
+                    onContinue: {
+                        // Обработка успешной покупки (опционально)
+                    },
+                    onRestore: {
+                        // Обработка восстановления (опционально)
+                    },
+                    onDismiss: {
+                        showPaywall = false
+                    }
+                )
+                .preferredColorScheme(.dark)
+            }
         }
     }
     
@@ -109,5 +128,7 @@ struct SettingsPlaceholderView: View {
 }
 
 #Preview {
-    SettingsPlaceholderView()
+    @Previewable @StateObject var paywallViewModel = PaywallViewModel()
+    
+    SettingsPlaceholderView().environmentObject(paywallViewModel)
 }
