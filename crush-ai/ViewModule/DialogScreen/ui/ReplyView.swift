@@ -28,6 +28,13 @@ struct ReplyView: View {
             .background(
                 RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                     .fill(gradientForTone).saturation(wasCopied ? 0.5 : 1)
+                    .overlay(alignment: .bottomTrailing) {
+                        Text(getToneName(tone: tone))
+                            .font(.title)
+                            .opacity(0.8)
+                            .rotationEffect(.degrees(-20))
+                            .offset(x: 5, y: 5)
+                    }
             )
             // Лёгкий «глянец», чтобы пузырёк выглядел живым
             .overlay(
