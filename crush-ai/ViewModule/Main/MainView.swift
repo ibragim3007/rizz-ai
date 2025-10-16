@@ -10,7 +10,7 @@ import SwiftUI
 struct MainView: View {
     
     @StateObject var vmMain = MainViewModel()
-    @StateObject var paywallViewModel = PaywallViewModel()
+    @EnvironmentObject private var paywallViewModel: PaywallViewModel
     
     // Пейвол при запуске и при потере подписки
     @State private var showPaywallAtLaunch: Bool = false
@@ -18,10 +18,9 @@ struct MainView: View {
     var body: some View {
         NavigationStack {
             Home()
-                .environmentObject(paywallViewModel)
                 .task {
                     await vmMain.loginUser()
-                    // После логина проверяем подписку
+                    
                     if !paywallViewModel.isSubscriptionActive {
                         showPaywallAtLaunch = true
                     }
@@ -60,3 +59,4 @@ struct MainView: View {
 
 
 // Плейсхолдер карточки в сетке
+

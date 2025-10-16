@@ -24,5 +24,9 @@ final class PaywallViewModel: ObservableObject {
         }
     }
     
+    init (isPreview: Bool) {
+        self.isSubscriptionActive = isPreview
+    }
+    
     
 }

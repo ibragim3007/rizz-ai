@@ -13,6 +13,9 @@ struct ContentView: View {
     @AppStorage("hasSeenOnboarding") private var hasSeenOnboarding = false
     @AppStorage("replyLanguage") private var replyLanguage: String = "auto"
     
+    // Единый экземпляр PaywallViewModel для всего дерева
+    @StateObject private var paywallViewModel = PaywallViewModel()
+    
     private var selectedLocale: Locale {
         if replyLanguage == "auto" {
             return .autoupdatingCurrent
@@ -24,18 +27,20 @@ struct ContentView: View {
     var body: some View {
         Group {
             if (hasSeenOnboarding) {
-                MainView().preferredColorScheme(.dark)
+                MainView()
+                    .preferredColorScheme(.dark)
             } else {
                 OnboardingView()
                     .preferredColorScheme(.dark)
             }
         }
         .environment(\.locale, selectedLocale)
+        .environmentObject(paywallViewModel)
     }
 }
 
 #Preview {
-    @Previewable @StateObject var paywallViewModel = PaywallViewModel()
+    @Previewable @StateObject var paywallViewModel = PaywallViewModel(isPreview: true)
     
     let container: ModelContainer = {
         let schema = Schema([ImageEntity.self, ReplyEntity.self, DialogEntity.self, DialogGroupEntity.self])
