@@ -56,14 +56,14 @@ struct PaywallView: View {
                             plan: .annual,
                             titlePrefix: "🔥 ",
                             title: "Most Popular – Annual Plan",
-                            subtitle: "Just $0.57 / week",
+                            subtitle: dynamicSubtitle(for: .annual),
                             badge: "SAVE 98%"
                         )
                         planCard(
                             plan: .weekly,
                             titlePrefix: "",
                             title: "Weekly plan",
-                            subtitle: weeklySubtitle,
+                            subtitle: dynamicSubtitle(for: .weekly),
                             badge: nil
                         )
                     }
@@ -290,6 +290,54 @@ struct PaywallView: View {
         .font(.system(size: 15, weight: .semibold, design: .rounded))
         .foregroundStyle(.white.opacity(0.85))
         .padding(.vertical, 6)
+    }
+}
+
+// MARK: - RevenueCat helpers
+
+private extension PaywallView {
+    func package(for plan: Plan) -> Package? {
+        guard let offering = currentOffering else { return nil }
+        switch plan {
+        case .annual:
+            return offering.annual
+        case .weekly:
+            return offering.weekly
+        }
+    }
+    
+    func dynamicSubtitle(for plan: Plan) -> String {
+        switch plan {
+        case .annual:
+            // Prefer localized price per week if available
+            if let pkg = package(for: .annual) {
+                let product = pkg.storeProduct
+                if let perWeek = product.localizedPricePerWeek {
+                    // Keep your original structure: "Most Popular – Annual Plan\nJust $X / week"
+                    return "Just \(perWeek) / week"
+                }
+            }
+            // Fallback to existing mock
+            return annualSubtitle.replacingOccurrences(of: "Most Popular – Annual Plan\n", with: "")
+            
+        case .weekly:
+            if let pkg = package(for: .weekly) {
+                let product = pkg.storeProduct
+                // If there is an intro discount for exactly 1 week, show "$intro / week, then $regular"
+                if let intro = product.introductoryDiscount,
+                   intro.subscriptionPeriod.unit == .week,
+                   intro.subscriptionPeriod.value == 1 {
+                    let introString = intro.localizedPriceString
+                    let regularString = product.localizedPriceString
+                    return "\(introString) / week, then \(regularString)"
+                } else {
+                    // No intro: show regular weekly price
+                    return "\(product.localizedPriceString) / week"
+                }
+            }
+            // Fallback to existing mock
+            return weeklySubtitle
+        }
     }
 }
 
