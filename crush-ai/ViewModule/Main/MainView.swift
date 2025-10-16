@@ -10,12 +10,48 @@ import SwiftUI
 struct MainView: View {
     
     @StateObject var vmMain = MainViewModel()
+    @StateObject var paywallViewModel = PaywallViewModel()
+    
+    // Пейвол при запуске и при потере подписки
+    @State private var showPaywallAtLaunch: Bool = false
 
     var body: some View {
         NavigationStack {
             Home()
+                .environmentObject(paywallViewModel)
                 .task {
                     await vmMain.loginUser()
+                    // После логина проверяем подписку
+                    if !paywallViewModel.isSubscriptionActive {
+                        showPaywallAtLaunch = true
+                    }
+                }
+                // Реагируем на изменения статуса подписки:
+                // если подписка активна — закрываем пейвол, если нет — показываем
+                .onChange(of: paywallViewModel.isSubscriptionActive) { _, isActive in
+                    showPaywallAtLaunch = !isActive
+                }
+                // Глобальный пейвол при старте/потере подписки
+                .fullScreenCover(isPresented: $showPaywallAtLaunch) {
+                    PaywallView(
+                        onContinue: {
+                            // Закрываем, если подписка активировалась
+                            if paywallViewModel.isSubscriptionActive {
+                                showPaywallAtLaunch = false
+                            }
+                        },
+                        onRestore: {
+                            if paywallViewModel.isSubscriptionActive {
+                                showPaywallAtLaunch = false
+                            }
+                        },
+                        onDismiss: {
+                            // Если пользователь закрыл вручную — оставим как есть.
+                            // Можно принудительно держать открытым, если нужно:
+                            // showPaywallAtLaunch = !paywallViewModel.isSubscriptionActive
+                        }
+                    )
+                    .preferredColorScheme(.dark)
                 }
         }
     }

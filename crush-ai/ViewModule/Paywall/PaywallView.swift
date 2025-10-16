@@ -15,6 +15,7 @@ struct PaywallView: View {
     var onRestore: (() -> Void)? = nil
     var onDismiss: (() -> Void)? = nil
     
+    @Environment(\.dismiss) private var dismiss
     
     @State private var selected: Plan = .annual
     @State private var currentPage: Int = 0
@@ -42,6 +43,7 @@ struct PaywallView: View {
             
             ScrollView {
                 VStack(spacing: 18) {
+                    
                     header
                     
                     carousel
@@ -86,6 +88,7 @@ struct PaywallView: View {
             }
         }
         .preferredColorScheme(.dark)
+        // Кнопка закрытия (крестик)
         .onAppear {
             Purchases.shared.getOfferings { offerings, error in
                 if let offer = offerings?.current, error == nil {
@@ -106,15 +109,35 @@ struct PaywallView: View {
     // MARK: - Header
     
     private var header: some View {
-        VStack(spacing: 6) {
-            Text("Less Typing. More Dates.")
-                .font(.system(size: 26, weight: .heavy, design: .rounded))
-                .tracking(1.0)
-                .foregroundStyle(.white)
+        VStack(spacing: 10) {
+            HStack (alignment: .firstTextBaseline) {
+                
+                CloseButton {
+#if canImport(UIKit)
+                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+#endif
+                    onDismiss?()
+                    dismiss()
+                }
+                .padding(.top, 12)
+                .padding(.trailing, 12)
+                VStack (spacing: 5) {
+                    Text("Less Typing. More Dates.")
+                        .font(.system(size: 22, weight: .heavy, design: .rounded))
+                        .tracking(1.0)
+                        .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    
+                    
+                    Text("Quick lines that actually get replies")
+                        .font(.system(size: 14, weight: .regular, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.8))
+                    
+                }
+                
+            }
             
-            Text("Quick lines that actually get replies")
-                .font(.system(size: 14, weight: .regular, design: .rounded))
-                .foregroundStyle(.white.opacity(0.8))
+            
         }
         .padding(.horizontal, 20)
         .padding(.top, 8)
@@ -313,6 +336,7 @@ struct PaywallView: View {
                 isProcessing = false
                 onContinue?() // Notify caller about success
                 onDismiss?()  // Optionally dismiss paywall after success
+                dismiss()
             } catch {
                 isProcessing = false
                 // User cancellations are thrown as ErrorCode.purchaseCancelledError by the SDK.
@@ -355,11 +379,36 @@ struct PaywallView: View {
                 isProcessing = false
                 onRestore?()
                 onDismiss?()
+                dismiss()
             } catch {
                 isProcessing = false
                 alertMessage = error.localizedDescription
             }
         }
+    }
+}
+
+// MARK: - Close Button
+
+private struct CloseButton: View {
+    var action: () -> Void
+    var body: some View {
+        Button(action: action) {
+            ZStack {
+                Circle()
+                    .fill(.ultraThinMaterial)
+                    .frame(width: 32, height: 32)
+                    .overlay(
+                        Circle()
+                            .stroke(.white.opacity(0.25), lineWidth: 1)
+                    )
+                Image(systemName: "xmark")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(.white)
+            }
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Close")
     }
 }
 

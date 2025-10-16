@@ -188,10 +188,10 @@ final class HomeViewModel: ObservableObject {
         #endif
         
         // Проверка подписки централизована в VM
-        if let paywall = paywallViewModel, paywall.isSubscriptionActive == false {
-            showPaywall = true
-            return
-        }
+//        if let paywall = paywallViewModel, paywall.isSubscriptionActive == false {
+//            showPaywall = true
+//            return
+//        }
         // Нет Paywall или подписка активна — открываем пикер
         showPhotoPicker = true
     }
