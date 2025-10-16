@@ -17,10 +17,12 @@ struct DialogScreen: View {
     var defaultImage = "https://cdsassets.apple.com/live/7WUAS350/images/ios/ios-26-iphone-16-pro-take-a-screenshot-options.png"
     
     @Environment(\.modelContext) private var modelContext
+    @EnvironmentObject private var paywallViewModel: PaywallViewModel
     
     @StateObject private var dialogScreenVm: DialogScreenViewModel
     @State private var selectedChips: Set<String> = []
     @FocusState private var isContextFocused: Bool
+    @State private var showPaywall: Bool = false
     
     init(dialog: DialogEntity, dialogGroup: DialogGroupEntity) {
         self.dialog = dialog
@@ -64,9 +66,12 @@ struct DialogScreen: View {
                         isLoading: dialogScreenVm.isLoading
                     ) {
                         guard !dialogScreenVm.isLoading else { return }
-                        // Sync input context into the dialog before request
-                        dialog.context = dialogScreenVm.context
-                        Task { await dialogScreenVm.getReply(modelContext: modelContext, tone: currentTone, replyLanguage: replyLanguage) }
+                        // Проверка подписки перед выполнением действия
+                        if !paywallViewModel.isSubscriptionActive {
+                            showPaywall = true
+                            return
+                        }
+                        performGetReply()
                     }
                 }
                 .sharedBackgroundVisibility(.hidden)
@@ -100,9 +105,12 @@ struct DialogScreen: View {
                         fullWidth: true
                     ) {
                         guard !dialogScreenVm.isLoading else { return }
-                        // Sync input context into the dialog before request
-                        dialog.context = dialogScreenVm.context
-                        Task { await dialogScreenVm.getReply(modelContext: modelContext, tone: currentTone,replyLanguage: replyLanguage) }
+                        // Проверка подписки перед выполнением действия
+                        if !paywallViewModel.isSubscriptionActive {
+                            showPaywall = true
+                            return
+                        }
+                        performGetReply()
                     }
                     .frame(maxWidth: .infinity)
                 }
@@ -110,6 +118,35 @@ struct DialogScreen: View {
                 .padding(.vertical, 10)
                 .background(.bar) // визуально как тулбар
             }
+        }
+        // Paywall presentation
+        .sheet(isPresented: $showPaywall) {
+            PaywallView(
+                onContinue: {
+                    showPaywall = false
+                    if paywallViewModel.isSubscriptionActive {
+                        performGetReply()
+                    }
+                },
+                onRestore: {
+                    showPaywall = false
+                    if paywallViewModel.isSubscriptionActive {
+                        performGetReply()
+                    }
+                },
+                onDismiss: {
+                    showPaywall = false
+                }
+            )
+            .preferredColorScheme(.dark)
+        }
+    }
+    
+    private func performGetReply() {
+        // Синхронизируем введенный контекст перед запросом
+        dialog.context = dialogScreenVm.context
+        Task {
+            await dialogScreenVm.getReply(modelContext: modelContext, tone: currentTone, replyLanguage: replyLanguage)
         }
     }
     

@@ -14,6 +14,7 @@ struct Home: View {
     // Диалоги теперь подтягиваем из SwiftData, чтобы список обновлялся сам
     @Query(sort: \DialogGroupEntity.updatedAt, order: .reverse) private var dialogs: [DialogGroupEntity]
     @StateObject var vmHome = HomeViewModel()
+    @EnvironmentObject private var paywallViewModel: PaywallViewModel
     
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 12, alignment: .top), count: 3)
     
@@ -85,8 +86,11 @@ struct Home: View {
             guard let item = newItem else { return }
             Task { await vmHome.handlePickedPhoto(item) }
         }
-        // Inject ModelContext after the view appears
-        .onAppear { vmHome.modelContext = modelContext }
+        // Inject dependencies after the view appears
+        .onAppear {
+            vmHome.modelContext = modelContext
+            vmHome.paywallViewModel = paywallViewModel
+        }
         // Подтверждение удаления всех элементов секции
         .alert(
             String(format: NSLocalizedString("Delete all in “%@”?", comment: "Delete all confirmation title"), pendingDeleteTitle),
@@ -122,6 +126,28 @@ struct Home: View {
             } else {
                 EmptyView()
             }
+        }
+        // Paywall sheet (controlled by VM)
+        .sheet(isPresented: $vmHome.showPaywall) {
+            PaywallView(
+                onContinue: {
+                    // При успешной покупке можно автоматически открыть загрузку
+                    vmHome.showPaywall = false
+                    if paywallViewModel.isSubscriptionActive {
+                        vmHome.uploadScreenshot()
+                    }
+                },
+                onRestore: {
+                    vmHome.showPaywall = false
+                    if paywallViewModel.isSubscriptionActive {
+                        vmHome.uploadScreenshot()
+                    }
+                },
+                onDismiss: {
+                    vmHome.showPaywall = false
+                }
+            )
+            .preferredColorScheme(.dark)
         }
     }
     

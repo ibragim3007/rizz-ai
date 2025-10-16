@@ -19,6 +19,9 @@ final class HomeViewModel: ObservableObject {
     @Published var showPhotoPicker = false
     @Published var selectedPhotoItem: PhotosPickerItem?
     
+    // Paywall presentation controlled from VM
+    @Published var showPaywall: Bool = false
+    
     // Navigation intent to DialogScreen
     @Published var navigateDialog: DialogEntity?
     @Published var navigateDialogGroup: DialogGroupEntity?
@@ -26,6 +29,9 @@ final class HomeViewModel: ObservableObject {
     
     // Allow late injection from the View
     var modelContext: ModelContext?
+    
+    // Subscription state (inject from View via EnvironmentObject)
+    var paywallViewModel: PaywallViewModel?
     
     init() {}
     
@@ -180,6 +186,13 @@ final class HomeViewModel: ObservableObject {
         #if canImport(UIKit)
         UIImpactFeedbackGenerator(style: .light).impactOccurred()
         #endif
+        
+        // Проверка подписки централизована в VM
+        if let paywall = paywallViewModel, paywall.isSubscriptionActive == false {
+            showPaywall = true
+            return
+        }
+        // Нет Paywall или подписка активна — открываем пикер
         showPhotoPicker = true
     }
 
