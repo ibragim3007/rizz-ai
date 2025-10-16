@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import RevenueCat
 
 struct PaywallView: View {
     
@@ -14,8 +15,12 @@ struct PaywallView: View {
     var onRestore: (() -> Void)? = nil
     var onDismiss: (() -> Void)? = nil
     
+    
     @State private var selected: Plan = .annual
     @State private var currentPage: Int = 0
+    
+    @State var currentOffering: Offering?
+    
     
     // Моковые цены/тексты (заменишь на реальные из RevenueCat/StoreKit)
     private let annualSubtitle = "Most Popular – Annual Plan\nJust $0.57 / week"
@@ -23,9 +28,9 @@ struct PaywallView: View {
     
     // Локальные изображения для карусели (замени на свои ассеты/URL)
     private let carouselImages: [String] = [
-        "sample-screen", // добавь такие имена в Assets или поменяй
-        "sample-screen",
-        "sample-screen"
+        "couple-1", // добавь такие имена в Assets или поменяй
+        "couple-2",
+        "couple-3"
     ]
     
     var body: some View {
@@ -77,20 +82,26 @@ struct PaywallView: View {
             }
         }
         .preferredColorScheme(.dark)
+        .onAppear {
+            Purchases.shared.getOfferings { offerings, error in
+                if let offer = offerings?.current, error == nil {
+                    currentOffering = offer
+                }
+            }
+        }
     }
     
     // MARK: - Header
     
     private var header: some View {
         VStack(spacing: 6) {
-            Text("UP YOUR GAME")
-                .font(.system(size: 36, weight: .heavy, design: .rounded))
+            Text("Less Typing. More Dates.")
+                .font(.system(size: 26, weight: .heavy, design: .rounded))
                 .tracking(1.0)
                 .foregroundStyle(.white)
-                .shadow(color: AppTheme.glow.opacity(0.45), radius: 12, x: 0, y: 6)
             
-            Text("Proven to get more girls")
-                .font(.system(size: 18, weight: .regular, design: .rounded))
+            Text("Quick lines that actually get replies")
+                .font(.system(size: 14, weight: .regular, design: .rounded))
                 .foregroundStyle(.white.opacity(0.8))
         }
         .padding(.horizontal, 20)
@@ -119,7 +130,7 @@ struct PaywallView: View {
                                     .opacity(UIImage(named: name) == nil ? 0 : 1)
                             }
                             .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
-                            .frame(height: 320)
+                            .frame(height: 300)
                             .overlay {
                                 if UIImage(named: name) == nil {
                                     Image(systemName: "photo")
@@ -133,7 +144,7 @@ struct PaywallView: View {
                 }
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
-            .frame(height: 330)
+            .frame(height: 310)
             
             // Custom page control
             HStack(spacing: 8) {
