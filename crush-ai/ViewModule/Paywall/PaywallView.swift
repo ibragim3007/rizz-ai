@@ -16,6 +16,7 @@ struct PaywallView: View {
     var onDismiss: (() -> Void)? = nil
     
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject private var paywallViewModel: PaywallViewModel
     
     @State private var selected: Plan = .annual
     @State private var currentPage: Int = 0
@@ -32,8 +33,8 @@ struct PaywallView: View {
     
     // Локальные изображения для карусели (замени на свои ассеты/URL)
     private let carouselImages: [String] = [
-        "couple-1", // добавь такие имена в Assets или поменяй
-        "couple-2",
+        "couple-2", // добавь такие имена в Assets или поменяй
+        "couple-1",
         "couple-3"
     ]
     
@@ -328,10 +329,9 @@ struct PaywallView: View {
         Task {
             do {
                 let result = try await Purchases.shared.purchase(package: pkg)
-                // You can check entitlements here if you want to validate access.
-                // For example:
-                // let customerInfo = result.customerInfo
-                // if customerInfo.entitlements.active["pro"] != nil { ... }
+                
+                // Обновляем состояние подписки из полученного CustomerInfo
+                refreshSubscriptionState(from: result.customerInfo)
                 
                 isProcessing = false
                 onContinue?() // Notify caller about success
@@ -375,7 +375,10 @@ struct PaywallView: View {
         isProcessing = true
         Task {
             do {
-                _ = try await Purchases.shared.restorePurchases()
+                let info = try await Purchases.shared.restorePurchases()
+                // Обновляем состояние подписки после восстановления
+                refreshSubscriptionState(from: info)
+                
                 isProcessing = false
                 onRestore?()
                 onDismiss?()
@@ -385,6 +388,14 @@ struct PaywallView: View {
                 alertMessage = error.localizedDescription
             }
         }
+    }
+    
+    // MARK: - Subscription state helper
+    
+    private func refreshSubscriptionState(from customerInfo: CustomerInfo?) {
+        // Используем ваш entitlement "Full Access"
+        let isActive = customerInfo?.entitlements.all["Full Access"]?.isActive == true
+        paywallViewModel.isSubscriptionActive = isActive
     }
 }
 
@@ -485,3 +496,4 @@ private enum Plan: String, CaseIterable {
         .previewDevice("iPhone SE (3rd generation)")
         .preferredColorScheme(.dark)
 }
+
