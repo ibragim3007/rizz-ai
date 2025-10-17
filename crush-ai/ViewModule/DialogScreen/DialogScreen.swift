@@ -252,8 +252,8 @@ struct LargeImageDisplay: View {
     
     private let corner: CGFloat = 24
     
-    // Состояние анимации «сканирования»
-    @State private var startScan = false
+    // Числовое состояние для бесконечного движения «луча»
+    @State private var scanY: CGFloat = 0
     
     var body: some View {
         ZStack {
@@ -289,8 +289,9 @@ struct LargeImageDisplay: View {
                                 .blendMode(.plusLighter)
                                 .allowsHitTesting(false)
                                 
-                                // Двигающийся «луч» сканирования
+                                // Двигающийся «луч» сканирования — бесконечная линейная анимация
                                 let beamHeight = max(40, geo.size.height * 0.18)
+                                
                                 LinearGradient(
                                     colors: [
                                         .clear,
@@ -308,12 +309,17 @@ struct LargeImageDisplay: View {
                                     RoundedRectangle(cornerRadius: corner, style: .continuous)
                                         .fill(.white)
                                 )
-                                .offset(y: startScan ? geo.size.height + beamHeight : -beamHeight)
-                                .animation(
-                                    .easeInOut(duration: 1.6)
-                                    .repeatForever(autoreverses: false),
-                                    value: startScan
-                                )
+                                .offset(y: scanY)
+                                // При изменении размеров (например, поворот) — перезапустим анимацию
+                                .id(beamHeight)
+                                .onAppear {
+                                    // старт над верхней границей
+                                    scanY = -beamHeight
+                                    withAnimation(.linear(duration: 1.6).repeatForever(autoreverses: false)) {
+                                        // финиш ниже нижней границы
+                                        scanY = geo.size.height + beamHeight
+                                    }
+                                }
                             }
                             
                             // Угловые маркеры
@@ -329,7 +335,6 @@ struct LargeImageDisplay: View {
                                 .shadow(color: .black.opacity(0.4), radius: 4, x: 0, y: 2)
                         }
                         .clipShape(RoundedRectangle(cornerRadius: corner, style: .continuous))
-                        .onAppear { startScan = true }
                     }
             }
         }
@@ -444,6 +449,9 @@ private struct CornerMarks: Shape {
 
 
 #Preview {
+    
+    @Previewable var paywallviewModel = PaywallViewModel(isPreview: true)
+    
     let image = ImageEntity(id: "id", remoteUrl: "https://cdsassets.apple.com/live/7WUAS350/images/ios/ios-26-iphone-16-pro-take-a-screenshot-options.png")
     let dialog = DialogEntity(id: "id2", userId: "u", title: "Test name", elements: ["opener", "test", "profile", "opener", "test", "profile"])
     
@@ -461,6 +469,7 @@ private struct CornerMarks: Shape {
     dialogGroup.cover = image
     dialogGroup.dialogs = [dialog]
     
-    return DialogScreen(dialog: dialog, dialogGroup: dialogGroup).preferredColorScheme(.dark)
+    return DialogScreen(dialog: dialog, dialogGroup: dialogGroup)
+        .preferredColorScheme(.dark)
+        .environmentObject(paywallviewModel)
 }
-
