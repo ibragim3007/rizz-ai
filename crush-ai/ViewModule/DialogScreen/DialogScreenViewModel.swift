@@ -37,7 +37,7 @@ final class DialogScreenViewModel: ObservableObject {
     }
     
     // MARK: - Public API
-    func getReply(modelContext: ModelContext, tone: ToneTypes, replyLanguage: String?) async {
+    func getReply(modelContext: ModelContext, tone: ToneTypes, replyLanguage: String?, useEmojis: Bool?) async {
         guard !isLoading else { return }
         isLoading = true
         defer { isLoading = false }
@@ -53,7 +53,8 @@ final class DialogScreenViewModel: ObservableObject {
             screenshotBase64: base64Image,
             tone: tone,
             context: dialog.context,
-            language: replyLanguage
+            language: replyLanguage,
+            useEmojis: useEmojis
         )
         
         do {

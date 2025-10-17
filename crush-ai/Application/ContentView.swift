@@ -9,9 +9,9 @@ import SwiftUI
 import SwiftData
 
 struct ContentView: View {
-    
     @AppStorage("hasSeenOnboarding") private var hasSeenOnboarding = false
     @AppStorage("replyLanguage") private var replyLanguage: String = "auto"
+    @AppStorage("useEmojis") private var useEmojis: Bool = false
     
     // Единый экземпляр PaywallViewModel для всего дерева
     @StateObject private var paywallViewModel = PaywallViewModel()

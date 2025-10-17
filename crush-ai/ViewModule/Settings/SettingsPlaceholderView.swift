@@ -12,14 +12,12 @@ struct SettingsPlaceholderView: View {
     
     @AppStorage("replyLanguage") private var replyLanguage: String = "auto"
     @AppStorage("tone") private var currentTone: ToneTypes = .RIZZ
+    @AppStorage("useEmojis") private var useEmojis: Bool = false
+
     @State private var showPaywall: Bool = false
     @EnvironmentObject private var paywallViewModel: PaywallViewModel
-    
-    // Legal links
-    private let termsURLString: String = "https://example.com/terms"
-    private let privacyURLString: String = "https://example.com/privacy"
-    @State private var legalURL: URL? = nil
-    
+
+
     var body: some View {
         ZStack {
             MeshedGradient().opacity(0.5)
@@ -56,43 +54,16 @@ struct SettingsPlaceholderView: View {
                     } label: {
                         Text(NSLocalizedString("Tone", comment: "Response tone"))
                     }
+                    
+                    // Эмодзи в ответах
+                    Toggle(isOn: $useEmojis) {
+                        Text(NSLocalizedString("Use Emoji", comment: "Toggle to include emoji in responses"))
+                    }
                 }
                 
                 // Legal section
                 Section("Legal") {
-                    Button {
-#if canImport(UIKit)
-                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-#endif
-                        if let url = URL(string: termsURLString) {
-                            legalURL = url
-                        }
-                    } label: {
-                        HStack {
-                            Text(NSLocalizedString("Terms of Use", comment: "Legal: Terms of Use"))
-                            Spacer()
-                            Image(systemName: "chevron.right")
-                                .foregroundStyle(.secondary)
-                        }
-                    }
-                    .buttonStyle(.plain)
-                    
-                    Button {
-#if canImport(UIKit)
-                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-#endif
-                        if let url = URL(string: privacyURLString) {
-                            legalURL = url
-                        }
-                    } label: {
-                        HStack {
-                            Text(NSLocalizedString("Privacy Policy", comment: "Legal: Privacy Policy"))
-                            Spacer()
-                            Image(systemName: "chevron.right")
-                                .foregroundStyle(.secondary)
-                        }
-                    }
-                    .buttonStyle(.plain)
+                    LegalSection()
                 }
                 
                 
@@ -117,20 +88,6 @@ struct SettingsPlaceholderView: View {
                     }
                 )
                 .preferredColorScheme(.dark)
-            }
-            // Present in-app Safari for Legal links
-            .sheet(
-                isPresented: Binding(
-                    get: { legalURL != nil },
-                    set: { if !$0 { legalURL = nil } }
-                )
-            ) {
-                if let url = legalURL {
-                    Link(destination: url) {
-                        Text(url.absoluteString)
-                            .padding()
-                    }
-                }
             }
         }
     }
@@ -191,4 +148,3 @@ struct SettingsPlaceholderView: View {
     
     SettingsPlaceholderView().environmentObject(paywallViewModel)
 }
-

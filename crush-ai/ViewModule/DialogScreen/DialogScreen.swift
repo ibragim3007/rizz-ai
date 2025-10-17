@@ -11,6 +11,7 @@ import SwiftData
 struct DialogScreen: View {
     @AppStorage("tone") private var currentTone: ToneTypes = .RIZZ
     @AppStorage("replyLanguage") private var replyLanguage: String = "auto"
+    @AppStorage("useEmojis") private var useEmojis: Bool = false
     
     var dialog: DialogEntity
     var dialogGroup: DialogGroupEntity
@@ -146,7 +147,7 @@ struct DialogScreen: View {
         // Синхронизируем введенный контекст перед запросом
         dialog.context = dialogScreenVm.context
         Task {
-            await dialogScreenVm.getReply(modelContext: modelContext, tone: currentTone, replyLanguage: replyLanguage)
+            await dialogScreenVm.getReply(modelContext: modelContext, tone: currentTone, replyLanguage: replyLanguage, useEmojis: useEmojis)
         }
     }
     

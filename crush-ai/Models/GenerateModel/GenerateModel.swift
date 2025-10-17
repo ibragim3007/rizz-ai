@@ -19,6 +19,7 @@ struct AnalyzeScreenshotRequest: Encodable {
     let tone: ToneTypes
     let context: String?
     let language: String?
+    let useEmojis: Bool?
 }
 
 struct AnalyzeScreenshotResponse: Codable {
