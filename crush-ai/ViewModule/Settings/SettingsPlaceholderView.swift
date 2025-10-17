@@ -15,8 +15,6 @@ struct SettingsPlaceholderView: View {
     @AppStorage("useEmojis") private var useEmojis: Bool = false
 
     @State private var showPaywall: Bool = false
-    @EnvironmentObject private var paywallViewModel: PaywallViewModel
-
 
     var body: some View {
         ZStack {
@@ -61,6 +59,11 @@ struct SettingsPlaceholderView: View {
                     }
                 }
                 
+                // Feedback section
+                Section("Feedback") {
+                    FeedbackSection()
+                }
+                
                 // Legal section
                 Section("Legal") {
                     LegalSection()
@@ -92,6 +95,7 @@ struct SettingsPlaceholderView: View {
         }
     }
     
+    // MARK: - Language / Tone helpers
     
     private struct LanguageOption: Identifiable, Hashable {
         let id: String          // BCP-47, либо "auto"
@@ -148,3 +152,4 @@ struct SettingsPlaceholderView: View {
     
     SettingsPlaceholderView().environmentObject(paywallViewModel)
 }
+
