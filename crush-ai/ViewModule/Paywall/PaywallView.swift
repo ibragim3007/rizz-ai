@@ -122,23 +122,17 @@ struct PaywallView: View {
                 }
                 .padding(.top, 12)
                 .padding(.trailing, 12)
-                VStack (spacing: 5) {
-                    Text("Less Typing. More Dates.")
-                        .font(.system(size: 22, weight: .heavy, design: .rounded))
+                VStack (alignment: .center, spacing: 5) {
+                    Text("Our dev tested replies")
+                        .font(.system(size: 24, weight: .heavy, design: .rounded))
                         .tracking(1.0)
                         .foregroundStyle(.white)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                    
-                    
-                    Text("Quick lines that actually get replies")
+                    Text("and accidentally beta-tested love.")
                         .font(.system(size: 14, weight: .regular, design: .rounded))
                         .foregroundStyle(.white.opacity(0.8))
-                    
                 }
-                
             }
-            
-            
         }
         .padding(.horizontal, 20)
         .padding(.top, 8)
