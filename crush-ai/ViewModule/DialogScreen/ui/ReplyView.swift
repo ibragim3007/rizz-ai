@@ -25,16 +25,18 @@ struct ReplyView: View {
             .padding(.vertical, 14)
             .padding(.horizontal, 16)
             .frame(maxWidth: .infinity, alignment: .leading)
+            .overlay(alignment: .leading) {
+                VStack {
+                    Text(getToneName(tone: tone))
+                        .font(.callout)
+                        .opacity(0.9)
+                        .saturation(0.8)
+                        .offset(x: -10)
+                }
+            }
             .background(
                 RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                     .fill(gradientForTone).saturation(wasCopied ? 0.5 : 1)
-                    .overlay(alignment: .bottomTrailing) {
-                        Text(getToneName(tone: tone))
-                            .font(.title)
-                            .opacity(0.8)
-                            .rotationEffect(.degrees(-20))
-                            .offset(x: 5, y: 5)
-                    }
             )
             // Лёгкий «глянец», чтобы пузырёк выглядел живым
             .overlay(

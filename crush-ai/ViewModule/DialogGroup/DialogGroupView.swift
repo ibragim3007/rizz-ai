@@ -180,6 +180,7 @@ struct DialogGroupView: View {
                             .contextMenu {
                                 Button(role: .destructive) {
                                     groupVm.requestDelete(dialog)
+                                    groupVm.confirmDelete(in: dialogGroup)
                                 } label: {
                                     Label("Delete", systemImage: "trash")
                                 }

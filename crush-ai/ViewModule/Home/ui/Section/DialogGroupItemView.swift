@@ -14,10 +14,15 @@ struct DialogGroupItemView: View {
     
     var body: some View {
         NavigationLink(destination: DialogGroupView(dialogGroup: dialogGroup)) {
-            ScreenShotItem(imageURL: dialogGroup.cover?.localFileURL, title: dialogGroup.title)
+            ScreenShotItem(
+                imageURL: dialogGroup.cover?.localFileURL, title: dialogGroup.title)
                 .contentTransition(.opacity)
-                .transition(.asymmetric(insertion: .opacity.combined(with: .scale(scale: 0.98)),
-                                        removal: .opacity.combined(with: .scale(scale: 0.9))))
+                .transition(
+                    .asymmetric(
+                        insertion: .opacity.combined(with: .scale(scale: 0.98)),
+                        removal: .opacity.combined(with: .scale(scale: 0.9))
+                    )
+                )
         }
         .contextMenu {
             // Pin / Unpin

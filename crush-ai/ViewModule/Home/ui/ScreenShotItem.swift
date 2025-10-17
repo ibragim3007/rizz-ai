@@ -53,7 +53,7 @@ struct ScreenShotItem: View {
     var body: some View {
         GeometryReader { geo in
             let size = geo.size
-            let cornerRadius: CGFloat = 15
+            let cornerRadius: CGFloat = 16
             
             RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                 .fill(.white.opacity(0.1))
@@ -129,7 +129,7 @@ struct ScreenShotItem: View {
                 }
                 .frame(width: size.width, height: size.height)
         }
-        .aspectRatio(0.618, contentMode: .fit)
+        .aspectRatio(0.62, contentMode: .fit)
         .task(id: imageURL) {
             await loadIfNeeded()
         }

@@ -45,7 +45,7 @@ struct DialogScreen: View {
         }
         // Тап по пустому фону закрывает клавиатуру
         .contentShape(Rectangle())
-        .onTapGesture { isContextFocused = false }
+//        .onTapGesture { isContextFocused = false }
         .navigationTitle(dialog.title)
         .navigationBarTitleDisplayMode(.automatic)
         .toolbar {
@@ -171,7 +171,7 @@ struct DialogScreen: View {
             .padding(.bottom, 50)
         }
         // Тап по прокрутке вне инпута тоже закрывает клавиатуру
-        .simultaneousGesture(TapGesture().onEnded { isContextFocused = false })
+//        .simultaneousGesture(TapGesture().onEnded { isContextFocused = false })
     }
     
     private var Elements: some View {
