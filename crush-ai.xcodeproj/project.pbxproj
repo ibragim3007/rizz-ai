@@ -11,6 +11,7 @@
 		1F7050A22EA162BE001F773C /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1F7050A12EA162BE001F773C /* SwiftUI.framework */; };
 		1F7050B32EA162C0001F773C /* crush-ai-widgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 1F70509D2EA162BE001F773C /* crush-ai-widgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		1FA748542EA05D3300477944 /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = 1FA748532EA05D3300477944 /* RevenueCat */; };
+		1FD702E92EA292FE00C86F0E /* crush-ai-share.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 1FD702DF2EA292FE00C86F0E /* crush-ai-share.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -21,6 +22,13 @@
 			remoteGlobalIDString = 1F70509C2EA162BE001F773C;
 			remoteInfo = "crush-ai-widgetExtension";
 		};
+		1FD702E72EA292FE00C86F0E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1F91AA1D2E8E07410048E4F7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1FD702DE2EA292FE00C86F0E;
+			remoteInfo = "crush-ai-share";
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -30,6 +38,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
+				1FD702E92EA292FE00C86F0E /* crush-ai-share.appex in Embed Foundation Extensions */,
 				1F7050B32EA162C0001F773C /* crush-ai-widgetExtension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
@@ -42,6 +51,7 @@
 		1F70509F2EA162BE001F773C /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		1F7050A12EA162BE001F773C /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		1F91AA252E8E07410048E4F7 /* crush-ai.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "crush-ai.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		1FD702DF2EA292FE00C86F0E /* crush-ai-share.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "crush-ai-share.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -51,6 +61,13 @@
 				Info.plist,
 			);
 			target = 1F70509C2EA162BE001F773C /* crush-ai-widgetExtension */;
+		};
+		1FD702EC2EA292FE00C86F0E /* Exceptions for "crush-ai-share" folder in "crush-ai-share" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 1FD702DE2EA292FE00C86F0E /* crush-ai-share */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
@@ -66,6 +83,14 @@
 		1F91AA272E8E07410048E4F7 /* crush-ai */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = "crush-ai";
+			sourceTree = "<group>";
+		};
+		1FD702E02EA292FE00C86F0E /* crush-ai-share */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				1FD702EC2EA292FE00C86F0E /* Exceptions for "crush-ai-share" folder in "crush-ai-share" target */,
+			);
+			path = "crush-ai-share";
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -88,6 +113,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		1FD702DC2EA292FE00C86F0E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -105,6 +137,7 @@
 			children = (
 				1F91AA272E8E07410048E4F7 /* crush-ai */,
 				1F7050A32EA162BE001F773C /* crush-ai-widget */,
+				1FD702E02EA292FE00C86F0E /* crush-ai-share */,
 				1F70509E2EA162BE001F773C /* Frameworks */,
 				1F91AA262E8E07410048E4F7 /* Products */,
 			);
@@ -115,6 +148,7 @@
 			children = (
 				1F91AA252E8E07410048E4F7 /* crush-ai.app */,
 				1F70509D2EA162BE001F773C /* crush-ai-widgetExtension.appex */,
+				1FD702DF2EA292FE00C86F0E /* crush-ai-share.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -157,6 +191,7 @@
 			);
 			dependencies = (
 				1F7050B22EA162C0001F773C /* PBXTargetDependency */,
+				1FD702E82EA292FE00C86F0E /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				1F91AA272E8E07410048E4F7 /* crush-ai */,
@@ -168,6 +203,28 @@
 			productName = "crush-ai";
 			productReference = 1F91AA252E8E07410048E4F7 /* crush-ai.app */;
 			productType = "com.apple.product-type.application";
+		};
+		1FD702DE2EA292FE00C86F0E /* crush-ai-share */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1FD702ED2EA292FE00C86F0E /* Build configuration list for PBXNativeTarget "crush-ai-share" */;
+			buildPhases = (
+				1FD702DB2EA292FE00C86F0E /* Sources */,
+				1FD702DC2EA292FE00C86F0E /* Frameworks */,
+				1FD702DD2EA292FE00C86F0E /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				1FD702E02EA292FE00C86F0E /* crush-ai-share */,
+			);
+			name = "crush-ai-share";
+			packageProductDependencies = (
+			);
+			productName = "crush-ai-share";
+			productReference = 1FD702DF2EA292FE00C86F0E /* crush-ai-share.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -183,6 +240,9 @@
 						CreatedOnToolsVersion = 26.0.1;
 					};
 					1F91AA242E8E07410048E4F7 = {
+						CreatedOnToolsVersion = 26.0.1;
+					};
+					1FD702DE2EA292FE00C86F0E = {
 						CreatedOnToolsVersion = 26.0.1;
 					};
 				};
@@ -206,6 +266,7 @@
 			targets = (
 				1F91AA242E8E07410048E4F7 /* crush-ai */,
 				1F70509C2EA162BE001F773C /* crush-ai-widgetExtension */,
+				1FD702DE2EA292FE00C86F0E /* crush-ai-share */,
 			);
 		};
 /* End PBXProject section */
@@ -219,6 +280,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		1F91AA232E8E07410048E4F7 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1FD702DD2EA292FE00C86F0E /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -242,6 +310,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		1FD702DB2EA292FE00C86F0E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -249,6 +324,11 @@
 			isa = PBXTargetDependency;
 			target = 1F70509C2EA162BE001F773C /* crush-ai-widgetExtension */;
 			targetProxy = 1F7050B12EA162C0001F773C /* PBXContainerItemProxy */;
+		};
+		1FD702E82EA292FE00C86F0E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1FD702DE2EA292FE00C86F0E /* crush-ai-share */;
+			targetProxy = 1FD702E72EA292FE00C86F0E /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -504,6 +584,62 @@
 			};
 			name = Release;
 		};
+		1FD702EA2EA292FE00C86F0E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = DY5D9CQULX;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "crush-ai-share/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "crush-ai-share";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "ibragim.crush-ai.crush-ai-share";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		1FD702EB2EA292FE00C86F0E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = DY5D9CQULX;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "crush-ai-share/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "crush-ai-share";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "ibragim.crush-ai.crush-ai-share";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -530,6 +666,15 @@
 			buildConfigurations = (
 				1F91AA312E8E07420048E4F7 /* Debug */,
 				1F91AA322E8E07420048E4F7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1FD702ED2EA292FE00C86F0E /* Build configuration list for PBXNativeTarget "crush-ai-share" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1FD702EA2EA292FE00C86F0E /* Debug */,
+				1FD702EB2EA292FE00C86F0E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
