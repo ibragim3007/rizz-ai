@@ -25,15 +25,6 @@ struct ReplyView: View {
             .padding(.vertical, 14)
             .padding(.horizontal, 16)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .overlay(alignment: .leading) {
-                VStack {
-                    Text(getToneName(tone: tone))
-                        .font(.callout)
-                        .opacity(0.9)
-                        .saturation(0.8)
-                        .offset(x: -10)
-                }
-            }
             .background(
                 RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                     .fill(gradientForTone).saturation(wasCopied ? 0.5 : 1)
@@ -51,6 +42,14 @@ struct ReplyView: View {
                 )
                 .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
             )
+            // Небольшой водяной знак с тоном внизу справа — почти не отвлекает
+            .overlay(alignment: .bottomTrailing) {
+                Text(getToneName(tone: tone))
+                    .font(.caption2.weight(.bold))
+                    .foregroundStyle(.white.opacity(0.6))
+                    .padding(8)
+                    .accessibilityHidden(true)
+            }
             // Всплывающий тост «Copied»
             .overlay(alignment: .topTrailing) {
                 if didCopy {
@@ -77,6 +76,7 @@ struct ReplyView: View {
             .onTapGesture(perform: copyToClipboard)
             .accessibilityLabel("Reply")
             .accessibilityHint("Double tap to copy")
+            .accessibilityValue(accessibilityToneName(for: tone))
             .accessibilityAddTraits(.isButton)
             .accessibilityAction(named: "Copy") { copyToClipboard() }
     }
@@ -139,6 +139,16 @@ struct ReplyView: View {
             withAnimation(.easeOut(duration: 0.25)) {
                 didCopy = false
             }
+        }
+    }
+    
+    // Для доступности — читабельное имя тона
+    private func accessibilityToneName(for tone: ToneTypes) -> String {
+        switch tone {
+        case .RIZZ: return "Rizz"
+        case .ROMANTIC: return "Romantic"
+        case .FLIRT: return "Flirt"
+        case .NSFW: return "NSFW"
         }
     }
 }
