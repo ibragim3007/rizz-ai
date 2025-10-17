@@ -37,7 +37,13 @@ final class DialogScreenViewModel: ObservableObject {
     }
     
     // MARK: - Public API
-    func getReply(modelContext: ModelContext, tone: ToneTypes, replyLanguage: String?, useEmojis: Bool?) async {
+    func getReply(
+        modelContext: ModelContext,
+        tone: ToneTypes,
+        replyLanguage: String?,
+        useEmojis: Bool?,
+        paymentToken: String?)
+    async {
         guard !isLoading else { return }
         isLoading = true
         defer { isLoading = false }
@@ -54,7 +60,8 @@ final class DialogScreenViewModel: ObservableObject {
             tone: tone,
             context: dialog.context,
             language: replyLanguage,
-            useEmojis: useEmojis
+            useEmojis: useEmojis,
+            paymentToken: paymentToken
         )
         
         do {

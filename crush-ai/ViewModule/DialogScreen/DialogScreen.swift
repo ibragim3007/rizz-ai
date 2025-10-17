@@ -147,7 +147,13 @@ struct DialogScreen: View {
         // Синхронизируем введенный контекст перед запросом
         dialog.context = dialogScreenVm.context
         Task {
-            await dialogScreenVm.getReply(modelContext: modelContext, tone: currentTone, replyLanguage: replyLanguage, useEmojis: useEmojis)
+            await dialogScreenVm.getReply(
+                modelContext: modelContext,
+                tone: currentTone,
+                replyLanguage: replyLanguage,
+                useEmojis: useEmojis,
+                paymentToken: paywallViewModel.appUserID
+            )
         }
     }
     
