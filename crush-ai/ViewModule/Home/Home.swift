@@ -149,6 +149,16 @@ struct Home: View {
             )
             .preferredColorScheme(.dark)
         }
+        // Ловим deep link из виджета и открываем загрузку скриншота
+        .onOpenURL { url in
+            guard url.scheme?.lowercased() == "crushai" else { return }
+            // Поддержим оба варианта: crushai://upload_screenshot и crushai:///upload_screenshot
+            let host = url.host?.lowercased()
+            let path = url.path.lowercased()
+            if host == "upload_screenshot" || path == "/upload_screenshot" {
+                vmHome.uploadScreenshot()
+            }
+        }
     }
     
     private var contentList: some View {
@@ -231,3 +241,4 @@ private extension Home {
     Home()
         .preferredColorScheme(.dark)
 }
+

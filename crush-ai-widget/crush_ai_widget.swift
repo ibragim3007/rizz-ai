@@ -53,6 +53,8 @@ struct crush_ai_widgetEntryView : View {
             }
             .foregroundStyle(.purple.gradient)
         }
+        // Делает весь виджет кликабельным и открывает приложение по deep link
+        .widgetURL(URL(string: "crushai://upload_screenshot"))
     }
 }
 
@@ -87,3 +89,4 @@ extension ConfigurationAppIntent {
     SimpleEntry(date: .now, configuration: .smiley)
     SimpleEntry(date: .now, configuration: .starEyes)
 }
+
