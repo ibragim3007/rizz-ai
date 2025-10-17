@@ -25,8 +25,8 @@ struct ContentView: View {
     }
     
     var body: some View {
-        Group {
-            if (hasSeenOnboarding) {
+        ZStack {
+            if hasSeenOnboarding {
                 MainView()
                     .preferredColorScheme(.dark)
             } else {
@@ -53,4 +53,3 @@ struct ContentView: View {
         .modelContainer(container)
         .environmentObject(paywallViewModel)
 }
-
