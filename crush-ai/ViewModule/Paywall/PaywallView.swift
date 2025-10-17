@@ -349,8 +349,8 @@ struct PaywallView: View {
     
     private var footerLinks: some View {
         HStack(spacing: 28) {
-            Link("Terms", destination: URL(string: "https://example.com/terms")!)
-            Link("Privacy", destination: URL(string: "https://example.com/privacy")!)
+            Link("Terms", destination: URL(string: termsURLString)!)
+            Link("Privacy", destination: URL(string: eulaPolicy)!)
             Button("Restore") {
 #if canImport(UIKit)
                 UIImpactFeedbackGenerator(style: .light).impactOccurred()
