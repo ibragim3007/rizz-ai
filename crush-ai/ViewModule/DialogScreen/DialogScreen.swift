@@ -318,7 +318,7 @@ struct LargeImageDisplay: View {
                             
                             // Угловые маркеры
                             CornerMarks(cornerRadius: corner)
-                                .stroke(.white.opacity(0.9), style: StrokeStyle(lineWidth: 2, lineCap: .round))
+                                    .stroke(.white.opacity(0.9), style: StrokeStyle(lineWidth: 2, lineCap: .round))
                                 .shadow(color: .white.opacity(0.25), radius: 2, x: 0, y: 0)
                                 .blendMode(.plusLighter)
                             
@@ -330,6 +330,7 @@ struct LargeImageDisplay: View {
                         }
                         .clipShape(RoundedRectangle(cornerRadius: corner, style: .continuous))
                         .onAppear { startScan = true }
+                        .onDisappear { startScan = false }
                     }
             }
         }
