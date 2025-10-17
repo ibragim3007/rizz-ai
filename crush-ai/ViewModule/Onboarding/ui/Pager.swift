@@ -20,7 +20,7 @@ struct OnboardingPager: View {
         .tabViewStyle(.page(indexDisplayMode: .never))
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         // Перехватываем свайпы, чтобы TabView не листался жестами
-//        .highPriorityGesture(DragGesture())
+        .highPriorityGesture(DragGesture())
     }
     
 }

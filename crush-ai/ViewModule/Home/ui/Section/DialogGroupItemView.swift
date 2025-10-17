@@ -34,7 +34,13 @@ struct DialogGroupItemView: View {
             }
             // Delete
             Button(role: .destructive, action: onDelete) {
-                Label(NSLocalizedString("Delete - " + dialogGroup.title, comment: "Delete group"), systemImage: "trash")
+                
+                let isThereTitle = !dialogGroup.title.isEmpty
+                let deleteText = isThereTitle ? "Delete" + " - " + dialogGroup.title : "Delete"
+                
+                let commentText = isThereTitle ? "This will delete the item: " + dialogGroup.title : "This will delete the item without a title."
+                
+                Label(NSLocalizedString(deleteText, comment: commentText), systemImage: "trash")
             }
         }
         .preferredColorScheme(.dark)
