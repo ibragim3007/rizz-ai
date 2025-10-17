@@ -21,6 +21,20 @@
                ReferencedContainer = "container:crush-ai.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "1F70509C2EA162BE001F773C"
+               BuildableName = "crush-ai-widgetExtension.appex"
+               BlueprintName = "crush-ai-widgetExtension"
+               ReferencedContainer = "container:crush-ai.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
