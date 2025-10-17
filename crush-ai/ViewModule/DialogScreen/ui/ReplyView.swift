@@ -26,8 +26,9 @@ struct ReplyView: View {
             .padding(.horizontal, 16)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(
-                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                    .fill(gradientForTone).saturation(wasCopied ? 0.5 : 1)
+                BubbleShape(cornerRadius: cornerRadius)
+                    .fill(gradientForTone)
+                    .saturation(wasCopied ? 0.5 : 1)
             )
             // Лёгкий «глянец», чтобы пузырёк выглядел живым
             .overlay(
@@ -40,13 +41,14 @@ struct ReplyView: View {
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 )
-                .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+                .clipShape(BubbleShape(cornerRadius: cornerRadius))
             )
             // Небольшой водяной знак с тоном внизу справа — почти не отвлекает
             .overlay(alignment: .bottomTrailing) {
                 Text(getToneName(tone: tone))
                     .font(.caption2.weight(.bold))
                     .foregroundStyle(.white.opacity(0.6))
+                    .opacity(0.5)
                     .padding(8)
                     .accessibilityHidden(true)
             }
@@ -68,9 +70,9 @@ struct ReplyView: View {
                     .padding(10)
                 }
             }
+            .contentShape(BubbleShape(cornerRadius: cornerRadius))
             // Объёмные тени
             .shadow(color: .black.opacity(0.25), radius: 6, x: 0, y: 2)
-            .contentShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
             // Лёгкое «вздрагивание» при копировании
             .modifier(ShakeEffect(amount: 3, shakesPerUnit: 2, animatableData: shakeTrigger))
             .onTapGesture(perform: copyToClipboard)
@@ -150,6 +152,83 @@ struct ReplyView: View {
         case .FLIRT: return "Flirt"
         case .NSFW: return "NSFW"
         }
+    }
+}
+
+// MARK: - Bubble shape with tail (bottom-right) + менее скруглённый правый нижний угол
+
+private struct BubbleShape: Shape {
+    var cornerRadius: CGFloat
+    
+    // Слегка уменьшаем правый нижний угол
+    var bottomRightFactor: CGFloat = 0.5 // 60% от общего радиуса
+    
+    // Параметры хвостика
+    var tailWidth: CGFloat = 10
+    var tailHeight: CGFloat = 5
+    var tailOffsetY: CGFloat = 0
+    var tailInsetFromRight: CGFloat = -10
+    
+    func path(in rect: CGRect) -> Path {
+        let tl = max(0, min(cornerRadius, min(rect.width, rect.height) / 2))
+        let tr = tl
+        let bl = tl
+        let br = max(0, min(tl * bottomRightFactor, min(rect.width, rect.height) / 2))
+        
+        var path = Path()
+        
+        // Основа: скруглённый прямоугольник с индивидуальными радиусами
+        path.move(to: CGPoint(x: rect.minX + tl, y: rect.minY))
+        // Верхняя грань -> правый верхний
+        path.addLine(to: CGPoint(x: rect.maxX - tr, y: rect.minY))
+        path.addArc(center: CGPoint(x: rect.maxX - tr, y: rect.minY + tr),
+                    radius: tr,
+                    startAngle: .degrees(-90),
+                    endAngle: .degrees(0),
+                    clockwise: false)
+        // Правая грань -> правый нижний
+        path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY - br))
+        path.addArc(center: CGPoint(x: rect.maxX - br, y: rect.maxY - br),
+                    radius: br,
+                    startAngle: .degrees(0),
+                    endAngle: .degrees(90),
+                    clockwise: false)
+        // Нижняя грань -> левый нижний
+        path.addLine(to: CGPoint(x: rect.minX + bl, y: rect.maxY))
+        path.addArc(center: CGPoint(x: rect.minX + bl, y: rect.maxY - bl),
+                    radius: bl,
+                    startAngle: .degrees(90),
+                    endAngle: .degrees(180),
+                    clockwise: false)
+        // Левая грань -> левый верхний
+        path.addLine(to: CGPoint(x: rect.minX, y: rect.minY + tl))
+        path.addArc(center: CGPoint(x: rect.minX + tl, y: rect.minY + tl),
+                    radius: tl,
+                    startAngle: .degrees(180),
+                    endAngle: .degrees(270),
+                    clockwise: false)
+        path.closeSubpath()
+        
+        // Хвостик (чуть левее уменьшенного угла)
+        let attachX = max(rect.minX + max(tl, tailWidth) + 6,
+                          rect.maxX - max(br + 6, tailInsetFromRight + tailWidth) + 6)
+        let baseY = rect.maxY - tailOffsetY
+        
+        let p1 = CGPoint(x: attachX, y: baseY)                     // правая точка крепления
+        let p2 = CGPoint(x: attachX - tailWidth, y: baseY)         // левая точка крепления
+        let tip = CGPoint(x: rect.maxX - 9, y: rect.maxY + tailHeight) // кончик
+        let c1 = CGPoint(x: (p2.x + tip.x) / 2, y: rect.maxY + tailHeight * 1.0)
+        let c2 = CGPoint(x: (p1.x + tip.x) / 2, y: rect.maxY + tailHeight * 0.9)
+        
+        var tail = Path()
+        tail.move(to: p1)
+        tail.addLine(to: p2)
+        tail.addQuadCurve(to: tip, control: c1)
+        tail.addQuadCurve(to: p1, control: c2)
+        tail.closeSubpath()
+        
+        path.addPath(tail)
+        return path
     }
 }
 
