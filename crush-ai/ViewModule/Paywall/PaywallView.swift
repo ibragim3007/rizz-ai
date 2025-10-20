@@ -129,7 +129,7 @@ struct PaywallView: View {
                 .padding(.top, 12)
                 .padding(.trailing, 12)
                 VStack (alignment: .center, spacing: 5) {
-                    Text("Our dev tested replies")
+                    Text("Unlimited ")
                         .font(.system(size: 24, weight: .heavy, design: .rounded))
                         .tracking(1.0)
                         .foregroundStyle(.white)

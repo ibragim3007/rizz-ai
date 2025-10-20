@@ -27,6 +27,9 @@ struct GiftView: View {
     @State private var bounce: Bool = false
     @State private var spin: Bool = false
     
+    // Анимация кнопки "Continue"
+    @State private var buttonBounce: Bool = false
+    
     var body: some View {
         ZStack {
             MeshedGradient().opacity(0.7)
@@ -38,6 +41,12 @@ struct GiftView: View {
                 
                 animatedGift
                     .padding(.horizontal, 24)
+                
+                Text("60% OFF")
+                    .fontWeight(.heavy)
+                    .foregroundStyle(AppTheme.primaryGradient)
+                    .font(.system(size: 50))
+                    .shadow(color: AppTheme.primary.opacity(0.5), radius: 20)
                 
                 Spacer()
                 
@@ -77,6 +86,19 @@ struct GiftView: View {
             withAnimation(.easeInOut(duration: 1.2).repeatForever(autoreverses: true)) { pulse = true }
             withAnimation(.spring(response: 0.9, dampingFraction: 0.65).repeatForever(autoreverses: true)) { bounce = true }
             withAnimation(.linear(duration: 6.0).repeatForever(autoreverses: false)) { spin = true }
+            // Запускаем лёгкую "прыгающую" анимацию кнопки
+            startButtonBounce()
+        }
+        .onChange(of: isProcessing) { newValue in
+            // Пока идёт покупка — успокаиваем кнопку
+            if newValue {
+                withAnimation(.spring(response: 0.35, dampingFraction: 1.0)) {
+                    buttonBounce = false
+                }
+            } else {
+                // Возобновляем мягкую анимацию после завершения
+                startButtonBounce()
+            }
         }
         .alert("Oops", isPresented: Binding(
             get: { alertMessage != nil },
@@ -100,7 +122,7 @@ struct GiftView: View {
             }
             Spacer()
             Text("One time offer")
-                .font(.system(size: 20, weight: .bold, design: .rounded))
+                .font(.system(size: 24, weight: .bold, design: .rounded))
                 .tracking(0.5)
                 .foregroundStyle(.white)
             Spacer()
@@ -176,6 +198,14 @@ struct GiftView: View {
                     .fill(AppTheme.primaryGradient)
                     .shadow(color: AppTheme.glow.opacity(0.45), radius: 18, x: 0, y: 10)
             )
+            // Небольшая "прыгающая" анимация
+            .scaleEffect(buttonBounce ? 1.02 : 0.98)
+            .offset(y: buttonBounce ? -2 : 2)
+            .animation(
+                .spring(response: 0.8, dampingFraction: 0.9)
+                    .repeatForever(autoreverses: true),
+                value: buttonBounce
+            )
         }
         .buttonStyle(.plain)
         .accessibilityLabel(isProcessing ? "Processing" : "Continue")
@@ -231,6 +261,19 @@ struct GiftView: View {
         // Иначе ищем в текущем офферинге
         guard let offering = currentOffering else { return nil }
         return offering.availablePackages.first { $0.packageType == .monthly }
+    }
+    
+    // MARK: - Button bounce control
+    
+    private func startButtonBounce() {
+        // Не запускаем бесконечную анимацию, если сейчас идёт процессинг
+        guard !isProcessing else { return }
+        withAnimation(
+            .spring(response: 0.8, dampingFraction: 0.9)
+                .repeatForever(autoreverses: true)
+        ) {
+            buttonBounce = true
+        }
     }
 }
 
