@@ -129,12 +129,12 @@ struct PaywallView: View {
                 .padding(.top, 12)
                 .padding(.trailing, 12)
                 VStack (alignment: .center, spacing: 5) {
-                    Text("Unlimited ")
-                        .font(.system(size: 24, weight: .heavy, design: .rounded))
+                    Text("Unlock All Features")
+                        .font(.system(size: 20, weight: .heavy, design: .rounded))
                         .tracking(1.0)
                         .foregroundStyle(.white)
                         .frame(maxWidth: .infinity, alignment: .center)
-                    Text("and accidentally beta-tested love.")
+                    Text("Get unlimited replies and premium access")
                         .font(.system(size: 14, weight: .regular, design: .rounded))
                         .foregroundStyle(.white.opacity(0.8))
                 }
