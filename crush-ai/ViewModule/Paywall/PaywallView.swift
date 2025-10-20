@@ -14,6 +14,8 @@ struct PaywallView: View {
     var onContinue: (() -> Void)? = nil
     var onRestore: (() -> Void)? = nil
     var onDismiss: (() -> Void)? = nil
+    // Новый колбэк: отдаём наружу месячный пакет при закрытии
+    var onDismissWithMonthly: ((Package?) -> Void)? = nil
     
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var paywallViewModel: PaywallViewModel
@@ -57,18 +59,20 @@ struct PaywallView: View {
                     
                     // Cards
                     VStack(spacing: 14) {
-                        planCard(
+                        PlanCard(
+                            selected: $selected,
                             plan: .annual,
                             titlePrefix: "🔥 ",
                             title: "Most Popular – Annual Plan",
-                            subtitle: dynamicSubtitle(for: .annual),
-                            badge: "SAVE 98%"
+                            subtitle: dynamicSubtitle(for: .annual, package: { plan in package(for: plan) }),
+                            badge: "SAVE 98%",
                         )
-                        planCard(
+                        PlanCard(
+                            selected: $selected,
                             plan: .weekly,
                             titlePrefix: "",
                             title: "Weekly plan",
-                            subtitle: dynamicSubtitle(for: .weekly),
+                            subtitle: dynamicSubtitle(for: .weekly, package: { plan in package(for: plan) }),
                             badge: nil
                         )
                     }
@@ -117,6 +121,8 @@ struct PaywallView: View {
 #if canImport(UIKit)
                     UIImpactFeedbackGenerator(style: .light).impactOccurred()
 #endif
+                    // Пробрасываем месячный пакет наружу при закрытии
+                    onDismissWithMonthly?(monthlyPackage())
                     onDismiss?()
                     dismiss()
                 }
@@ -190,95 +196,7 @@ struct PaywallView: View {
     }
     
     // MARK: - Plan Card
-    
-    private func planCard(plan: Plan, titlePrefix: String, title: String, subtitle: String, badge: String?) -> some View {
-        let isSelected = selected == plan
-        
-        return Button {
-#if canImport(UIKit)
-            UIImpactFeedbackGenerator(style: .light).impactOccurred()
-#endif
-            withAnimation(.spring(response: 0.35, dampingFraction: 0.9)) {
-                selected = plan
-            }
-        } label: {
-            ZStack(alignment: .topTrailing) {
-                RoundedRectangle(cornerRadius: 22, style: .continuous)
-                    .fill(.white.opacity(isSelected ? 0.10 : 0.06))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 22, style: .continuous)
-                            .stroke(
-                                isSelected
-                                ? LinearGradient(colors: [AppTheme.primary, AppTheme.primaryLight],
-                                                 startPoint: .topLeading, endPoint: .bottomTrailing)
-                                : AppTheme.borderPrimaryGradient,
-                                lineWidth: 2
-                            )
-                    )
-                    .shadow(color: AppTheme.glow.opacity(isSelected ? 0.35 : 0.0), radius: 16, x: 0, y: 8)
-                
-                if let badge {
-                    Text(badge)
-                        .font(.system(size: 12, weight: .bold, design: .rounded))
-                        .foregroundStyle(.white)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 6)
-                        .background(.red)
-                        .clipShape(Capsule())
-                        .offset(x: -14, y: -12)
-                }
-                
-                HStack(alignment: .center, spacing: 14) {
-                    // Radio
-                    ZStack {
-                        Circle()
-                            .fill(.white.opacity(0.10))
-                            .frame(width: 36, height: 36)
-                        if isSelected {
-                            Circle()
-                                .fill(AppTheme.primary)
-                                .frame(width: 26, height: 26)
-                                .overlay(
-                                    Image(systemName: "checkmark")
-                                        .font(.system(size: 12, weight: .bold))
-                                        .foregroundStyle(.white)
-                                )
-                                .transition(.scale.combined(with: .opacity))
-                        } else {
-                            Circle()
-                                .stroke(.white.opacity(0.8), lineWidth: 3)
-                                .frame(width: 26, height: 26)
-                        }
-                    }
-                    .padding(.leading, 12)
-                    
-                    VStack(alignment: .leading, spacing: 6) {
-                        HStack(spacing: 6) {
-                            if !titlePrefix.isEmpty {
-                                Text(titlePrefix)
-                            }
-                            Text(title)
-                        }
-                        .font(.system(size: 18, weight: .semibold, design: .rounded))
-                        .foregroundStyle(.white)
-                        
-                        Text(subtitle)
-                            .font(.system(size: 16, weight: .medium, design: .rounded))
-                            .foregroundStyle(.white.opacity(0.85))
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-                    
-                    Spacer(minLength: 8)
-                }
-                .padding(.vertical, 18)
-            }
-        }
-        .buttonStyle(.plain)
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel(Text("\(title)"))
-        .accessibilityHint(Text(isSelected ? "Selected" : "Tap to select"))
-    }
-    
+
     // MARK: - Continue (Purchase)
     
     private var continueButton: some View {
@@ -329,6 +247,8 @@ struct PaywallView: View {
                 
                 isProcessing = false
                 onContinue?() // Notify caller about success
+                // Пробросим месячный пакет при закрытии
+                onDismissWithMonthly?(monthlyPackage())
                 onDismiss?()  // Optionally dismiss paywall after success
                 dismiss()
             } catch {
@@ -375,6 +295,8 @@ struct PaywallView: View {
                 
                 isProcessing = false
                 onRestore?()
+                // Пробросим месячный пакет при закрытии
+                onDismissWithMonthly?(monthlyPackage())
                 onDismiss?()
                 dismiss()
             } catch {
@@ -393,29 +315,6 @@ struct PaywallView: View {
     }
 }
 
-// MARK: - Close Button
-
-private struct CloseButton: View {
-    var action: () -> Void
-    var body: some View {
-        Button(action: action) {
-            ZStack {
-                Circle()
-                    .fill(.ultraThinMaterial)
-                    .frame(width: 32, height: 32)
-                    .overlay(
-                        Circle()
-                            .stroke(.white.opacity(0.25), lineWidth: 1)
-                    )
-                Image(systemName: "xmark")
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(.white)
-            }
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel("Close")
-    }
-}
 
 // MARK: - RevenueCat helpers
 
@@ -427,116 +326,27 @@ private extension PaywallView {
             return offering.annual
         case .weekly:
             return offering.weekly
+        case .monthly:
+            return offering.monthly
         }
     }
     
-    // Build subtitle so that billed price per period is first and prominent,
-    // and per-week breakdown appears only for periods longer than a week.
-    func dynamicSubtitle(for plan: Plan) -> String {
-        guard let pkg = package(for: plan) else {
-            // Fallbacks (keep billed-first to remain compliant if we lack live data)
-            switch plan {
-            case .annual:
-                return "$XX.XX / year ≈ $YY.YY /week"
-            case .weekly:
-                return "$X.XX / week"
-            }
-        }
-        
-        let product = pkg.storeProduct
-        
-        // Billed price (localized currency string + period)
-        let billed = billedPriceString(for: product)
-        
-        // If the product bills weekly, no per-week breakdown needed (already weekly).
-        if let period = product.subscriptionPeriod,
-           period.unit == .week {
-            return billed
-        }
-        
-        // For periods longer than a week, add a per-week breakdown on the next line.
-        if let perWeek = pricePerWeekString(for: product) {
-            return "\(billed) ≈ \(perWeek) / week"
-        } else {
-            return billed
-        }
+    // Новый helper: месячный пакет из currentOffering
+    func monthlyPackage() -> Package? {
+        guard let offering = currentOffering else { return nil }
+        print(offering.availablePackages.first { $0.packageType == .monthly })
+        return offering.availablePackages.first { $0.packageType == .monthly }
     }
     
+
     // MARK: Price formatting helpers
-    
-    // Billed price per actual period, e.g. "$29.99 / year" or "$4.99 / month"
-    func billedPriceString(for product: StoreProduct) -> String {
-        let base = product.localizedPriceString
-        guard let period = product.subscriptionPeriod else {
-            return base
-        }
-        
-        let unitString: String
-        switch period.unit {
-        case .day:
-            unitString = period.value == 1 ? "day" : "\(period.value) days"
-        case .week:
-            unitString = period.value == 1 ? "week" : "\(period.value) weeks"
-        case .month:
-            unitString = period.value == 1 ? "month" : "\(period.value) months"
-        case .year:
-            unitString = period.value == 1 ? "year" : "\(period.value) years"
-        @unknown default:
-            unitString = "period"
-        }
-        
-        return "\(base) / \(unitString)"
-    }
+
     
     // Localized currency per week for periods longer than a week.
     // Uses calendar-based duration to derive weeks in the period to avoid rough constants.
-    func pricePerWeekString(for product: StoreProduct) -> String? {
-        guard let period = product.subscriptionPeriod else { return nil }
-        // If already weekly, caller should not show breakdown
-        guard period.unit != .week else { return nil }
-        
-        let priceDecimal = product.price as NSDecimalNumber
-        
-        // Compute the duration of the subscription period using Calendar
-        let calendar = Calendar(identifier: .gregorian)
-        let start = Date()
-        var comps = DateComponents()
-        switch period.unit {
-        case .day:
-            comps.day = period.value
-        case .week:
-            comps.day = period.value * 7
-        case .month:
-            comps.month = period.value
-        case .year:
-            comps.year = period.value
-        @unknown default:
-            return nil
-        }
-        guard let end = calendar.date(byAdding: comps, to: start) else { return nil }
-        let seconds = end.timeIntervalSince(start)
-        let weeks = seconds / (7 * 24 * 60 * 60)
-        guard weeks > 0 else { return nil }
-        
-        let divisor = NSDecimalNumber(value: weeks)
-        let perWeek = priceDecimal.dividing(by: divisor)
-        
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .currency
-        formatter.currencyCode = product.currencyCode
-        formatter.maximumFractionDigits = 2
-        formatter.minimumFractionDigits = 0
-        
-        return formatter.string(from: perWeek)
-    }
+
 }
 
-// MARK: - Model
-
-private enum Plan: String, CaseIterable {
-    case annual
-    case weekly
-}
 
 // MARK: - Preview
 
@@ -556,3 +366,4 @@ private enum Plan: String, CaseIterable {
         .previewDevice("iPhone SE (3rd generation)")
         .preferredColorScheme(.dark)
 }
+

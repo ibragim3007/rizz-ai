@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SwiftData
+import RevenueCat
 
 struct DialogScreen: View {
     @AppStorage("tone") private var currentTone: ToneTypes = .RIZZ
@@ -24,6 +25,10 @@ struct DialogScreen: View {
     @State private var selectedChips: Set<String> = []
     @FocusState private var isContextFocused: Bool
     @State private var showPaywall: Bool = false
+    
+    // Новый стейт для показа GiftView и передачи месячного пакета
+    @State private var showGift: Bool = false
+    @State private var giftMonthlyPackage: Package? = nil
     
     init(dialog: DialogEntity, dialogGroup: DialogGroupEntity) {
         self.dialog = dialog
@@ -124,6 +129,7 @@ struct DialogScreen: View {
         .sheet(isPresented: $showPaywall) {
             PaywallView(
                 onContinue: {
+                    // Покупка могла пройти — закрываем пейвол
                     showPaywall = false
                     if paywallViewModel.isSubscriptionActive {
                         performGetReply()
@@ -136,10 +142,22 @@ struct DialogScreen: View {
                     }
                 },
                 onDismiss: {
+                    // Пользователь закрыл пейвол — покажем GiftView
                     showPaywall = false
+                    // Если по UX GiftView нужно показывать всегда на dismiss — просто включаем ниже
+                    showGift = true
+                },
+                onDismissWithMonthly: { monthly in
+                    // Сохраняем месячный пакет, полученный из PaywallView
+                    giftMonthlyPackage = monthly
                 }
             )
             .preferredColorScheme(.dark)
+        }
+        // GiftView presentation сразу после закрытия пейвола
+        .sheet(isPresented: $showGift) {
+            GiftView(injectedMonthlyPackage: giftMonthlyPackage)
+                .preferredColorScheme(.dark)
         }
     }
     
@@ -464,4 +482,3 @@ private struct CornerMarks: Shape {
     
     return DialogScreen(dialog: dialog, dialogGroup: dialogGroup).preferredColorScheme(.dark)
 }
-

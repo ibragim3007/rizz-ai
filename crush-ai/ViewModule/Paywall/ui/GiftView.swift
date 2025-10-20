@@ -1,0 +1,295 @@
+//
+//  GiftView.swift
+//  crush-ai
+//
+//  Created by Ibragim Ibragimov on 10/20/25.
+//
+
+import SwiftUI
+import RevenueCat
+
+struct GiftView: View {
+    
+    @Environment(\.dismiss) private var dismiss
+    
+    // Можно принять месячный пакет извне (приоритетнее всего)
+    var injectedMonthlyPackage: Package? = nil
+    
+    @State private var currentOffering: Offering?
+    @State private var isProcessing: Bool = false
+    @State private var alertMessage: String?
+    
+    // Выбор тарифа для PlanCard — явно используем Plan
+    @State private var selected: Plan = .monthly
+    
+    // Анимации подарка
+    @State private var pulse: Bool = false
+    @State private var bounce: Bool = false
+    @State private var spin: Bool = false
+    
+    var body: some View {
+        ZStack {
+            MeshedGradient().opacity(0.7)
+            
+            VStack(spacing: 20) {
+                header
+                
+                Spacer()
+                
+                animatedGift
+                    .padding(.horizontal, 24)
+                
+                Spacer()
+                
+                VStack(spacing: 14) {
+                    Spacer()
+                    
+                    PlanCard(
+                        selected: $selected,
+                        plan: .monthly,
+                        titlePrefix: "⏳ ",
+                        title: "Monthly Plan",
+                        subtitle: dynamicSubtitle(for: .monthly, package: { plan in package(for: plan) }),
+                        badge: "LIMIT OFFER"
+                    ).frame(maxHeight: 100)
+                        .padding(.horizontal)
+                    
+                    purchaseButton
+                        .padding(.horizontal, 20)
+                        .disabled(isProcessing)
+                        .opacity(isProcessing ? 0.85 : 1.0)
+                }
+                .padding(.bottom, 22)
+            }
+            .padding(.top, 8)
+        }
+        .preferredColorScheme(.dark)
+        .onAppear {
+            // Если пакет заранее не передали — подгрузим Offering, чтобы найти месячный
+            if injectedMonthlyPackage == nil {
+                Purchases.shared.getOfferings { offerings, error in
+                    if let offer = offerings?.current, error == nil {
+                        currentOffering = offer
+                    }
+                }
+            }
+            // Запускаем анимации
+            withAnimation(.easeInOut(duration: 1.2).repeatForever(autoreverses: true)) { pulse = true }
+            withAnimation(.spring(response: 0.9, dampingFraction: 0.65).repeatForever(autoreverses: true)) { bounce = true }
+            withAnimation(.linear(duration: 6.0).repeatForever(autoreverses: false)) { spin = true }
+        }
+        .alert("Oops", isPresented: Binding(
+            get: { alertMessage != nil },
+            set: { if !$0 { alertMessage = nil } }
+        )) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text(alertMessage ?? "")
+        }
+    }
+    
+    // MARK: - Header
+    
+    private var header: some View {
+        HStack {
+            CloseButton {
+#if canImport(UIKit)
+                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+#endif
+                dismiss()
+            }
+            Spacer()
+            Text("One time offer")
+                .font(.system(size: 20, weight: .bold, design: .rounded))
+                .tracking(0.5)
+                .foregroundStyle(.white)
+            Spacer()
+            // Плейсхолдер под симметрию
+            Color.clear
+                .frame(width: 32, height: 32)
+        }
+        .padding(.horizontal, 20)
+        .padding(.top, 8)
+    }
+    
+    // MARK: - Animated Gift
+    
+    private var animatedGift: some View {
+        ZStack {
+            // Мягкое свечение
+            Circle()
+                .fill(AppTheme.primary.opacity(0.18))
+                .frame(width: 260, height: 260)
+                .blur(radius: pulse ? 22 : 10)
+                .scaleEffect(pulse ? 1.05 : 0.98)
+                .animation(.easeInOut(duration: 1.4).repeatForever(autoreverses: true), value: pulse)
+            
+            // Контур с градиентом
+            Circle()
+                .stroke(AppTheme.primaryGradient, lineWidth: 3)
+                .frame(width: 240, height: 240)
+                .shadow(color: AppTheme.glow.opacity(0.35), radius: 16, x: 0, y: 10)
+                .rotationEffect(.degrees(spin ? 360 : 0))
+            
+            // Сам подарок
+            Image(systemName: "gift.fill")
+                .symbolRenderingMode(.palette)
+                .foregroundStyle(AppTheme.primaryLight, .white)
+                .font(.system(size: 120, weight: .bold, design: .rounded))
+                .scaleEffect(bounce ? 1.06 : 0.94)
+                .shadow(color: AppTheme.glow.opacity(0.7), radius: 24, x: 0, y: 8)
+                .overlay {
+                    // Блики/частицы (простые точки)
+                    ParticlesView(color: AppTheme.primary, count: 18)
+                        .frame(width: 260, height: 260)
+                        .allowsHitTesting(false)
+                }
+        }
+        .frame(maxWidth: .infinity)
+    }
+    
+    // MARK: - Purchase
+    
+    private var purchaseButton: some View {
+        Button {
+#if canImport(UIKit)
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+#endif
+            startMonthlyPurchase()
+        } label: {
+            ZStack {
+                Text(isProcessing ? "Processing..." : "Continue")
+                    .font(.system(size: 20, weight: .bold, design: .rounded))
+                    .foregroundStyle(.white)
+                    .opacity(isProcessing ? 0 : 1)
+                
+                if isProcessing {
+                    ProgressView()
+                        .progressViewStyle(.circular)
+                        .tint(.white)
+                }
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 16)
+            .background(
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .fill(AppTheme.primaryGradient)
+                    .shadow(color: AppTheme.glow.opacity(0.45), radius: 18, x: 0, y: 10)
+            )
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(isProcessing ? "Processing" : "Continue")
+    }
+    
+    private func startMonthlyPurchase() {
+        guard !isProcessing else { return }
+        guard let pkg = monthlyPackage() else {
+            alertMessage = "No monthly product available. Please try again later."
+            return
+        }
+        isProcessing = true
+        
+        Task {
+            do {
+                let result = try await Purchases.shared.purchase(package: pkg)
+                // Можно закрывать экран после успеха
+                isProcessing = false
+                if !result.userCancelled {
+                    dismiss()
+                }
+            } catch {
+                isProcessing = false
+                let nsError = error as NSError
+                if nsError.code == ErrorCode.purchaseCancelledError.rawValue {
+                    // тихая отмена
+                } else {
+                    alertMessage = error.localizedDescription
+                }
+            }
+        }
+    }
+    
+    // MARK: - RevenueCat helpers
+    
+    // Пакет для любого плана (для переиспользования в dynamicSubtitle)
+    private func package(for plan: Plan) -> Package? {
+        switch plan {
+        case .monthly:
+            return monthlyPackage()
+        case .annual:
+            guard let offering = currentOffering else { return nil }
+            return offering.availablePackages.first { $0.packageType == .annual }
+        case .weekly:
+            guard let offering = currentOffering else { return nil }
+            return offering.availablePackages.first { $0.packageType == .weekly }
+        }
+    }
+    
+    private func monthlyPackage() -> Package? {
+        // Приоритет: переданный извне пакет
+        if let injectedMonthlyPackage { return injectedMonthlyPackage }
+        // Иначе ищем в текущем офферинге
+        guard let offering = currentOffering else { return nil }
+        return offering.availablePackages.first { $0.packageType == .monthly }
+    }
+}
+
+// MARK: - Simple particles
+
+private struct ParticlesView: View {
+    let color: Color
+    let count: Int
+    
+    @State private var randoms: [Particle] = []
+    
+    var body: some View {
+        ZStack {
+            ForEach(randoms) { p in
+                Circle()
+                    .fill(color.opacity(p.opacity))
+                    .frame(width: p.size, height: p.size)
+                    .offset(x: p.x, y: p.y)
+                    .animation(.easeInOut(duration: p.duration).repeatForever(autoreverses: true), value: p.phase)
+            }
+        }
+        .onAppear {
+            var tmp: [Particle] = []
+            for i in 0..<count {
+                tmp.append(.random(id: i))
+            }
+            randoms = tmp
+            // триггер фазы
+            for i in 0..<randoms.count {
+                DispatchQueue.main.asyncAfter(deadline: .now() + Double(i) * 0.05) {
+                    randoms[i].phase.toggle()
+                }
+            }
+        }
+    }
+    
+    struct Particle: Identifiable {
+        let id: Int
+        var x: CGFloat
+        var y: CGFloat
+        var size: CGFloat
+        var opacity: Double
+        var duration: Double
+        var phase: Bool = false
+        
+        static func random(id: Int) -> Particle {
+            Particle(
+                id: id,
+                x: CGFloat.random(in: -110...110),
+                y: CGFloat.random(in: -110...110),
+                size: CGFloat.random(in: 3...7),
+                opacity: Double.random(in: 0.2...0.6),
+                duration: Double.random(in: 1.2...2.6)
+            )
+        }
+    }
+}
+
+#Preview {
+    GiftView()
+        .preferredColorScheme(.dark)
+}
