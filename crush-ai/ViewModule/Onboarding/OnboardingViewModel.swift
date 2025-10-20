@@ -17,7 +17,7 @@ final class OnboardingViewModel: ObservableObject {
     @Published var steps: [OnboardingStep] = [
         .init(kind: .feature( title: "Tired of being", highlightText: "left on read?", subtitle: "Keep the energy up with replies that actually move things forward", imageName: "" ), illustration: AnyView(MessageBubbles()), illustrationKey: "MessageBubbles"),
         .init(kind: .feature(title: "Your First Message Is", highlightText: "Everything", subtitle: "Open with a line that sounds like you and gets a real reply.", imageName: "", ), illustration: AnyView(SecondScreenContent())),
-        .init(kind: .rateUsPage(title: "Quick check", subtext: "How useful does this look now?", icon: "app-icon")),
+        .init(kind: .rateUsPage(title: "Help us Grow", subtext: "How useful does this look now?", icon: "app-icon")),
         .init(kind: .question(title: "What's your age?", subtitle: "I’ll adjust your tone and flirty level", variants: ["I’m under 18","18-24", "25–34", "35–44", "45–54", "55+"])),
         .init(kind: .question(title: "What’s your goal here?", subtitle: "This question will help us determine how to help you ideally", variants: ["💞 Real connection", "😜 Fun & light", "💎 Long-term", "😈 Flirty only" ,"🤔 Not sure yet"])),
         .init(kind: .feature(title: "Make Them Feel", highlightText: "Seen", subtitle: "Paste their message. Get the perfect reply in seconds.", imageName: "", ), illustration: AnyView(BeforeAfterContent())),

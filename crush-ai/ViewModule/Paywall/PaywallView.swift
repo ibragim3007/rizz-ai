@@ -127,7 +127,7 @@ struct PaywallView: View {
                         .font(.system(size: 24, weight: .heavy, design: .rounded))
                         .tracking(1.0)
                         .foregroundStyle(.white)
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .frame(maxWidth: .infinity, alignment: .center)
                     Text("and accidentally beta-tested love.")
                         .font(.system(size: 14, weight: .regular, design: .rounded))
                         .foregroundStyle(.white.opacity(0.8))
