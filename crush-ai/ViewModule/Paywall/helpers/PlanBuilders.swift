@@ -17,20 +17,28 @@ enum Plan: String, CaseIterable {
 
 // Build subtitle so that billed price per period is first and prominent,
 // and per-week breakdown appears only for periods longer than a week.
+// For weekly plan: if there is an introductory offer (free trial or intro price)
+// show it explicitly, e.g. "First X days free, then Y / week" or
+// "First N weeks at A/week, then B / week".
 func dynamicSubtitle(for plan: Plan, package: (_ for: Plan) -> Package?) -> String {
     guard let pkg = package(plan) else {
         // Fallbacks (keep billed-first to remain compliant if we lack live data)
         switch plan {
         case .annual:
-            return "$XX.XX / year ≈ $YY.YY /week"
+            return "$XX.XX / year ≈ $YY.YY / week"
         case .weekly:
             return "$X.XX / week"
         case .monthly:
-            return "$X.XX / monthly"
+            return "$X.XX / month"
         }
     }
     
     let product = pkg.storeProduct
+    
+    // Special handling for weekly plan: prefer showing introductory offer if available.
+    if plan == .weekly, let offerText = weeklyIntroOfferSubtitle(for: product) {
+        return offerText
+    }
     
     // Billed price (localized currency string + period)
     let billed = billedPriceString(for: product)
@@ -58,21 +66,7 @@ func billedPriceString(for product: StoreProduct) -> String {
         return base
     }
     
-    let unitString: String
-    switch period.unit {
-    case .day:
-        unitString = period.value == 1 ? "day" : "\(period.value) days"
-    case .week:
-        unitString = period.value == 1 ? "week" : "\(period.value) weeks"
-    case .month:
-        unitString = period.value == 1 ? "month" : "\(period.value) months"
-    case .year:
-        unitString = period.value == 1 ? "year" : "\(period.value) years"
-    @unknown default:
-        unitString = "period"
-    }
-    
-    return "\(base) / \(unitString)"
+    return "\(base) / \(periodUnitString(period.unit, count: period.value))"
 }
 
 func pricePerWeekString(for product: StoreProduct) -> String? {
@@ -113,4 +107,89 @@ func pricePerWeekString(for product: StoreProduct) -> String? {
     formatter.minimumFractionDigits = 0
     
     return formatter.string(from: perWeek)
+}
+
+// MARK: - Weekly intro offer rendering
+
+// Returns a subtitle that prioritizes the introductory offer for weekly products.
+// Examples:
+// - "First 7 days free, then $4.99 / week"
+// - "First 1 week at $0.99 / week, then $4.99 / week"
+// - "First 4 weeks for $2.99, then $4.99 / week"
+private func weeklyIntroOfferSubtitle(for product: StoreProduct) -> String? {
+    guard let intro = product.introductoryDiscount else { return nil }
+    
+    // Base "then" price: show per billed period (for weekly product it's "/ week").
+    let thenPrice: String = {
+        if let period = product.subscriptionPeriod {
+            return "\(product.localizedPriceString) / \(periodUnitString(period.unit, count: period.value))"
+        } else {
+            return product.localizedPriceString
+        }
+    }()
+    
+    // Derive total intro duration and wording.
+    let totalIntro = totalIntroPeriod(intro)
+    
+    switch intro.paymentMode {
+    case .freeTrial:
+        // "First X days free, then Y / week"
+        let firstPart = "First \(totalIntro.countDescription) free"
+        return "\(firstPart), then \(thenPrice)"
+        
+    case .payAsYouGo:
+        // Price applies per each intro period cycle.
+        // If the unit is week, use "at A / week"; otherwise "at A".
+        let introPrice = intro.localizedPriceString
+        let atPart: String
+        if intro.subscriptionPeriod.unit == .week && intro.subscriptionPeriod.value == 1 {
+            atPart = "\(introPrice)"
+        } else {
+            atPart = "at \(introPrice)"
+        }
+        // "First N weeks at A / week, then Y / week"
+        let firstPart = "First \(totalIntro.countDescription) \(atPart)"
+        return "\(firstPart), then \(thenPrice)"
+        
+    case .payUpFront:
+        // One upfront price for the whole intro duration.
+        // "First N weeks for A, then Y / week"
+        let firstPart = "First \(totalIntro.countDescription) for \(intro.localizedPriceString)"
+        return "\(firstPart), then \(thenPrice)"
+        
+    @unknown default:
+        return nil
+    }
+}
+
+// Compute total intro duration: subscriptionPeriod * numberOfPeriods,
+// returning a convenient textual description ("7 days", "3 weeks", "1 month", etc.).
+private func totalIntroPeriod(_ intro: StoreProductDiscount) -> (unit: SubscriptionPeriod.Unit, value: Int, countDescription: String) {
+    let unit = intro.subscriptionPeriod.unit
+    let valuePerCycle = intro.subscriptionPeriod.value
+    let cycles = max(intro.numberOfPeriods, 1)
+    
+    // Multiply value by number of cycles in the same unit.
+    let totalValue = valuePerCycle * cycles
+    
+    // Optionally, you could normalize days -> weeks if divisible by 7, but
+    // keeping original unit is often clearer and matches App Store Connect setup.
+    let description = periodUnitString(unit, count: totalValue)
+    return (unit, totalValue, description)
+}
+
+// English pluralization for period units.
+private func periodUnitString(_ unit: SubscriptionPeriod.Unit, count: Int) -> String {
+    switch unit {
+    case .day:
+        return count == 1 ? "day" : "\(count) days"
+    case .week:
+        return count == 1 ? "week" : "\(count) weeks"
+    case .month:
+        return count == 1 ? "month" : "\(count) months"
+    case .year:
+        return count == 1 ? "year" : "\(count) years"
+    @unknown default:
+        return "period"
+    }
 }
