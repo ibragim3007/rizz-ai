@@ -11,6 +11,7 @@ import RevenueCat
 struct GiftView: View {
     
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject private var paywallViewModel: PaywallViewModel
     
     // Можно принять месячный пакет извне (приоритетнее всего)
     var injectedMonthlyPackage: Package? = nil
@@ -222,8 +223,11 @@ struct GiftView: View {
         Task {
             do {
                 let result = try await Purchases.shared.purchase(package: pkg)
-                // Можно закрывать экран после успеха
                 isProcessing = false
+                // Обновляем состояние подписки в модели (даже если пользователь не закрыл paywall)
+                refreshSubscriptionState(from: result.customerInfo)
+                
+                // Можно закрывать экран после успеха, если не отменено пользователем
                 if !result.userCancelled {
                     dismiss()
                 }
@@ -274,6 +278,15 @@ struct GiftView: View {
         ) {
             buttonBounce = true
         }
+    }
+    
+    // MARK: - Paywall state refresh (mirrors PaywallView behavior)
+    
+    private func refreshSubscriptionState(from customerInfo: CustomerInfo?) {
+        let isActive = customerInfo?.entitlements.all["Full Access"]?.isActive == true
+        paywallViewModel.isSubscriptionActive = isActive
+        // Обновим appUserID на случай его изменения SDK
+        paywallViewModel.appUserID = Purchases.shared.appUserID
     }
 }
 
@@ -334,5 +347,6 @@ private struct ParticlesView: View {
 
 #Preview {
     GiftView()
+        .environmentObject(PaywallViewModel(isPreview: false))
         .preferredColorScheme(.dark)
 }

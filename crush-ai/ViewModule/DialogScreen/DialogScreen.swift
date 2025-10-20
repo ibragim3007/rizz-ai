@@ -8,6 +8,7 @@
 import SwiftUI
 import SwiftData
 import RevenueCat
+import StoreKit
 
 struct DialogScreen: View {
     @AppStorage("tone") private var currentTone: ToneTypes = .RIZZ
@@ -20,6 +21,7 @@ struct DialogScreen: View {
     
     @Environment(\.modelContext) private var modelContext
     @EnvironmentObject private var paywallViewModel: PaywallViewModel
+    @Environment(\.requestReview) private var requestReview
     
     @StateObject private var dialogScreenVm: DialogScreenViewModel
     @State private var selectedChips: Set<String> = []
@@ -164,6 +166,10 @@ struct DialogScreen: View {
     private func performGetReply() {
         // Синхронизируем введенный контекст перед запросом
         dialog.context = dialogScreenVm.context
+        
+        // Запоминаем количество ответов до запроса
+        let initialCount = dialog.replies.count
+        
         Task {
             await dialogScreenVm.getReply(
                 modelContext: modelContext,
@@ -172,6 +178,13 @@ struct DialogScreen: View {
                 useEmojis: useEmojis,
                 paymentToken: paywallViewModel.appUserID
             )
+            
+            // Проверяем успешность: нет показанной ошибки и появились новые ответы
+            let hasNewReplies = dialog.replies.count > initialCount
+            if !dialogScreenVm.showingError && hasNewReplies {
+                // Запрос системного промпта оценки
+                requestReview()
+            }
         }
     }
     
