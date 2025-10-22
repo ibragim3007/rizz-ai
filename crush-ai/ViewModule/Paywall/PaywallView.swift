@@ -47,15 +47,26 @@ struct PaywallView: View {
             ScrollView {
                 VStack(spacing: 18) {
                     
-                    header
-                    
                     carousel
                         .padding(.horizontal, 20)
+                        .overlay (alignment: .topLeading) {
+                            CloseButton {
+#if canImport(UIKit)
+                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+#endif
+                                // Пробрасываем месячный пакет наружу при закрытии
+                                onDismissWithMonthly?(monthlyPackage())
+                                onDismiss?()
+                                dismiss()
+                            }
+                            .offset(x: 30)
+                            .padding(.top, 12)
+                            .padding(.trailing, 12)
+                        }
                     
-                    Text("No Commitment – Cancel Anytime")
-                        .font(.system(size: 20, weight: .semibold, design: .rounded))
-                        .foregroundStyle(.white.opacity(0.9))
-                        .padding(.top, 6)
+                    header
+                        .padding(.bottom, 10)
+                
                     
                     // Cards
                     VStack(spacing: 14) {
@@ -79,15 +90,22 @@ struct PaywallView: View {
                     .padding(.horizontal, 20)
                     .padding(.top, 6)
                     
-                    continueButton
-                        .padding(.horizontal, 20)
-                        .padding(.top, 8)
-                        .disabled(isProcessing)
-                        .opacity(isProcessing ? 0.8 : 1.0)
-                    
-                    footerLinks
-                        .padding(.top, 4)
-                        .padding(.bottom, 8)
+                    VStack {
+                        Text("No Commitment – Cancel Anytime")
+                            .font(.system(size: 14, weight: .regular))
+                            .foregroundStyle(.secondary)
+                            .padding(.top, 6)
+                        
+                        continueButton
+                            .padding(.horizontal, 20)
+                            .padding(.top, 8)
+                            .disabled(isProcessing)
+                            .opacity(isProcessing ? 0.8 : 1.0)
+                        
+                        footerLinks
+                            .padding(.top, 4)
+                            .padding(.bottom, 8)
+                    }
                 }
                 .padding(.top, 14)
             }
@@ -116,25 +134,13 @@ struct PaywallView: View {
     private var header: some View {
         VStack(spacing: 10) {
             HStack (alignment: .firstTextBaseline) {
-                
-                CloseButton {
-#if canImport(UIKit)
-                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
-#endif
-                    // Пробрасываем месячный пакет наружу при закрытии
-                    onDismissWithMonthly?(monthlyPackage())
-                    onDismiss?()
-                    dismiss()
-                }
-                .padding(.top, 12)
-                .padding(.trailing, 12)
                 VStack (alignment: .center, spacing: 5) {
-                    Text("Unlock All Features")
-                        .font(.system(size: 20, weight: .heavy, design: .rounded))
+                    Text("Get unlimited replies")
+                        .font(.system(size: 28, weight: .bold, design: .rounded))
                         .tracking(1.0)
                         .foregroundStyle(.white)
                         .frame(maxWidth: .infinity, alignment: .center)
-                    Text("Get unlimited replies and premium access")
+                    Text("Proven to get more dates")
                         .font(.system(size: 14, weight: .regular, design: .rounded))
                         .foregroundStyle(.white.opacity(0.8))
                 }
@@ -196,7 +202,7 @@ struct PaywallView: View {
     }
     
     // MARK: - Plan Card
-
+    
     // MARK: - Continue (Purchase)
     
     private var continueButton: some View {
@@ -338,13 +344,13 @@ private extension PaywallView {
         return offering.availablePackages.first { $0.packageType == .monthly }
     }
     
-
+    
     // MARK: Price formatting helpers
-
+    
     
     // Localized currency per week for periods longer than a week.
     // Uses calendar-based duration to derive weeks in the period to avoid rough constants.
-
+    
 }
 
 
