@@ -142,7 +142,7 @@ struct GiftView: View {
                 .frame(width: 32, height: 32)
         }
         .padding(.horizontal, 20)
-        .padding(.top, 8)
+        .padding(.top, 25)
     }
     
     // MARK: - Animated Gift

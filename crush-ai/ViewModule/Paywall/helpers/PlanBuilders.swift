@@ -25,7 +25,7 @@ func dynamicSubtitle(for plan: Plan, package: (_ for: Plan) -> Package?) -> Stri
         // Fallbacks (keep billed-first to remain compliant if we lack live data)
         switch plan {
         case .annual:
-            return "$XX.XX / year ≈ $YY.YY / week"
+            return "$XX.XX / year"
         case .weekly:
             return "$X.XX / week"
         case .monthly:
@@ -43,18 +43,21 @@ func dynamicSubtitle(for plan: Plan, package: (_ for: Plan) -> Package?) -> Stri
     // Billed price (localized currency string + period)
     let billed = billedPriceString(for: product)
     
-    // If the product bills weekly, no per-week breakdown needed (already weekly).
-    if let period = product.subscriptionPeriod,
-       period.unit == .week {
-        return billed
-    }
+    // return billed we dont need anuthing else clear price for timemark
+    return billed
     
-    // For periods longer than a week, add a per-week breakdown on the next line.
-    if let perWeek = pricePerWeekString(for: product) {
-        return "\(billed) ≈ \(perWeek) / week"
-    } else {
-        return billed
-    }
+//    // If the product bills weekly, no per-week breakdown needed (already weekly).
+//    if let period = product.subscriptionPeriod,
+//       period.unit == .week {
+//        return billed
+//    }
+//    
+//    // For periods longer than a week, add a per-week breakdown on the next line.
+//    if let perWeek = pricePerWeekString(for: product) {
+//        return "\(billed) ≈ \(perWeek) / week"
+//    } else {
+//        return billed
+//    }
 }
 
 
