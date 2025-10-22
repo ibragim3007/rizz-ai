@@ -43,7 +43,6 @@ struct PaywallView: View {
     var body: some View {
         ZStack {
             MeshedGradient().opacity(0.7)
-            
             ScrollView {
                 VStack(spacing: 20) {
                     carousel
@@ -135,16 +134,17 @@ struct PaywallView: View {
         VStack(spacing: 10) {
             HStack (alignment: .firstTextBaseline) {
                 VStack (alignment: .center, spacing: 5) {
-                    Text("Get unlimited replies")
-                        .font(.system(size: 28, weight: .bold, design: .rounded))
+                    Text("All tones & features unlocked")
+                        .font(.system(size: 22, weight: .bold, design: .rounded))
                         .tracking(1.0)
                         .foregroundStyle(.white)
                         .frame(maxWidth: .infinity, alignment: .center)
+                        .multilineTextAlignment(.center)
                     HStack (spacing: 0) {
-                        Text("Proven to get more ")
-                        Text("dates")
-                            .foregroundStyle(AppTheme.primaryGradient)
-                            .fontWeight(.bold)
+                        Text("Unlimited AI replies for your chats and posts")
+//                        Text("dates")
+//                            .foregroundStyle(AppTheme.primaryGradient)
+//                            .fontWeight(.bold)
                     }
                     .font(.system(size: 16, weight: .regular, design: .rounded))
                     .foregroundStyle(.white.opacity(0.8))

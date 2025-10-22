@@ -149,24 +149,24 @@ struct DialogScreen: View {
                     // Если по UX GiftView нужно показывать всегда на dismiss — просто включаем ниже
                     showGift = true
                 },
-                onDismissWithMonthly: { monthly in
-                    // Сохраняем месячный пакет, полученный из PaywallView
-                    giftMonthlyPackage = monthly
-                }
+//                onDismissWithMonthly: { monthly in
+//                    // Сохраняем месячный пакет, полученный из PaywallView
+//                    giftMonthlyPackage = monthly
+//                }
             )
             .preferredColorScheme(.dark)
         }
         // GiftView presentation сразу после закрытия пейвола
-        .sheet(isPresented: $showGift) {
-            GiftView(injectedMonthlyPackage: giftMonthlyPackage)
-                .preferredColorScheme(.dark)
-        }
+//        .sheet(isPresented: $showGift) {
+//            GiftView(injectedMonthlyPackage: giftMonthlyPackage)
+//                .preferredColorScheme(.dark)
+//        }
         // Покрываем кейс свайпа по sheet: когда showPaywall стал false, а подписки нет — показываем GiftView
-        .onChange(of: showPaywall) { isPresented in
-            if isPresented == false && !paywallViewModel.isSubscriptionActive {
-                showGift = true
-            }
-        }
+//        .onChange(of: showPaywall) { isPresented in
+//            if isPresented == false && !paywallViewModel.isSubscriptionActive {
+//                showGift = true
+//            }
+//        }
     }
     
     private func performGetReply() {
