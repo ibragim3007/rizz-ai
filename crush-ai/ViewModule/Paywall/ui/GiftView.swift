@@ -135,6 +135,9 @@ struct GiftView: View {
                     .tracking(1.0)
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity, alignment: .center)
+                Text("You will never see this again")
+                    .foregroundColor(.secondary)
+                    .font(.system(size: 20))
             }
             Spacer()
             // Плейсхолдер под симметрию
@@ -169,7 +172,7 @@ struct GiftView: View {
                 .symbolRenderingMode(.palette)
                 .foregroundStyle(AppTheme.primaryLight, .white)
                 .font(.system(size: 120, weight: .bold, design: .rounded))
-                .scaleEffect(bounce ? 1.04 : 0.96)
+                .scaleEffect(bounce ? 1.01 : 0.99)
                 .shadow(color: AppTheme.glow.opacity(0.7), radius: 24, x: 0, y: 8)
                 .overlay {
                     // Блики/частицы (простые точки)
@@ -191,7 +194,7 @@ struct GiftView: View {
             startMonthlyPurchase()
         } label: {
             ZStack {
-                Text(isProcessing ? "Processing..." : "Continue")
+                Text(isProcessing ? "Processing..." : "Claim Limited Offer")
                     .font(.system(size: 20, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
                     .opacity(isProcessing ? 0 : 1)
@@ -219,7 +222,7 @@ struct GiftView: View {
             )
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(isProcessing ? "Processing" : "Continue")
+        .accessibilityLabel(isProcessing ? "Processing" : "Claim Limited Offer")
     }
     
     private func startMonthlyPurchase() {

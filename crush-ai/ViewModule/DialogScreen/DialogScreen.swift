@@ -161,6 +161,12 @@ struct DialogScreen: View {
             GiftView(injectedMonthlyPackage: giftMonthlyPackage)
                 .preferredColorScheme(.dark)
         }
+        // Покрываем кейс свайпа по sheet: когда showPaywall стал false, а подписки нет — показываем GiftView
+        .onChange(of: showPaywall) { isPresented in
+            if isPresented == false && !paywallViewModel.isSubscriptionActive {
+                showGift = true
+            }
+        }
     }
     
     private func performGetReply() {

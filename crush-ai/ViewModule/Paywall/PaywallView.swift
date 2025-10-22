@@ -231,13 +231,13 @@ struct PaywallView: View {
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 16)
-            .background(
-                RoundedRectangle(cornerRadius: 18, style: .continuous)
-                    .fill(AppTheme.primaryGradient)
-                    .shadow(color: AppTheme.glow.opacity(0.45), radius: 18, x: 0, y: 10)
-            )
+//            .background(
+//                RoundedRectangle(cornerRadius: 18, style: .continuous)
+//                    .fill(AppTheme.primaryGradient)
+//                    .shadow(color: AppTheme.glow.opacity(0.45), radius: 18, x: 0, y: 10)
+//            )
         }
-        .buttonStyle(.plain)
+        .buttonStyle(PrimaryGradientButtonStyleShimmer(isShimmering: true))
         .accessibilityLabel(isProcessing ? "Processing" : "Continue")
     }
     
