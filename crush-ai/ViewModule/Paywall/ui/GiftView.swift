@@ -43,16 +43,22 @@ struct GiftView: View {
                 animatedGift
                     .padding(.horizontal, 24)
                 
-                Text("60% OFF")
+                Text("Get Unlimited Replies")
+                    .multilineTextAlignment(.center)
                     .fontWeight(.heavy)
                     .foregroundStyle(AppTheme.primaryGradient)
-                    .font(.system(size: 50))
+                    .font(.system(size: 40))
                     .shadow(color: AppTheme.primary.opacity(0.5), radius: 20)
                 
                 Spacer()
                 
-                VStack(spacing: 14) {
+                VStack(spacing: 30) {
                     Spacer()
+                    
+                    Text("No Commitment – Cancel Anytime")
+                        .font(.system(size: 14, weight: .regular))
+                        .foregroundStyle(.secondary)
+                        .padding(.top, 6)
                     
                     PlanCard(
                         selected: $selected,
@@ -122,10 +128,14 @@ struct GiftView: View {
                 dismiss()
             }
             Spacer()
-            Text("One time offer")
-                .font(.system(size: 24, weight: .bold, design: .rounded))
-                .tracking(0.5)
-                .foregroundStyle(.white)
+            
+            VStack (alignment: .center, spacing: 5) {
+                Text("One time offer")
+                    .font(.system(size: 28, weight: .bold, design: .rounded))
+                    .tracking(1.0)
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity, alignment: .center)
+            }
             Spacer()
             // Плейсхолдер под симметрию
             Color.clear
@@ -159,7 +169,7 @@ struct GiftView: View {
                 .symbolRenderingMode(.palette)
                 .foregroundStyle(AppTheme.primaryLight, .white)
                 .font(.system(size: 120, weight: .bold, design: .rounded))
-                .scaleEffect(bounce ? 1.06 : 0.94)
+                .scaleEffect(bounce ? 1.04 : 0.96)
                 .shadow(color: AppTheme.glow.opacity(0.7), radius: 24, x: 0, y: 8)
                 .overlay {
                     // Блики/частицы (простые точки)
@@ -204,7 +214,7 @@ struct GiftView: View {
             .offset(y: buttonBounce ? -2 : 2)
             .animation(
                 .spring(response: 0.8, dampingFraction: 0.9)
-                    .repeatForever(autoreverses: true),
+                .repeatForever(autoreverses: true),
                 value: buttonBounce
             )
         }
@@ -274,7 +284,7 @@ struct GiftView: View {
         guard !isProcessing else { return }
         withAnimation(
             .spring(response: 0.8, dampingFraction: 0.9)
-                .repeatForever(autoreverses: true)
+            .repeatForever(autoreverses: true)
         ) {
             buttonBounce = true
         }
