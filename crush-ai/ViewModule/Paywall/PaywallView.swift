@@ -45,8 +45,7 @@ struct PaywallView: View {
             MeshedGradient().opacity(0.7)
             
             ScrollView {
-                VStack(spacing: 18) {
-                    
+                VStack(spacing: 20) {
                     carousel
                         .padding(.horizontal, 20)
                         .overlay (alignment: .topLeading) {
@@ -109,6 +108,7 @@ struct PaywallView: View {
                 }
                 .padding(.top, 14)
             }
+            .scrollIndicators(.hidden)
         }
         .preferredColorScheme(.dark)
         // Кнопка закрытия (крестик)
@@ -140,9 +140,14 @@ struct PaywallView: View {
                         .tracking(1.0)
                         .foregroundStyle(.white)
                         .frame(maxWidth: .infinity, alignment: .center)
-                    Text("Proven to get more dates")
-                        .font(.system(size: 14, weight: .regular, design: .rounded))
-                        .foregroundStyle(.white.opacity(0.8))
+                    HStack (spacing: 0) {
+                        Text("Proven to get more ")
+                        Text("dates")
+                            .foregroundStyle(AppTheme.primaryGradient)
+                            .fontWeight(.bold)
+                    }
+                    .font(.system(size: 16, weight: .regular, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.8))
                 }
             }
         }
@@ -285,8 +290,8 @@ struct PaywallView: View {
             }
             .buttonStyle(.plain)
         }
-        .font(.system(size: 15, weight: .semibold, design: .rounded))
-        .foregroundStyle(.white.opacity(0.85))
+        .font(.system(size: 12, weight: .regular))
+        .foregroundStyle(.white.secondary)
         .padding(.vertical, 6)
     }
     
