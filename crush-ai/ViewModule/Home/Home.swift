@@ -27,14 +27,7 @@ struct Home: View {
         ZStack {
 
             MeshedGradient()
-            
-            if dialogs.isEmpty {
-                EmptyDialogsView()
-                    .padding(.horizontal, 24)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-                    .allowsHitTesting(false)
-                    .transition(.opacity)
-            }
+
             
             contentList
                 .scrollIndicators(.hidden)
@@ -163,6 +156,14 @@ struct Home: View {
     
     private var contentList: some View {
         ScrollView {
+            
+            if dialogs.isEmpty {
+                EmptyDialogsView()
+                    .padding(.horizontal, 24)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+                    .allowsHitTesting(false)
+                    .transition(.opacity)
+            }
             LazyVStack(alignment: .leading, spacing: 24) {
                 ForEach(sections, id: \.title) { section in
                     if !section.items.isEmpty {

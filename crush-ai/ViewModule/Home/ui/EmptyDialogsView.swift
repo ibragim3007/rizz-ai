@@ -16,97 +16,95 @@ struct EmptyDialogsView: View {
     @State private var showFooter = false
     
     var body: some View {
-        ScrollView(showsIndicators: false) {
-            VStack(spacing: 24) {
-                // Header / Illustration block
-                ZStack {
-                    // Card background with subtle depth
-                    RoundedRectangle(cornerRadius: 24, style: .continuous)
-                        .fill(
-                            LinearGradient(
-                                colors: [
-                                    Color.white.opacity(0.1),
-                                    Color.white.opacity(0.03)
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
+        VStack(spacing: 24) {
+            // Header / Illustration block
+            ZStack {
+                // Card background with subtle depth
+                RoundedRectangle(cornerRadius: 24, style: .continuous)
+                    .fill(
+                        LinearGradient(
+                            colors: [
+                                Color.white.opacity(0.1),
+                                Color.white.opacity(0.03)
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
                         )
+                    )
+                
+                HStack(spacing: 18) {
+                    Image("girl-4")
+                        .resizable()
+                        .scaledToFill()
+                        .frame(maxWidth: 110, maxHeight: 120)
+                        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+                        .accessibilityHidden(true)
                     
-                    HStack(spacing: 18) {
-                        Image("girl-4")
-                            .resizable()
-                            .scaledToFill()
-                            .frame(maxWidth: 110, maxHeight: 120)
-                            .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-                            .accessibilityHidden(true)
-                        
-                        VStack(alignment: .leading, spacing: 10) {
-                            Text("Getting Started")
-                                .font(.system(size: 24, weight: .bold, design: .rounded))
-                            Text("Create your first conversation in three simple steps.")
-                                .font(.system(.subheadline, design: .rounded))
-                                .foregroundStyle(.secondary)
-                                .fixedSize(horizontal: false, vertical: true)
-                        }
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("Getting Started")
+                            .font(.system(size: 24, weight: .bold, design: .rounded))
+                        Text("Create your first conversation in three simple steps.")
+                            .font(.system(.subheadline, design: .rounded))
+                            .foregroundStyle(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
-                    .padding(10)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 }
-                // Анимация появления хедера
-                .opacity(showHeader ? 1 : 0)
-                .offset(y: showHeader ? 0 : 16)
-                .animation(.snappy(duration: 0.6), value: showHeader)
-                
-                // Steps
-                VStack(spacing: 16) {
-                    StepCard(
-                        number: 1,
-                        title: "Upload a screenshot",
-                        subtitle: "Choose or drag & drop a screenshot to start a new dialog.",
-                        systemImage: "photo.on.rectangle.angled"
-                    )
-                    .opacity(showStep1 ? 1 : 0)
-                    .offset(y: showStep1 ? 0 : 14)
-                    .scaleEffect(showStep1 ? 1.0 : 0.98)
-                    .animation(.snappy(duration: 0.55), value: showStep1)
-                    
-                    StepCard(
-                        number: 2,
-                        title: "Tap \"Get Reply\"",
-                        subtitle: "We’ll analyze the content and prepare a tailored response.",
-                        systemImage: "sparkles"
-                    )
-                    .opacity(showStep2 ? 1 : 0)
-                    .offset(y: showStep2 ? 0 : 14)
-                    .scaleEffect(showStep2 ? 1.0 : 0.98)
-                    .animation(.snappy(duration: 0.55), value: showStep2)
-                    
-                    StepCard(
-                        number: 3,
-                        title: "Enjoy the result",
-                        subtitle: "Review, refine, and continue the conversation effortlessly.",
-                        systemImage: "face.smiling"
-                    )
-                    .opacity(showStep3 ? 1 : 0)
-                    .offset(y: showStep3 ? 0 : 14)
-                    .scaleEffect(showStep3 ? 1.0 : 0.98)
-                    .animation(.snappy(duration: 0.55), value: showStep3)
-                }
-                
-                // Footer hint
-                Text("Pro tip: You can add more screenshots later to improve context.")
-                    .font(.system(.footnote, design: .rounded))
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 24)
-                    .padding(.top, 4)
-                    .opacity(showFooter ? 1 : 0)
-                    .offset(y: showFooter ? 0 : 10)
-                    .animation(.snappy(duration: 0.5), value: showFooter)
+                .padding(10)
             }
-            .padding(.vertical, 28)
+            // Анимация появления хедера
+            .opacity(showHeader ? 1 : 0)
+            .offset(y: showHeader ? 0 : 16)
+            .animation(.snappy(duration: 0.6), value: showHeader)
+            
+            // Steps
+            VStack(spacing: 16) {
+                StepCard(
+                    number: 1,
+                    title: "Upload a screenshot",
+                    subtitle: "Choose or drag & drop a screenshot to start a new dialog.",
+                    systemImage: "photo.on.rectangle.angled"
+                )
+                .opacity(showStep1 ? 1 : 0)
+                .offset(y: showStep1 ? 0 : 14)
+                .scaleEffect(showStep1 ? 1.0 : 0.98)
+                .animation(.snappy(duration: 0.55), value: showStep1)
+                
+                StepCard(
+                    number: 2,
+                    title: "Tap \"Get Reply\"",
+                    subtitle: "We’ll analyze the content and prepare a tailored response.",
+                    systemImage: "sparkles"
+                )
+                .opacity(showStep2 ? 1 : 0)
+                .offset(y: showStep2 ? 0 : 14)
+                .scaleEffect(showStep2 ? 1.0 : 0.98)
+                .animation(.snappy(duration: 0.55), value: showStep2)
+                
+                StepCard(
+                    number: 3,
+                    title: "Enjoy the result",
+                    subtitle: "Review, refine, and continue the conversation effortlessly.",
+                    systemImage: "face.smiling"
+                )
+                .opacity(showStep3 ? 1 : 0)
+                .offset(y: showStep3 ? 0 : 14)
+                .scaleEffect(showStep3 ? 1.0 : 0.98)
+                .animation(.snappy(duration: 0.55), value: showStep3)
+            }
+            
+            // Footer hint
+            Text("Pro tip: You can add more screenshots later to improve context.")
+                .font(.system(.footnote, design: .rounded))
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 24)
+                .padding(.top, 4)
+                .opacity(showFooter ? 1 : 0)
+                .offset(y: showFooter ? 0 : 10)
+                .animation(.snappy(duration: 0.5), value: showFooter)
         }
+        .padding(.vertical, 28)
         .task {
             // Запускаем «каскад» появления с небольшими задержками
             await animateSequence()
@@ -158,14 +156,14 @@ private struct StepCard: View {
                     if #available(iOS 18.0, *) {
                         Image(systemName: systemImage)
                             .font(.system(size: 16, weight: .semibold))
-                            //                        .foregroundStyle(AppTheme.primary)
+                        //                        .foregroundStyle(AppTheme.primary)
                             .accessibilityHidden(true)
                             .symbolRenderingMode(.monochrome)
                             .symbolEffect(.wiggle.up)
                     } else {
                         Image(systemName: systemImage)
                             .font(.system(size: 16, weight: .semibold))
-                            //                        .foregroundStyle(AppTheme.primary)
+                        //                        .foregroundStyle(AppTheme.primary)
                             .accessibilityHidden(true)
                             .symbolRenderingMode(.monochrome)
                     }

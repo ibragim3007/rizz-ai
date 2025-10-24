@@ -17,19 +17,19 @@ struct SettingsPlaceholderView: View {
     @State private var showPaywall: Bool = false
     @Environment(\.openURL) private var openURL
     
-    // Вставьте реальную iCloud‑ссылку на ваш шорткат «Get Reply»
+    // Insert the real iCloud link to your “Get Reply” shortcut
     private let getReplyShortcutURLString: String = "https://www.icloud.com/shortcuts/800fa932c78040bda5aeacb25d8f0a39"
 
     var body: some View {
         ZStack {
             MeshedGradient().opacity(0.5)
             List {
-                // Premium section with a beautiful subscribe button
+                // Premium section with a subscribe button
                 Section("Premium") {
                     PremiumSection(showPaywall: $showPaywall)
                 }
                 
-                // Shortcuts section with a pre-save button for "Get Reply"
+                // Shortcuts section with a pre‑save button for "Get Reply"
                 Section("Shortcuts") {
                     Button {
 #if canImport(UIKit)
@@ -37,21 +37,50 @@ struct SettingsPlaceholderView: View {
 #endif
                         openGetReplyShortcut()
                     } label: {
-                        HStack {
-                            Text(NSLocalizedString("Добавить шорткат “Get Reply”", comment: "Add Get Reply shortcut button"))
+                        HStack(spacing: 12) {
+                            // Shortcuts‑style glyph
+                            ZStack {
+                                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                    .fill(
+                                        LinearGradient(
+                                            colors: [.purple, .blue],
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        )
+                                    )
+                                    .frame(width: 36, height: 36)
+                                    .shadow(color: .purple.opacity(0.18), radius: 6, x: 0, y: 3)
+                                // SF Symbol to suggest adding a shortcut
+                                Image(systemName: "app.badge.plus")
+                                    .foregroundStyle(.white)
+                                    .font(.system(size: 16, weight: .semibold))
+                            }
+                            
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(NSLocalizedString("Add “Get Reply” Shortcut", comment: "Add Get Reply shortcut button"))
+                                    .font(.body)
+                                    .fontWeight(.semibold)
+                                Text(NSLocalizedString("Opens the Shortcuts app to install it.", comment: "Subtitle explaining the shortcut action"))
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                    .lineLimit(1)
+                            }
+                            
                             Spacer()
+                            
                             Image(systemName: "chevron.right")
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(.tertiary)
                         }
+                        .padding(.vertical, 4)
                     }
                     .buttonStyle(.plain)
-                    .accessibilityLabel(NSLocalizedString("Добавить шорткат Get Reply", comment: "Accessibility label for adding shortcut"))
-                    .accessibilityHint(NSLocalizedString("Откроет установку шортката в приложении «Команды»", comment: "Accessibility hint for adding shortcut"))
+                    .accessibilityLabel(NSLocalizedString("Add Get Reply shortcut", comment: "Accessibility label for adding shortcut"))
+                    .accessibilityHint(NSLocalizedString("Opens the Shortcuts app to install the shortcut.", comment: "Accessibility hint for adding shortcut"))
                 }
                 
                 Section("Settings") {
                     
-                    // Язык
+                    // Language
                     Picker(selection: $replyLanguage) {
                         ForEach(languageOptions) { option in
                             Text(option.title).tag(option.id)
@@ -60,7 +89,7 @@ struct SettingsPlaceholderView: View {
                         Text(NSLocalizedString("Response language", comment: "Response language"))
                     }
                     
-                    // Тон
+                    // Tone
                     Picker(selection: $currentTone) {
                         ForEach(ToneTypes.allCases, id: \.self) { tone in
                             VStack(alignment: .leading, spacing: 2) {
@@ -77,7 +106,7 @@ struct SettingsPlaceholderView: View {
                         Text(NSLocalizedString("Tone", comment: "Response tone"))
                     }
                     
-                    // Эмодзи в ответах
+                    // Emoji in responses
                     Toggle(isOn: $useEmojis) {
                         Text(NSLocalizedString("Use Emoji", comment: "Toggle to include emoji in responses"))
                     }
@@ -93,22 +122,19 @@ struct SettingsPlaceholderView: View {
                     LegalSection()
                 }
                 
-                
                 Section("Storage") {
                     StorageSection()
                 }
-                
-                
             }
             .scrollContentBackground(.hidden)
             .navigationTitle("Settings")
             .sheet(isPresented: $showPaywall) {
                 PaywallView(
                     onContinue: {
-                        // Обработка успешной покупки (опционально)
+                        // Handle successful purchase (optional)
                     },
                     onRestore: {
-                        // Обработка восстановления (опционально)
+                        // Handle restore (optional)
                     },
                     onDismiss: {
                         showPaywall = false
@@ -123,12 +149,12 @@ struct SettingsPlaceholderView: View {
     
     private func openGetReplyShortcut() {
         guard let icloudURL = URL(string: getReplyShortcutURLString) else { return }
-        // Пробуем открыть прямую iCloud‑ссылку
+        // Try to open the direct iCloud link
         openURL(icloudURL)
-        // На случай, если нужна явная схема импорта — соберём shortcuts:// ссылку
+        // As a fallback, build a shortcuts:// import link
         if let encoded = getReplyShortcutURLString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
            let importURL = URL(string: "shortcuts://import-shortcut?url=\(encoded)") {
-            // Неблокирующий фоллбэк: попытается открыть приложение «Команды» напрямую
+            // Non‑blocking fallback: tries to open the Shortcuts app directly
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                 openURL(importURL)
             }
@@ -138,11 +164,11 @@ struct SettingsPlaceholderView: View {
     // MARK: - Language / Tone helpers
     
     private struct LanguageOption: Identifiable, Hashable {
-        let id: String          // BCP-47, либо "auto"
-        let title: String       // Человекочитаемое имя
+        let id: String          // BCP-47, or "auto"
+        let title: String       // Human-readable name
     }
     
-    // Авто + ~10 языков с эмодзи флагов
+    // Auto + ~10 languages with flag emoji
     private var languageOptions: [LanguageOption] {
         [
             LanguageOption(id: "auto",    title: "🌐 " + NSLocalizedString("Automatic", comment: "Language - automatic")),
