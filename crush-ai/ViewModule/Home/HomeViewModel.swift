@@ -53,7 +53,7 @@ final class HomeViewModel: ObservableObject {
                                                     quality: 0.6) ?? originalData
 
             // Сохраняем в файловую систему (Documents)
-            let fileURL = try saveImageDataToDocuments(
+            let fileURL = try Self.saveImageDataToDocuments(
                 data: jpegData,
                 suggestedName: await suggestedFilename(from: item),
                 forceExtension: "jpg"
@@ -122,7 +122,7 @@ final class HomeViewModel: ObservableObject {
                                                     quality: 0.6) ?? originalData
             
             // 2) Сохранение файла в Documents
-            let fileURL = try saveImageDataToDocuments(
+            let fileURL = try Self.saveImageDataToDocuments(
                 data: jpegData,
                 suggestedName: await suggestedFilename(from: item),
                 forceExtension: "jpg"
@@ -257,7 +257,7 @@ final class HomeViewModel: ObservableObject {
 
     // MARK: - File saving helpers
 
-    func saveImageDataToDocuments(data: Data, suggestedName: String?, forceExtension: String? = nil) throws -> URL {
+    static func saveImageDataToDocuments(data: Data, suggestedName: String?, forceExtension: String? = nil) throws -> URL {
         let fm = FileManager.default
         let docs = try fm.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
         let baseName = (suggestedName?.isEmpty == false ? suggestedName! : UUID().uuidString)
@@ -327,4 +327,3 @@ final class HomeViewModel: ObservableObject {
         }
     }
 }
-

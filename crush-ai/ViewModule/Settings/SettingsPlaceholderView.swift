@@ -15,6 +15,10 @@ struct SettingsPlaceholderView: View {
     @AppStorage("useEmojis") private var useEmojis: Bool = false
 
     @State private var showPaywall: Bool = false
+    @Environment(\.openURL) private var openURL
+    
+    // Вставьте реальную iCloud‑ссылку на ваш шорткат «Get Reply»
+    private let getReplyShortcutURLString: String = "https://www.icloud.com/shortcuts/800fa932c78040bda5aeacb25d8f0a39"
 
     var body: some View {
         ZStack {
@@ -23,6 +27,26 @@ struct SettingsPlaceholderView: View {
                 // Premium section with a beautiful subscribe button
                 Section("Premium") {
                     PremiumSection(showPaywall: $showPaywall)
+                }
+                
+                // Shortcuts section with a pre-save button for "Get Reply"
+                Section("Shortcuts") {
+                    Button {
+#if canImport(UIKit)
+                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+#endif
+                        openGetReplyShortcut()
+                    } label: {
+                        HStack {
+                            Text(NSLocalizedString("Добавить шорткат “Get Reply”", comment: "Add Get Reply shortcut button"))
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(NSLocalizedString("Добавить шорткат Get Reply", comment: "Accessibility label for adding shortcut"))
+                    .accessibilityHint(NSLocalizedString("Откроет установку шортката в приложении «Команды»", comment: "Accessibility hint for adding shortcut"))
                 }
                 
                 Section("Settings") {
@@ -95,6 +119,22 @@ struct SettingsPlaceholderView: View {
         }
     }
     
+    // MARK: - Shortcuts helpers
+    
+    private func openGetReplyShortcut() {
+        guard let icloudURL = URL(string: getReplyShortcutURLString) else { return }
+        // Пробуем открыть прямую iCloud‑ссылку
+        openURL(icloudURL)
+        // На случай, если нужна явная схема импорта — соберём shortcuts:// ссылку
+        if let encoded = getReplyShortcutURLString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
+           let importURL = URL(string: "shortcuts://import-shortcut?url=\(encoded)") {
+            // Неблокирующий фоллбэк: попытается открыть приложение «Команды» напрямую
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                openURL(importURL)
+            }
+        }
+    }
+    
     // MARK: - Language / Tone helpers
     
     private struct LanguageOption: Identifiable, Hashable {
@@ -152,4 +192,3 @@ struct SettingsPlaceholderView: View {
     
     SettingsPlaceholderView().environmentObject(paywallViewModel)
 }
-
