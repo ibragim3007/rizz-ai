@@ -64,7 +64,7 @@ struct PaywallView: View {
                     
                     header
                         .padding(.bottom, 10)
-                
+                    
                     
                     // Cards
                     VStack(spacing: 14) {
@@ -134,21 +134,14 @@ struct PaywallView: View {
         VStack(spacing: 10) {
             HStack (alignment: .firstTextBaseline) {
                 VStack (alignment: .center, spacing: 5) {
-                    Text("All tones & features unlocked")
+                    Text("CrushAI Pro — Everything you need for smart replies")
                         .font(.system(size: 22, weight: .bold, design: .rounded))
-                        .tracking(1.0)
                         .foregroundStyle(.white)
-                        .frame(maxWidth: .infinity, alignment: .center)
-                        .multilineTextAlignment(.center)
-                    HStack (spacing: 0) {
-                        Text("Unlimited AI replies for your chats and posts")
-//                        Text("dates")
-//                            .foregroundStyle(AppTheme.primaryGradient)
-//                            .fontWeight(.bold)
-                    }
-                    .font(.system(size: 16, weight: .regular, design: .rounded))
-                    .foregroundStyle(.white.opacity(0.8))
+                    Text("Get AI answers for your chats and posts, with all features unlocked.")
+                        .font(.system(size: 16, weight: .regular, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.8))
                 }
+                .multilineTextAlignment(.center)
             }
         }
         .padding(.horizontal, 20)
@@ -177,7 +170,7 @@ struct PaywallView: View {
                                     .opacity(UIImage(named: name) == nil ? 0 : 1)
                             }
                             .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
-                            .frame(height: 300)
+                            .frame(height: 280)
                             .overlay {
                                 if UIImage(named: name) == nil {
                                     Image(systemName: "photo")
@@ -191,7 +184,7 @@ struct PaywallView: View {
                 }
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
-            .frame(height: 310)
+            .frame(height: 290)
             
             // Custom page control
             HStack(spacing: 8) {
@@ -231,11 +224,11 @@ struct PaywallView: View {
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 16)
-//            .background(
-//                RoundedRectangle(cornerRadius: 18, style: .continuous)
-//                    .fill(AppTheme.primaryGradient)
-//                    .shadow(color: AppTheme.glow.opacity(0.45), radius: 18, x: 0, y: 10)
-//            )
+            //            .background(
+            //                RoundedRectangle(cornerRadius: 18, style: .continuous)
+            //                    .fill(AppTheme.primaryGradient)
+            //                    .shadow(color: AppTheme.glow.opacity(0.45), radius: 18, x: 0, y: 10)
+            //            )
         }
         .buttonStyle(PrimaryGradientButtonStyleShimmer(isShimmering: true))
         .accessibilityLabel(isProcessing ? "Processing" : "Continue")
