@@ -16,9 +16,6 @@ struct SettingsPlaceholderView: View {
 
     @State private var showPaywall: Bool = false
     @Environment(\.openURL) private var openURL
-    
-    // Insert the real iCloud link to your “Get Reply” shortcut
-    private let getReplyShortcutURLString: String = "https://www.icloud.com/shortcuts/800fa932c78040bda5aeacb25d8f0a39"
 
     var body: some View {
         ZStack {
@@ -31,51 +28,7 @@ struct SettingsPlaceholderView: View {
                 
                 // Shortcuts section with a pre‑save button for "Get Reply"
                 Section("Shortcuts") {
-                    Button {
-#if canImport(UIKit)
-                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-#endif
-                        openGetReplyShortcut()
-                    } label: {
-                        HStack(spacing: 12) {
-                            // Shortcuts‑style glyph
-                            ZStack {
-                                RoundedRectangle(cornerRadius: 10, style: .continuous)
-                                    .fill(
-                                        LinearGradient(
-                                            colors: [.purple, .blue],
-                                            startPoint: .topLeading,
-                                            endPoint: .bottomTrailing
-                                        )
-                                    )
-                                    .frame(width: 36, height: 36)
-                                    .shadow(color: .purple.opacity(0.18), radius: 6, x: 0, y: 3)
-                                // SF Symbol to suggest adding a shortcut
-                                Image(systemName: "app.badge.plus")
-                                    .foregroundStyle(.white)
-                                    .font(.system(size: 16, weight: .semibold))
-                            }
-                            
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(NSLocalizedString("Add “Get Reply” Shortcut", comment: "Add Get Reply shortcut button"))
-                                    .font(.body)
-                                    .fontWeight(.semibold)
-                                Text(NSLocalizedString("Opens the Shortcuts app to install it.", comment: "Subtitle explaining the shortcut action"))
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                                    .lineLimit(1)
-                            }
-                            
-                            Spacer()
-                            
-                            Image(systemName: "chevron.right")
-                                .foregroundStyle(.tertiary)
-                        }
-                        .padding(.vertical, 4)
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel(NSLocalizedString("Add Get Reply shortcut", comment: "Accessibility label for adding shortcut"))
-                    .accessibilityHint(NSLocalizedString("Opens the Shortcuts app to install the shortcut.", comment: "Accessibility hint for adding shortcut"))
+                    ShortcutButton()
                 }
                 
                 Section("Settings") {
@@ -141,22 +94,6 @@ struct SettingsPlaceholderView: View {
                     }
                 )
                 .preferredColorScheme(.dark)
-            }
-        }
-    }
-    
-    // MARK: - Shortcuts helpers
-    
-    private func openGetReplyShortcut() {
-        guard let icloudURL = URL(string: getReplyShortcutURLString) else { return }
-        // Try to open the direct iCloud link
-        openURL(icloudURL)
-        // As a fallback, build a shortcuts:// import link
-        if let encoded = getReplyShortcutURLString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
-           let importURL = URL(string: "shortcuts://import-shortcut?url=\(encoded)") {
-            // Non‑blocking fallback: tries to open the Shortcuts app directly
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                openURL(importURL)
             }
         }
     }

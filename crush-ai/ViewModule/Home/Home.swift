@@ -155,13 +155,12 @@ struct Home: View {
     }
     
     private var contentList: some View {
-        ScrollView {
-            
+        ScrollView {            
             if dialogs.isEmpty {
                 EmptyDialogsView()
                     .padding(.horizontal, 24)
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-                    .allowsHitTesting(false)
+//                    .allowsHitTesting(false)
                     .transition(.opacity)
             }
             LazyVStack(alignment: .leading, spacing: 24) {

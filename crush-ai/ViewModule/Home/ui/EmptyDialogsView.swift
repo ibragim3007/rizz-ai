@@ -14,9 +14,14 @@ struct EmptyDialogsView: View {
     @State private var showStep2 = false
     @State private var showStep3 = false
     @State private var showFooter = false
+    @Environment(\.openURL) private var openURL
+
     
     var body: some View {
         VStack(spacing: 24) {
+            
+            ShortcutButton()
+            
             // Header / Illustration block
             ZStack {
                 // Card background with subtle depth
@@ -103,6 +108,8 @@ struct EmptyDialogsView: View {
                 .opacity(showFooter ? 1 : 0)
                 .offset(y: showFooter ? 0 : 10)
                 .animation(.snappy(duration: 0.5), value: showFooter)
+                
+            
         }
         .padding(.vertical, 28)
         .task {
