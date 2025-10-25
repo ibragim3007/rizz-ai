@@ -214,6 +214,8 @@ struct DialogScreen: View {
             }
             .padding(.bottom, 50)
         }
+        // Включаем именованное пространство для параллакса
+        .coordinateSpace(name: "dialogScroll")
         // Тап по прокрутке вне инпута тоже закрывает клавиатуру
 //        .simultaneousGesture(TapGesture().onEnded { isContextFocused = false })
     }
@@ -265,19 +267,47 @@ struct ImageView: View {
     var image: ImageEntity?
     var isLoading: Bool
     
+    // Базовая высота области изображения (синхронизирована с maxHeight внутри LargeImageDisplay)
+    private let baseHeight: CGFloat = 450
+    
     var body: some View {
-        if let img = image {
-            LargeImageDisplay(isLoading: isLoading, imageEntity: img)
-                .padding(.horizontal, 20)
-        } else {
-            RoundedRectangle(cornerRadius: 24, style: .continuous)
-                .overlay {
-                    Image(systemName: "photo")
-                        .font(.system(size: 36, weight: .semibold))
-                        .foregroundStyle(.white.opacity(0.85))
+        GeometryReader { geo in
+            // Позиция контейнера относительно скролла
+            let minY = geo.frame(in: .named("dialogScroll")).minY
+            let pullDown = max(0, minY)          // тянем вниз
+            let scrollUp = min(0, minY)          // скроллим вверх (отрицательное)
+            
+            // Лёгкий параллакс при прокрутке вверх (картинка «отстаёт»)
+            let parallaxOffset = -scrollUp * 0.25
+            
+            // Небольшой скейл при вытягивании вниз
+            let scale = 1.0 + (pullDown / 600.0)
+            
+            // Плавное затухание при прокрутке вверх, минимум 0.2
+            let fade = max(0.2, 1.0 + (scrollUp / 600.0))
+            
+            ZStack {
+                if let img = image {
+                    LargeImageDisplay(isLoading: isLoading, imageEntity: img)
+                        .scaleEffect(scale, anchor: .center)
+                        .offset(y: parallaxOffset)
+                        .opacity(fade)
+                } else {
+                    RoundedRectangle(cornerRadius: 24, style: .continuous)
+                        .overlay {
+                            Image(systemName: "photo")
+                                .font(.system(size: 36, weight: .semibold))
+                                .foregroundStyle(.white.opacity(0.85))
+                        }
+                        .scaleEffect(scale, anchor: .center)
+                        .offset(y: parallaxOffset)
+                        .opacity(fade)
                 }
-                .padding()
+            }
+            .padding(.horizontal, 20)
         }
+        // GeometryReader требует зафиксированной высоты
+        .frame(height: baseHeight)
     }
 }
 

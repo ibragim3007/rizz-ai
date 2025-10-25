@@ -51,8 +51,8 @@ final class DialogScreenViewModel: ObservableObject {
         // Сжимаем: даунскейл до 60% и JPEG качество 0.6
         let base64Image = DialogScreenViewModel.makeBase64(
             from: currentImageUrl,
-            downscaleFactor: 0.6,
-            jpegQuality: 0.6
+            downscaleFactor: 0.8,
+            jpegQuality: 0.8
         )
         
         let body = AnalyzeScreenshotRequest(
