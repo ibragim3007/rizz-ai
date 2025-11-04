@@ -24,7 +24,7 @@
     "_developerTeamID" : "DY5D9CQULX",
     "_disableDialogs" : false,
     "_failTransactionsEnabled" : false,
-    "_lastSynchronizedDate" : 782865110.76926303,
+    "_lastSynchronizedDate" : 783460155.53728604,
     "_locale" : "en_US",
     "_renewalBillingIssuesEnabled" : false,
     "_storefront" : "USA",
@@ -50,41 +50,12 @@
           ],
           "displayPrice" : "8.99",
           "familyShareable" : false,
-          "groupNumber" : 1,
-          "internalID" : "6754048892",
-          "introductoryOffer" : null,
-          "localizations" : [
-            {
-              "description" : "Full access to all functions",
-              "displayName" : "Crush AI — Monthly Full Access",
-              "locale" : "en_US"
-            }
-          ],
-          "productID" : "crush_ai_monthly_regular",
-          "recurringSubscriptionPeriod" : "P1M",
-          "referenceName" : "Monthly regular",
-          "subscriptionGroupID" : "21808247",
-          "type" : "RecurringSubscription",
-          "winbackOffers" : [
-
-          ]
-        },
-        {
-          "adHocOffers" : [
-
-          ],
-          "codeOffers" : [
-
-          ],
-          "displayPrice" : "8.99",
-          "familyShareable" : false,
           "groupNumber" : 3,
           "internalID" : "6754050036",
           "introductoryOffer" : {
-            "displayPrice" : "2.99",
-            "internalID" : "96205B37",
+            "internalID" : "81EBB427",
             "numberOfPeriods" : 1,
-            "paymentMode" : "payAsYouGo",
+            "paymentMode" : "free",
             "subscriptionPeriod" : "P1W"
           },
           "localizations" : [

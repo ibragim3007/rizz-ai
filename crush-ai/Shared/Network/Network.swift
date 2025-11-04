@@ -58,8 +58,15 @@ final class APIClient: APIClientProtocol {
     static let shared = APIClient()
     private init() {}
     
-    /// Базовый URL API сервера (замените на ваш)
-    private let baseURL = URL(string: "https://crush-ai-server-production.up.railway.app")!
+    /// Базовый URL API сервера
+    /// В Dev (DEBUG) окружении — локальный сервер, в остальных — прод
+    private let baseURL: URL = {
+        #if DEBUG
+        return URL(string: "https://crush-ai-server-production.up.railway.app")!
+        #else
+        return URL(string: "https://crush-ai-server-production.up.railway.app")!
+        #endif
+    }()
     
     /// Универсальный generic запрос
     func request<T: Decodable>(
@@ -121,4 +128,3 @@ private struct AnyEncodable: Encodable {
         try _encode(encoder)
     }
 }
-

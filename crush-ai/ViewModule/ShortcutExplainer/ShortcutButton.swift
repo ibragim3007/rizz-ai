@@ -9,18 +9,17 @@ import SwiftUI
 
 struct ShortcutButton: View {
     
-    @Environment(\.openURL) private var openURL
-    
-    // Insert the real iCloud link to your “Get Reply” shortcut
-    private let getReplyShortcutURLString: String = "https://www.icloud.com/shortcuts/800fa932c78040bda5aeacb25d8f0a39"
-
+    // Локальный стейт для показа шита с объяснением шортката
+    @State private var showExplainerSheet: Bool = false
     
     var body: some View {
         Button {
 #if canImport(UIKit)
             UIImpactFeedbackGenerator(style: .light).impactOccurred()
 #endif
-            openGetReplyShortcut()
+            withAnimation(.spring(response: 0.32, dampingFraction: 0.9, blendDuration: 0.2)) {
+                showExplainerSheet = true
+            }
         } label: {
             HStack(spacing: 12) {
                 // Shortcuts‑style glyph
@@ -29,7 +28,6 @@ struct ShortcutButton: View {
                         .fill(AppTheme.primaryGradient)
                         .frame(width: 36, height: 36)
                         .shadow(color: .purple.opacity(0.18), radius: 6, x: 0, y: 3)
-                    // SF Symbol to suggest adding a shortcut
                     Image("apple-shortcut-icon")
                         .resizable()
                         .foregroundStyle(.white)
@@ -55,28 +53,36 @@ struct ShortcutButton: View {
         }
         .buttonStyle(.plain)
         .accessibilityLabel(NSLocalizedString("Add Get Reply shortcut", comment: "Accessibility label for adding shortcut"))
-        .accessibilityHint(NSLocalizedString("Opens the Shortcuts app to install the shortcut.", comment: "Accessibility hint for adding shortcut"))
+        .accessibilityHint(NSLocalizedString("Opens the explainer to install the shortcut.", comment: "Accessibility hint for adding shortcut"))
+        // Презентация как bottom sheet на 70% экрана
+        .sheet(isPresented: $showExplainerSheet) {
+            ShortcutExplainer {
+                // Закрываем шит по нажатию "Let’s start"
+                withAnimation(.spring(response: 0.32, dampingFraction: 0.95, blendDuration: 0.2)) {
+                    showExplainerSheet = false
+                }
+            }
+            .preferredColorScheme(.dark)
+            .presentationDragIndicator(.visible)
+            .presentationCornerRadius(20)
+            .applyDetents70()
+        }
     }
-    
-    // MARK: - Shortcuts helpers
-    
-    private func openGetReplyShortcut() {
-        print("BUtto pressed")
-        guard let icloudURL = URL(string: getReplyShortcutURLString) else { return }
-        // Try to open the direct iCloud link
-        openURL(icloudURL)
-        // As a fallback, build a shortcuts:// import link
-//        if let encoded = getReplyShortcutURLString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
-//           let importURL = URL(string: "shortcuts://import-shortcut?url=\(encoded)") {
-//            // Non‑blocking fallback: tries to open the Shortcuts app directly
-//            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-//                openURL(importURL)
-//            }
-//        }
-    }
-    
 }
 
+// Вспомогательный модификатор: применяем detents только там, где доступно
+private extension View {
+    @ViewBuilder
+    func applyDetents70() -> some View {
+        if #available(iOS 16.0, *) {
+            self
+                .presentationDetents([.fraction(0.8)])
+                .presentationBackgroundInteraction(.enabled(upThrough: .fraction(0.8)))
+        } else {
+            self
+        }
+    }
+}
 
 #Preview {
     ShortcutButton()
