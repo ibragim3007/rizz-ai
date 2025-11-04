@@ -12,8 +12,21 @@ struct EmptyDialogsView: View {
     @State private var showHero = false
     @State private var showChips = false
 
+    // Слайдер изображений (бесконечный)
+    @State private var page: Int = 1 // внутренний индекс в расширенном массиве
+    private let heroImages = ["welcome-image-1", "welcome-image-2", "welcome-image-3"]
+
     // Единый вход в поток импорта
     var onImportTapped: () -> Void = {}
+
+    // Расширенный массив для бесшовного цикла: [last] + images + [first]
+    private var carouselImages: [String] {
+        guard let first = heroImages.first, let last = heroImages.last else { return heroImages }
+        return [last] + heroImages + [first]
+    }
+
+    // Длительность анимации перелистывания (синхронизируем с .animation)
+    private let slideDuration: Double = 2
 
     var body: some View {
         VStack(spacing: 20) {
@@ -30,12 +43,57 @@ struct EmptyDialogsView: View {
                         )
                     
                     ZStack(alignment: .bottomLeading) {
-                        Image(.welcom)
-                            .resizable()
-                            .scaledToFill()
-                            .frame(maxHeight: .infinity)
-                            .accessibilityHidden(true)
-                
+                        // Горизонтальный слайдер (пейджинг) — закольцованный
+                        TabView(selection: $page) {
+                            ForEach(carouselImages.indices, id: \.self) { idx in
+                                GeometryReader { geo in
+                                    let width = geo.size.width
+                                    let height = geo.size.height
+                                    Image(carouselImages[idx])
+                                        .resizable()
+                                        .scaledToFill()
+                                        .frame(width: width, height: height)
+                                        .clipped()
+                                        .scaleEffect(page == idx ? 1.0 : 0.995) // небольшой акцент
+                                        .tag(idx)
+                                }
+                            }
+                        }
+                        .tabViewStyle(.page(indexDisplayMode: .never))
+                        .animation(.snappy(duration: slideDuration), value: page)
+                        .frame(height: 250)
+                        .scrollDisabled(false)
+                        // Следим за переходами, чтобы «перешивать» края без анимации
+                        .onChange(of: page) { old, new in
+                            guard carouselImages.count >= 3 else { return }
+                            // Если ушли вправо до правого дубликата — прыгаем на реальный первый (1)
+                            if new == carouselImages.count - 1 {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + slideDuration - 0.05) {
+                                    var transaction = Transaction()
+                                    transaction.disablesAnimations = true
+                                    withTransaction(transaction) {
+                                        page = 1
+                                    }
+                                }
+                            }
+                            // Если ушли влево до левого дубликата — прыгаем на реальный последний (count-2)
+                            if new == 0 {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + slideDuration - 0.05) {
+                                    var transaction = Transaction()
+                                    transaction.disablesAnimations = true
+                                    withTransaction(transaction) {
+                                        page = carouselImages.count - 2
+                                    }
+                                }
+                            }
+                        }
+                        .onAppear {
+                            // Стартуем с реального первого
+                            if carouselImages.count >= 3 {
+                                page = 1
+                            }
+                        }
+
                         // Черный градиент снизу под текстом
                         LinearGradient(
                             colors: [Color.black.opacity(0.0), Color.black.opacity(0.8)],
@@ -82,6 +140,9 @@ struct EmptyDialogsView: View {
         .task {
             await animateIn()
         }
+        .task {
+            await cycleHeroImages()
+        }
     }
 
     // MARK: - Simple animation
@@ -95,6 +156,21 @@ struct EmptyDialogsView: View {
 
         try? await Task.sleep(nanoseconds: 120_000_000)
         withAnimation(.snappy(duration: 0.5)) { showChips = true }
+    }
+
+    // MARK: - Hero images auto-cycle (закольцовано)
+
+    private func cycleHeroImages() async {
+        guard heroImages.count > 1 else { return }
+        // Бесконечный цикл будет автоматически отменен при уходе экрана
+        while true {
+            try? await Task.sleep(nanoseconds: 6_000_000_000)
+            // Движемся вперед по расширенному массиву
+            withAnimation(.snappy(duration: slideDuration)) {
+                page += 1
+            }
+            // Остальную «перепрошивку» на 1/последний сделает onChange(page)
+        }
     }
 }
 
