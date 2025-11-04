@@ -39,27 +39,31 @@ struct Home: View {
                     }
                     ToolbarItem { SettingsButton(destination: SettingsPlaceholderView()) }
                     if #available(iOS 26.0, *) {
-                        ToolbarItem(placement: .bottomBar) {
-                            PrimaryCTAButton(
-                                title: "Upload Screenshot",
-                                height: 60,
-                                font: .system(size: 20, weight: .semibold, design: .rounded),
-                                fullWidth: true
-                            ) {
-                                vmHome.uploadScreenshot()
+                        if(!dialogs.isEmpty) {
+                            ToolbarItem(placement: .bottomBar) {
+                                PrimaryCTAButton(
+                                    title: "Upload Screenshot",
+                                    height: 60,
+                                    font: .system(size: 20, weight: .semibold, design: .rounded),
+                                    fullWidth: true
+                                ) {
+                                    vmHome.uploadScreenshot()
+                                }
                             }
+                            .sharedBackgroundVisibility(.hidden)
                         }
-                        .sharedBackgroundVisibility(.hidden)
                     } else {
-                        // Fallback on earlier versions
-                        ToolbarItem(placement: .bottomBar) {
-                            PrimaryCTAButton(
-                                title: "Upload Screenshot",
-                                height: 60,
-                                font: .system(size: 20, weight: .semibold, design: .rounded),
-                                fullWidth: true
-                            ) {
-                                vmHome.uploadScreenshot()
+                        if(!dialogs.isEmpty) {
+                            // Fallback on earlier versions
+                            ToolbarItem(placement: .bottomBar) {
+                                PrimaryCTAButton(
+                                    title: "Upload Screenshot",
+                                    height: 60,
+                                    font: .system(size: 20, weight: .semibold, design: .rounded),
+                                    fullWidth: true
+                                ) {
+                                    vmHome.uploadScreenshot()
+                                }
                             }
                         }
                     }
@@ -156,7 +160,7 @@ struct Home: View {
     
     private var contentList: some View {
         ScrollView {            
-            if dialogs.isEmpty {
+            if(dialogs.isEmpty) {
                 EmptyDialogsView(onImportTapped: {
                     vmHome.uploadScreenshot()
                 })

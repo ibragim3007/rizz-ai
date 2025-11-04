@@ -63,7 +63,7 @@ struct EmptyDialogsView: View {
                 .opacity(showHero ? 1 : 0)
                 .animation(.snappy(duration: 0.6), value: showHero)
                 
-                Spacer()
+                Spacer(minLength: 30)
                 // Vertical step-by-step flow chips (timeline style)
                 FlowChipsVertical(
                     show: showChips,
@@ -172,6 +172,11 @@ private struct TimelineStepRow: View {
     private let innerDot: CGFloat = 7
     private let corner: CGFloat = 18
 
+    // Анимации взаимодействия
+    @GestureState private var isPressed: Bool = false
+    @State private var pulse: Bool = false
+    @State private var shakePhase: CGFloat = 0
+
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
             // Left rail + marker
@@ -218,9 +223,26 @@ private struct TimelineStepRow: View {
                 .onTapGesture {
                     action?()
                 }
+                .simultaneousGesture(
+                    LongPressGesture(minimumDuration: 0.0)
+                        .updating($isPressed) { _, state, _ in
+                            state = true
+                        }
+                )
                 .accessibilityLabel("\(title)")
+                .accessibilityAddTraits(state == .active ? .isButton : [])
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        .onAppear {
+            // Мягкое пульсирующее свечение и легкая дрожь только для активного шага
+            guard state == .active else { return }
+            withAnimation(.easeInOut(duration: 1.4).repeatForever(autoreverses: true)) {
+                pulse.toggle()
+            }
+            withAnimation(.easeInOut(duration: 0.9).repeatForever(autoreverses: true)) {
+                shakePhase = 1
+            }
+        }
     }
 
     // MARK: - Content card
@@ -245,14 +267,53 @@ private struct TimelineStepRow: View {
         .frame(height: 48)
         .padding(.horizontal, 14)
         .background(
-            RoundedRectangle(cornerRadius: corner, style: .continuous)
-                .fill(isActive ? Color.white.opacity(0.06) : Color.white.opacity(0.03))
+            Group {
+                if isActive {
+                    RoundedRectangle(cornerRadius: corner, style: .continuous)
+                        .fill(AppTheme.primaryGradient)
+                } else {
+                    RoundedRectangle(cornerRadius: corner, style: .continuous)
+                        .fill(Color.white.opacity(0.03))
+                }
+            }
         )
+        .buttonStyle(PrimaryGradientButtonStyleShimmer(isShimmering: true))
         .overlay(
             RoundedRectangle(cornerRadius: corner, style: .continuous)
                 .stroke(AppTheme.borderPrimaryGradient, lineWidth: 1)
                 .opacity(isActive ? 1.0 : 0.8)
         )
+        // Иконка "tap" справа как подсказка (только для активного шага)
+        .overlay(alignment: .trailing) {
+            if isActive {
+                Image(systemName: "hand.tap")
+                    .font(.system(size: 16, weight: .semibold))
+                    .symbolRenderingMode(.monochrome)
+                    .foregroundStyle(.white.opacity(0.95))
+                    .shadow(color: AppTheme.glow.opacity(0.35), radius: 8, x: 0, y: 0)
+                    .scaleEffect(isPressed ? 0.92 : (pulse ? 1.06 : 1.0))
+                    .opacity(0.95)
+                    .padding(.trailing, 12)
+                    .accessibilityHidden(true)
+                    .transition(.scale.combined(with: .opacity))
+                    .animation(.easeInOut(duration: 0.25), value: isActive)
+            }
+        }
+        // Небольшое свечение и scale при нажатии
+        .shadow(
+            color: (isActive ? AppTheme.glow.opacity(pulse ? 0.35 : 0.18) : .clear),
+            radius: isActive ? (pulse ? 16 : 8) : 0,
+            x: 0,
+            y: isActive ? 6 : 0
+        )
+        .scaleEffect(isActive && isPressed ? 0.97 : 1.0)
+        // Легкая дрожь по оси X
+        .modifier(
+            isActive
+            ? ShakeEffect(amount: 1.5, shakesPerUnit: 1.2, animatableData: shakePhase)
+            : ShakeEffect(amount: 0, shakesPerUnit: 0, animatableData: 0)
+        )
+        .animation(.snappy(duration: 0.15), value: isPressed)
     }
 
     // MARK: - Colors
@@ -286,6 +347,19 @@ private struct TimelineStepRow: View {
         case .completed: return AppTheme.glow.opacity(0.25)
         case .upcoming: return .black.opacity(0.25)
         }
+    }
+}
+
+// MARK: - Легкий shake-эффект
+
+private struct ShakeEffect: GeometryEffect {
+    var amount: CGFloat = 2
+    var shakesPerUnit: CGFloat = 1.5
+    var animatableData: CGFloat
+
+    func effectValue(size: CGSize) -> ProjectionTransform {
+        let translation = amount * sin(animatableData * .pi * 2 * shakesPerUnit)
+        return ProjectionTransform(CGAffineTransform(translationX: translation, y: 0))
     }
 }
 
