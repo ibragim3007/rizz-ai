@@ -14,7 +14,12 @@ struct ContentView: View {
     @AppStorage("useEmojis") private var useEmojis: Bool = false
     
     // Единый экземпляр PaywallViewModel для всего дерева
-    @StateObject private var paywallViewModel = PaywallViewModel()
+    @StateObject private var paywallViewModel: PaywallViewModel
+
+    // Позволяем инъекцию PaywallViewModel (например, из превью или App)
+    init(paywallViewModel: PaywallViewModel? = nil) {
+        _paywallViewModel = StateObject(wrappedValue: paywallViewModel ?? PaywallViewModel())
+    }
     
     private var selectedLocale: Locale {
         if replyLanguage == "auto" {
@@ -40,16 +45,26 @@ struct ContentView: View {
 }
 
 #Preview {
-    @Previewable @StateObject var paywallViewModel = PaywallViewModel(isPreview: true)
+    // Пропускаем онбординг в превью, чтобы сразу увидеть основной экран
+    UserDefaults.standard.set(true, forKey: "hasSeenOnboarding")
+    return ContentViewPreviewContainer()
+}
+
+// Отдельный контейнер только для превью, чтобы избежать неоднозначности типов
+private struct ContentViewPreviewContainer: View {
+    @StateObject var paywallViewModel = PaywallViewModel(isPreview: true)
     
-    let container: ModelContainer = {
+    // Локальный контейнер SwiftData с вашей схемой
+    private let container: ModelContainer = {
         let schema = Schema([ImageEntity.self, ReplyEntity.self, DialogEntity.self, DialogGroupEntity.self])
         let container = try! ModelContainer(for: schema, configurations: [])
-        
         return container
     }()
     
-    ContentView()
-        .modelContainer(container)
-        .environmentObject(paywallViewModel)
+    var body: some View {
+        // Инъецируем paywallViewModel напрямую в ContentView
+        ContentView(paywallViewModel: paywallViewModel)
+            .modelContainer(container)
+            // Дополнительно environmentObject не нужен, ContentView сам прокинет вниз свой экземпляр
+    }
 }

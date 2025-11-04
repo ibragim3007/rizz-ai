@@ -25,15 +25,17 @@ struct SettingsPlaceholderView: View {
                     // Premium section with a subscribe button
                     Section("Premium") {
                         PremiumSection(showPaywall: $showPaywall)
+                        ShortcutButton()
+                        
                     }
                     
                     // Shortcuts section with a pre‑save button for "Get Reply"
-                    Section("Shortcuts") {
-                        ShortcutButton()
-                    }
+//                    Section("Shortcuts") {
+//                    
+//                    }
                     
                     Section("Settings") {
-                        
+    
                         // Language
                         Picker(selection: $replyLanguage) {
                             ForEach(languageOptions) { option in

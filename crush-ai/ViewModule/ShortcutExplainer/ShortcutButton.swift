@@ -21,10 +21,10 @@ struct ShortcutButton: View {
                 showExplainerSheet = true
             }
         } label: {
-            HStack(spacing: 12) {
+            HStack(spacing: 22) {
                 // Shortcuts‑style glyph
                 ZStack {
-                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    RoundedRectangle(cornerRadius: 100, style: .continuous)
                         .fill(AppTheme.primaryGradient)
                         .frame(width: 36, height: 36)
                         .shadow(color: .purple.opacity(0.18), radius: 6, x: 0, y: 3)
