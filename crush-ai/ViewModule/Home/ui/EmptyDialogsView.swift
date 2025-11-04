@@ -19,10 +19,10 @@ struct EmptyDialogsView: View {
             VStack (spacing: 15) {
                 
                 ZStack {
-                    RoundedRectangle(cornerRadius: 20, style: .continuous)
+                    RoundedRectangle(cornerRadius: 35, style: .continuous)
                         .fill(.clear)
                         .overlay(
-                            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                            RoundedRectangle(cornerRadius: 35, style: .continuous)
                                 .stroke(AppTheme.borderPrimaryGradient, lineWidth: 1)
                         )
                     
@@ -53,9 +53,9 @@ struct EmptyDialogsView: View {
                         }
                         .foregroundStyle(.white)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(14)
+                        .padding(20)
                     }
-                    .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+                    .clipShape(RoundedRectangle(cornerRadius: 35, style: .continuous))
 
                 }
                 .opacity(showHero ? 1 : 0)
@@ -130,11 +130,11 @@ private struct Chip: View {
         .padding(.vertical, 8)
         .padding(.horizontal, 12)
         .background(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
+            RoundedRectangle(cornerRadius: 15, style: .continuous)
                 .fill(Color.white.opacity(0.06))
         )
         .overlay(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
+            RoundedRectangle(cornerRadius: 15, style: .continuous)
                 .stroke(AppTheme.borderPrimaryGradient, lineWidth: 1)
         )
     }
