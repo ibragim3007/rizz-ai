@@ -5,9 +5,12 @@ struct ChooseActivationPageView: View {
     var onSelectActionButton: () -> Void = {}
     var onSelectDoubleTap: () -> Void = {}
     
+    @State private var isDoubleTapFlowPresented: Bool = false
+
     var body: some View {
         ScrollView(showsIndicators: false) {
             VStack(spacing: 18) {
+                Spacer()
                 Text("Choose Activation")
                     .font(.system(size: 28, weight: .bold, design: .rounded))
                     .multilineTextAlignment(.center)
@@ -39,7 +42,8 @@ struct ChooseActivationPageView: View {
                         subtitle: "Works on any iPhone",
                         systemImage: "hand.tap"
                     ) {
-                        onSelectDoubleTap()
+//                        onSelectDoubleTap()
+                        isDoubleTapFlowPresented = true
                     }
                 }
                 .padding(.horizontal, 20)
@@ -47,6 +51,23 @@ struct ChooseActivationPageView: View {
                 Spacer()
             }
             .padding(.bottom, 20)
+        }
+        .sheet(isPresented: $isDoubleTapFlowPresented) {
+            NavigationStack {
+                DoubleTapFlow()
+                    .toolbar {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            Button {
+                                isDoubleTapFlowPresented = false
+                            } label: {
+                                Image(systemName: "xmark")
+                                    .font(.system(size: 16, weight: .semibold, design: .rounded))
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityLabel("Close")
+                        }
+                    }
+            }
         }
     }
     
