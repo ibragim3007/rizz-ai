@@ -157,7 +157,9 @@ struct Home: View {
     private var contentList: some View {
         ScrollView {            
             if dialogs.isEmpty {
-                EmptyDialogsView()
+                EmptyDialogsView(onImportTapped: {
+                    vmHome.uploadScreenshot()
+                })
                     .padding(.horizontal, 24)
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
 //                    .allowsHitTesting(false)

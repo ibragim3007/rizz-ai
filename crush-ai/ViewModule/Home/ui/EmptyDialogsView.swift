@@ -12,6 +12,9 @@ struct EmptyDialogsView: View {
     @State private var showHero = false
     @State private var showChips = false
 
+    // Единый вход в поток импорта
+    var onImportTapped: () -> Void = {}
+
     var body: some View {
         VStack(spacing: 20) {
 
@@ -33,7 +36,6 @@ struct EmptyDialogsView: View {
                             .frame(maxHeight: .infinity)
                             .accessibilityHidden(true)
                 
-                        
                         // Черный градиент снизу под текстом
                         LinearGradient(
                             colors: [Color.black.opacity(0.0), Color.black.opacity(0.8)],
@@ -59,37 +61,22 @@ struct EmptyDialogsView: View {
 
                 }
                 .opacity(showHero ? 1 : 0)
-                //            .offset(y: showHero ? 0 : 14)
                 .animation(.snappy(duration: 0.6), value: showHero)
                 
-                // Компактные подсказки
-                HStack(spacing: 10) {
-                    Chip(icon: "sparkles", text: "Smart reply")
-                    Chip(icon: "photo.on.rectangle.angled", text: "Use screenshots")
-                    Spacer(minLength: 0)
-                }
-                .opacity(showChips ? 1 : 0)
-                .offset(y: showChips ? 0 : 10)
+                Spacer()
+                // Vertical step-by-step flow chips (timeline style)
+                FlowChipsVertical(
+                    show: showChips,
+                    onImport: onImportTapped
+                )
                 .animation(.snappy(duration: 0.5), value: showChips)
-                
             }
             
             // Главное действие
-            ShortcutButton()
-                .opacity(showHero ? 1 : 0)
-                .offset(y: showHero ? 0 : 10)
-                .animation(.snappy(duration: 0.5).delay(0.05), value: showHero)
-
-            // Короткий хинт
-            Text("Add more screenshots anytime to improve context.")
-                .font(.system(.footnote, design: .rounded))
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.leading)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.top, 2)
-                .opacity(showChips ? 1 : 0)
-                .offset(y: showChips ? 0 : 8)
-                .animation(.snappy(duration: 0.45).delay(0.05), value: showChips)
+//            ShortcutButton()
+//                .opacity(showHero ? 1 : 0)
+//                .offset(y: showHero ? 0 : 10)
+//                .animation(.snappy(duration: 0.5).delay(0.05), value: showHero)
         }
         .padding(.vertical, 28)
         .task {
@@ -111,7 +98,198 @@ struct EmptyDialogsView: View {
     }
 }
 
-// MARK: - Chip
+// MARK: - Vertical flow chips column (Timeline)
+
+private struct FlowChipsVertical: View {
+    let show: Bool
+    let onImport: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            // 1) Import screenshot — active & interactive
+            TimelineStepRow(
+                index: 0,
+                isFirst: true,
+                isLast: false,
+                state: .active,
+                title: "Import screenshot",
+                icon: "photo.on.rectangle.angled",
+                action: {
+#if canImport(UIKit)
+                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+#endif
+                    onImport()
+                }
+            )
+
+            // 2) Analyze — upcoming
+            TimelineStepRow(
+                index: 1,
+                isFirst: false,
+                isLast: false,
+                state: .upcoming,
+                title: "Analyze",
+                icon: "sparkles"
+            )
+
+            // 3) Copy reply — upcoming
+            TimelineStepRow(
+                index: 2,
+                isFirst: false,
+                isLast: true,
+                state: .upcoming,
+                title: "Copy reply",
+                icon: "doc.on.doc"
+            )
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .opacity(show ? 1 : 0)
+//        .offset(y: show ? 0 : 10)
+        .accessibilityElement(children: .contain)
+    }
+}
+
+// MARK: - Timeline row
+
+private enum StepState {
+    case active
+    case completed
+    case upcoming
+}
+
+private struct TimelineStepRow: View {
+    let index: Int
+    let isFirst: Bool
+    let isLast: Bool
+    let state: StepState
+    let title: String
+    let icon: String
+    var action: (() -> Void)? = nil
+
+    // Размеры
+    private let railWidth: CGFloat = 44
+    private let circleSize: CGFloat = 25
+    private let innerDot: CGFloat = 7
+    private let corner: CGFloat = 18
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            // Left rail + marker
+            ZStack {
+                // Верхняя часть линии (до кружка)
+                if !isFirst {
+                    Rectangle()
+                        .fill(railColor.opacity(state == .upcoming ? 0.25 : 1))
+                        .frame(width: 3)
+                        .offset(y: -circleSize/2 - 16)
+                        .frame(maxHeight: 32, alignment: .top)
+                }
+                // Нижняя часть линии (после кружка)
+                if !isLast {
+                    Rectangle()
+                        .fill(railColor.opacity(state == .upcoming ? 0.25 : 1))
+                        .frame(width: 3)
+                        .offset(y: circleSize/2 + 6)
+                        .frame(maxHeight: 10, alignment: .bottom)
+                }
+
+                // Маркер шага
+                ZStack {
+                    Circle()
+                        .fill(markerFill)
+                        .overlay(
+                            Circle()
+                                .stroke(AppTheme.borderPrimaryGradient, lineWidth: 1)
+                                .opacity(0.9)
+                        )
+                        .shadow(color: markerShadow, radius: state == .active ? 10 : 4, x: 0, y: 4)
+
+                    Circle()
+                        .fill(innerFill)
+                        .frame(width: innerDot, height: innerDot)
+                }
+                .frame(width: circleSize, height: circleSize)
+            }
+            .frame(width: railWidth, height: 54)
+
+            // Content card
+            contentCard
+                .contentShape(RoundedRectangle(cornerRadius: corner, style: .continuous))
+                .onTapGesture {
+                    action?()
+                }
+                .accessibilityLabel("\(title)")
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    // MARK: - Content card
+
+    @ViewBuilder
+    private var contentCard: some View {
+        let isActive = (state == .active)
+        HStack(spacing: 10) {
+            Image(systemName: icon)
+                .font(.system(size: 14, weight: .semibold))
+                .symbolRenderingMode(.monochrome)
+                .foregroundStyle(isActive ? .white : .white.opacity(0.85))
+                .accessibilityHidden(true)
+
+            Text(title)
+                .font(.system(.subheadline, design: .rounded))
+                .fontWeight(.semibold)
+                .foregroundStyle(isActive ? .white : .white.opacity(0.92))
+
+            Spacer(minLength: 0)
+        }
+        .frame(height: 48)
+        .padding(.horizontal, 14)
+        .background(
+            RoundedRectangle(cornerRadius: corner, style: .continuous)
+                .fill(isActive ? Color.white.opacity(0.06) : Color.white.opacity(0.03))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: corner, style: .continuous)
+                .stroke(AppTheme.borderPrimaryGradient, lineWidth: 1)
+                .opacity(isActive ? 1.0 : 0.8)
+        )
+    }
+
+    // MARK: - Colors
+
+    private var railColor: Color {
+        switch state {
+        case .completed, .active: return AppTheme.primary
+        case .upcoming: return .white
+        }
+    }
+
+    private var markerFill: Color {
+        switch state {
+        case .active: return AppTheme.primary
+        case .completed: return AppTheme.primary.opacity(0.25)
+        case .upcoming: return Color.white.opacity(0.06)
+        }
+    }
+
+    private var innerFill: Color {
+        switch state {
+        case .active: return .white
+        case .completed: return AppTheme.primary
+        case .upcoming: return .white.opacity(0.55)
+        }
+    }
+
+    private var markerShadow: Color {
+        switch state {
+        case .active: return AppTheme.glow.opacity(0.45)
+        case .completed: return AppTheme.glow.opacity(0.25)
+        case .upcoming: return .black.opacity(0.25)
+        }
+    }
+}
+
+// MARK: - Legacy chip (kept for reference; not used now)
 
 private struct Chip: View {
     let icon: String
