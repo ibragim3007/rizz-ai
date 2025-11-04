@@ -76,7 +76,9 @@ private extension View {
     func applyDetents70() -> some View {
         if #available(iOS 16.0, *) {
             self
-                .presentationDetents([.fraction(0.8)])
+                // Добавляем возможность развернуть до полной высоты
+                .presentationDetents([.fraction(0.8), .large])
+                // Интеракцию с фоном оставляем доступной только до 0.8
                 .presentationBackgroundInteraction(.enabled(upThrough: .fraction(0.8)))
         } else {
             self
