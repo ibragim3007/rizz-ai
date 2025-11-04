@@ -2,9 +2,14 @@
 import SwiftUI
 
 struct ExplainerPageView: View {
+    
+    @State var counter: Int = 0
+    @State var origin: CGPoint = .zero
+    
     var body: some View {
         ScrollView(showsIndicators: false) {
             VStack(spacing: 22) {
+                Spacer()
                 Text("Reply Like a Pro")
                     .font(.system(size: 32, weight: .bold, design: .rounded))
                     .multilineTextAlignment(.center)
@@ -19,7 +24,7 @@ struct ExplainerPageView: View {
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 24)
-                
+                Spacer()
                 ZStack {
                     RoundedRectangle(cornerRadius: 24, style: .continuous)
                         .fill(
@@ -41,10 +46,15 @@ struct ExplainerPageView: View {
                     Image("shortcut-intro")
                         .resizable()
                         .scaledToFill()
-                        .frame(maxWidth: .infinity)
+                        .frame(height: 400)
                         .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
                         .padding(12)
                         .accessibilityHidden(true)
+                        .modifier(RippleEffect(at: origin, trigger: counter))
+                        .onTapGesture { location in
+                            origin = location
+                            counter += 1
+                        }
                 }
                 .padding(.horizontal, 24)
                 

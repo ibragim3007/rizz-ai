@@ -77,9 +77,9 @@ private extension View {
         if #available(iOS 16.0, *) {
             self
                 // Добавляем возможность развернуть до полной высоты
-                .presentationDetents([.fraction(0.8), .large])
+                .presentationDetents([.fraction(1), .large])
                 // Интеракцию с фоном оставляем доступной только до 0.8
-                .presentationBackgroundInteraction(.enabled(upThrough: .fraction(0.8)))
+                .presentationBackgroundInteraction(.enabled(upThrough: .fraction(1)))
         } else {
             self
         }

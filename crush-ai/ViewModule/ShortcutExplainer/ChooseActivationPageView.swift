@@ -23,6 +23,8 @@ struct ChooseActivationPageView: View {
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 24)
                 
+                Spacer()
+
                 VStack(spacing: 14) {
                     activationCard(
                         title: "Action Button",
@@ -42,9 +44,9 @@ struct ChooseActivationPageView: View {
                 }
                 .padding(.horizontal, 20)
                 
-                Spacer(minLength: 40)
+                Spacer()
             }
-            .padding(.bottom, 120)
+            .padding(.bottom, 20)
         }
     }
     

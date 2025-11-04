@@ -5,6 +5,8 @@ struct InstallShortcutPageView: View {
     var body: some View {
         ScrollView(showsIndicators: false) {
             VStack(spacing: 14) {
+                
+                Spacer()
                 Text("Install Shortcut")
                     .font(.system(size: 28, weight: .bold, design: .rounded))
                     .multilineTextAlignment(.center)

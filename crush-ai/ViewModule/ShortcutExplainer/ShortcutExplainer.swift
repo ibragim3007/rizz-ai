@@ -70,6 +70,9 @@ struct ShortcutExplainer: View {
                             font: .system(size: 20, weight: .semibold, design: .rounded),
                             fullWidth: true
                         ) {
+#if canImport(UIKit)
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+#endif
                             withAnimation(.spring(response: 0.45, dampingFraction: 0.9)) {
                                 pageSelection = 1
                             }
@@ -82,6 +85,9 @@ struct ShortcutExplainer: View {
                                 font: .system(size: 18, weight: .semibold, design: .rounded),
                                 fullWidth: true
                             ) {
+            #if canImport(UIKit)
+                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+            #endif
                                 openGetReplyShortcut()
                             }
                             
@@ -91,6 +97,9 @@ struct ShortcutExplainer: View {
                                 font: .system(size: 17, weight: .semibold, design: .rounded),
                                 fullWidth: true
                             ) {
+#if canImport(UIKit)
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+#endif
                                 withAnimation(.spring(response: 0.45, dampingFraction: 0.9)) {
                                     pageSelection = 2
                                 }

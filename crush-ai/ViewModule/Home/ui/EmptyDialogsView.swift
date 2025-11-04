@@ -32,6 +32,7 @@ struct EmptyDialogsView: View {
                             .scaledToFill()
                             .frame(maxHeight: .infinity)
                             .accessibilityHidden(true)
+                
                         
                         // Черный градиент снизу под текстом
                         LinearGradient(
@@ -40,7 +41,6 @@ struct EmptyDialogsView: View {
                             endPoint: .bottom
                         )
                         .frame(maxHeight: 150)
-                        .allowsHitTesting(false)
                         
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Start a new dialog")
@@ -56,6 +56,7 @@ struct EmptyDialogsView: View {
                         .padding(14)
                     }
                     .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+
                 }
                 .opacity(showHero ? 1 : 0)
                 //            .offset(y: showHero ? 0 : 14)
