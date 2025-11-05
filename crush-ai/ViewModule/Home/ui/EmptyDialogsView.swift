@@ -33,7 +33,6 @@ struct EmptyDialogsView: View {
 
             // Hero / Illustration block
             VStack (spacing: 15) {
-                
                 ZStack {
                     RoundedRectangle(cornerRadius: 35, style: .continuous)
                         .fill(.clear)

@@ -1,23 +1,21 @@
 //
-//  DoubleTapFlow.swift
+//  ActionButtonFlow.swift
 //  crush-ai
 //
-//  Created by Ibragim Ibragimov on 11/3/25.
+//  Created by Ibragim Ibragimov on 11/4/25.
 //
 
 import SwiftUI
 
-struct DoubleTapFlow: View {
+struct ActionButtonFlow: View {
     @State private var currentStep: Int = 1
     @State private var showCompleted: Bool = false
-    
     private let steps: [String] = [
         "Open Settings",
-        "Go to Accessibility",
-        "Tap Touch",
-        "Select Back Tap",
-        "Choose Double Tap",
-        "Scroll Down & Pick “Get Reply”"
+        "Tap Action Button",
+        "Swipe through actions and select Shortcut",
+        "Tap Choose Shortcut",
+        "Select “Get Reply”",
     ]
     
     var body: some View {
@@ -26,7 +24,7 @@ struct DoubleTapFlow: View {
             
             VStack(spacing: 15) {
                 Spacer()
-                FlowHeader(title: "Set Up Double Tap", subtext: "Follow these steps to assign Double Tap to “Get Reply”.")
+                FlowHeader(title: "Set Up Action Button", subtext: "Follow these steps to assign Action Button “Get Reply”.")
                 
                 Spacer()
                 illustration
@@ -53,12 +51,9 @@ struct DoubleTapFlow: View {
         .alert("All set!", isPresented: $showCompleted) {
             Button("OK", role: .cancel) {}
         } message: {
-            Text("Your Double Tap is now configured to “Get Reply”. You can try it by double-tapping the back of your iPhone.")
+            Text("Your Action Button is now set to “Get Reply.” Try it by pressing your iPhone’s Action Button.")
         }
     }
-    
-    
-    // MARK: - Illustration
     
     private var illustration: some View {
         ZStack {
@@ -113,9 +108,9 @@ struct DoubleTapFlow: View {
             .buttonStyle(.plain)
         }
     }
+    
 }
 
 #Preview {
-    DoubleTapFlow()
-        .preferredColorScheme(.dark)
+    ActionButtonFlow()
 }
