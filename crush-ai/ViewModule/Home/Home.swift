@@ -25,9 +25,9 @@ struct Home: View {
     
     var body: some View {
         ZStack {
-
+            
             MeshedGradient()
-
+            
             
             contentList
                 .scrollIndicators(.hidden)
@@ -159,15 +159,15 @@ struct Home: View {
     }
     
     private var contentList: some View {
-        ScrollView {            
+        ScrollView {   
             if(dialogs.isEmpty) {
                 EmptyDialogsView(onImportTapped: {
                     vmHome.uploadScreenshot()
                 })
-                    .padding(.horizontal, 24)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-//                    .allowsHitTesting(false)
-                    .transition(.opacity)
+                .padding(.horizontal, 24)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+                //                    .allowsHitTesting(false)
+                .transition(.opacity)
             }
             LazyVStack(alignment: .leading, spacing: 24) {
                 ForEach(sections, id: \.title) { section in
@@ -201,7 +201,7 @@ struct GroupSection {
 
 private extension Home {
     var sections: [GroupSection] {
-//        let items = dialogs.sorted { $0.updatedAt > $1.updatedAt }
+        //        let items = dialogs.sorted { $0.updatedAt > $1.updatedAt }
         return makeSections(from: dialogs)
     }
     

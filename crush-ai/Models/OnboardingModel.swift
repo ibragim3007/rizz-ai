@@ -14,6 +14,7 @@ enum OnboardingStepKind: Equatable {
     case permissionNotifications
     case rateUsPage(title: String, subtext: String, icon: String)
     case smallLoader (title: String, duration: Int)
+    case statistics (title: String, description: String)
 }
 
 struct OnboardingStep: Identifiable, Equatable {

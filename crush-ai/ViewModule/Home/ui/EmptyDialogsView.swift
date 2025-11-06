@@ -48,10 +48,10 @@ struct EmptyDialogsView: View {
                             .frame(maxHeight: 150)
                         
                         VStack {
-                            ReplyView(content: "dangerously good at making gym socks feel inadequate", tone: .RIZZ)
+                            ReplyView(content: "keep texting like that and i might start charging rent for my attention", tone: .RIZZ)
                         }
                         .scaleEffect(0.65)
-                        .offset(x: 40, y: -10)
+                        .offset(x: 50, y: -5)
 
                     }
                     .clipShape(RoundedRectangle(cornerRadius: 30, style: .continuous))

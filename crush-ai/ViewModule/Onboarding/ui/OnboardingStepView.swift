@@ -30,8 +30,12 @@ struct OnboardingStepView: View {
                 SmallLoader(title: title, duration: TimeInterval(duration)) {
                     UIImpactFeedbackGenerator(style: .light).impactOccurred()
                     // Завершаем онбординг по окончании загрузки
-                    hasSeenOnboarding = true
+//                    hasSeenOnboarding = true
+                    viewModel.next()
                 }
+                
+            case let .statistics(title, description):
+                StatisticsContent()
 
             case let .question(title, subtitle, variants):
                 QuestionTemplate(title: title, subtext: subtitle, variants: variants)  {variant in

@@ -46,7 +46,7 @@ struct ContentView: View {
 
 #Preview {
     // Пропускаем онбординг в превью, чтобы сразу увидеть основной экран
-    UserDefaults.standard.set(true, forKey: "hasSeenOnboarding")
+    UserDefaults.standard.set(false, forKey: "hasSeenOnboarding")
     return ContentViewPreviewContainer()
 }
 

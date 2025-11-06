@@ -23,8 +23,8 @@ final class OnboardingViewModel: ObservableObject {
         .init(kind: .feature(title: "Make Them Feel", highlightText: "Seen", subtitle: "Paste their message. Get the perfect reply in seconds.", imageName: "", ), illustration: AnyView(BeforeAfterContent())),
         .init(kind: .question(title: "How many of your chats get a reply?", subtitle: "", variants: ["💔 Almost never", "😕 1–3 replies", "🙂 4–6 replies", "😎 7–12 replies" ,"🏆 13+ replies"])),
         .init(kind: .question(title: "What’s your biggest roadblock in chats?", subtitle: "", variants: ["🤔 First line?", "💭 Stuck after reply", "🥱 Boring questions", "☕️ Date too late" ,"🛟 Other"])),
-        
-        .init(kind: .smallLoader(title: "Analyzing your info", duration: 7))
+        .init(kind: .smallLoader(title: "Analyzing your info", duration: 7)),
+        .init(kind: .statistics(title: "Crush AI Can increase your dates 7x times more", description: "Starting today, you can get more girls than ever before. The point is, it really does make your life easier: more original and personalized responses equal more dates."))
     ]
     
     func getCurrentPage() -> OnboardingStep {
