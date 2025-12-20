@@ -360,7 +360,6 @@ private extension PaywallView {
         onRestore: { print("Restore tapped") },
         onDismiss: { print("Dismiss tapped") }
     )
-    .preferredColorScheme(.dark)
     .previewLayout(.device)
 }
 
@@ -368,6 +367,6 @@ private extension PaywallView {
     PaywallView()
         .previewDisplayName("iPhone SE size")
         .previewDevice("iPhone SE (3rd generation)")
-        .preferredColorScheme(.dark)
+ 
 }
 

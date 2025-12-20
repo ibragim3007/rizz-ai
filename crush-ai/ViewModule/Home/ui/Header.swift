@@ -35,7 +35,7 @@ struct SettingsButton<Destination: View>: View {
         NavigationLink(destination: destination) {
             Image(systemName: "gearshape")
                 .font(.system(size: 18, weight: .semibold))
-                .foregroundStyle(.white.opacity(0.8))
+                .foregroundColor(AppTheme.fontMain.opacity(0.8))
         }
         .simultaneousGesture(TapGesture().onEnded {
             #if canImport(UIKit)

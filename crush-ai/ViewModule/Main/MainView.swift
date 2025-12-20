@@ -14,7 +14,7 @@ struct MainView: View {
     
     // Пейвол при запуске и при потере подписки
     @State private var showPaywallAtLaunch: Bool = false
-
+    
     var body: some View {
         NavigationStack {
             Home()
@@ -25,12 +25,12 @@ struct MainView: View {
                         showPaywallAtLaunch = true
                     }
                 }
-                // Реагируем на изменения статуса подписки:
-                // если подписка активна — закрываем пейвол, если нет — показываем
+            // Реагируем на изменения статуса подписки:
+            // если подписка активна — закрываем пейвол, если нет — показываем
                 .onChange(of: paywallViewModel.isSubscriptionActive) { _, isActive in
                     showPaywallAtLaunch = !isActive
                 }
-                // Глобальный пейвол при старте/потере подписки
+            // Глобальный пейвол при старте/потере подписки
                 .fullScreenCover(isPresented: $showPaywallAtLaunch) {
                     PaywallView(
                         onContinue: {
@@ -50,7 +50,6 @@ struct MainView: View {
                             // showPaywallAtLaunch = !paywallViewModel.isSubscriptionActive
                         }
                     )
-                    .preferredColorScheme(.dark)
                 }
         }
     }

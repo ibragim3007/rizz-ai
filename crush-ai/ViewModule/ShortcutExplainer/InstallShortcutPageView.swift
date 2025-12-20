@@ -80,5 +80,5 @@ private struct DownArrowHint: View {
 }
 
 #Preview {
-    InstallShortcutPageView().preferredColorScheme(.dark)
+    InstallShortcutPageView()
 }

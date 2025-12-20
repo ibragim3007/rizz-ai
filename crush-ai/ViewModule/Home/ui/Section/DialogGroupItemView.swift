@@ -48,6 +48,5 @@ struct DialogGroupItemView: View {
                 Label(NSLocalizedString(deleteText, comment: commentText), systemImage: "trash")
             }
         }
-        .preferredColorScheme(.dark)
     }
 }

@@ -76,5 +76,4 @@ struct PrimaryCTAButton: View {
             .padding(.horizontal, 20)
     }
     .padding()
-    .preferredColorScheme(.dark)
 }

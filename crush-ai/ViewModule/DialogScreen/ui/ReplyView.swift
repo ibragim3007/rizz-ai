@@ -271,6 +271,5 @@ private struct ShakeEffect: GeometryEffect {
             startPoint: .top, endPoint: .bottom
         )
     )
-    .preferredColorScheme(.dark)
 }
 

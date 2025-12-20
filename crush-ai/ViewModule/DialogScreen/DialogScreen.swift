@@ -311,5 +311,5 @@ struct ImageView: View {
     dialogGroup.cover = image
     dialogGroup.dialogs = [dialog]
     
-    return DialogScreen(dialog: dialog, dialogGroup: dialogGroup).preferredColorScheme(.dark)
+    return DialogScreen(dialog: dialog, dialogGroup: dialogGroup)
 }

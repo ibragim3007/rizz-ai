@@ -16,9 +16,9 @@ public struct MeshedGradient: View {
                 .init(0, 0.5), .init(0.5, 0.5), .init(1, 0.5),
                 .init(0, 1), .init(0.5, 1), .init(1, 1)
             ], colors: [
-                AppTheme.primary.opacity(0.15), .black, .black,
-                .black, AppTheme.primary.opacity(0.15), AppTheme.primary.opacity(0.2),
-                AppTheme.primary.opacity(0.1), .black, AppTheme.primary.opacity(0.1)
+                AppTheme.primary.opacity(0.15), .white, .white,
+                .white, AppTheme.primary.opacity(0.10), AppTheme.primary.opacity(0.15),
+                AppTheme.primary.opacity(0.1), .white, AppTheme.primary.opacity(0.1)
             ]).ignoresSafeArea()
         } else {
             EmptyView()

@@ -35,7 +35,7 @@ struct StatisticsContent: View {
         VStack(spacing: 6) {
             Text("How Crush AI boosts your results")
                 .font(.system(size: 24, weight: .heavy, design: .rounded))
-                .foregroundStyle(.white)
+                .foregroundStyle(AppTheme.fontMain)
                 .multilineTextAlignment(.center)
         }
         .padding(.top, 6)
@@ -47,14 +47,14 @@ struct StatisticsContent: View {
         VStack(alignment: .leading, spacing: 14) {
             // Legend
             HStack(spacing: 14) {
-                LegendDot(color: .white.opacity(0.28))
+                LegendDot(color: AppTheme.fontMain.opacity(0.28))
                 Text("Without Crush AI")
                     .font(.system(size: 13, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.white.opacity(0.7))
+                    .foregroundStyle(AppTheme.fontMain.opacity(0.7))
                 LegendDot(color: AppTheme.primary)
                 Text("With Crush AI")
                     .font(.system(size: 13, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.white.opacity(0.9))
+                    .foregroundStyle(AppTheme.fontMain.opacity(0.9))
                 Spacer()
             }
             .padding(.bottom, 2)
@@ -70,7 +70,7 @@ struct StatisticsContent: View {
         .padding(16)
         .background(
             RoundedRectangle(cornerRadius: AppTheme.cornerRadius, style: .continuous)
-                .fill(.white.opacity(0.06))
+                .fill(AppTheme.fontMain.opacity(0.06))
         )
         .overlay(
             RoundedRectangle(cornerRadius: AppTheme.cornerRadius, style: .continuous)
@@ -82,7 +82,7 @@ struct StatisticsContent: View {
     private var subtext: some View {
         Text("With Crush AI you get up to 7× more replies, move into conversations faster, and land more dates. The AI crafts strong openers and helps maintain interest less effort, more results for you.")
             .font(.system(size: 14, weight: .regular, design: .rounded))
-            .foregroundStyle(.white.opacity(0.8))
+            .foregroundStyle(AppTheme.fontMain.opacity(0.8))
             .multilineTextAlignment(.leading)
             .padding(.horizontal, 4)
     }
@@ -92,7 +92,7 @@ struct StatisticsContent: View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Your benefits with Crush AI")
                 .font(.system(size: 16, weight: .heavy, design: .rounded))
-                .foregroundStyle(.white.opacity(0.9))
+                .foregroundStyle(AppTheme.fontMain.opacity(0.9))
             
             VStack(spacing: 10) {
                 BenefitRow(icon: "bolt.fill",
@@ -108,7 +108,7 @@ struct StatisticsContent: View {
             .padding(12)
             .background(
                 RoundedRectangle(cornerRadius: AppTheme.cornerRadius, style: .continuous)
-                    .fill(.white.opacity(0.04))
+                    .fill(AppTheme.fontMain.opacity(0.04))
             )
             .overlay(
                 RoundedRectangle(cornerRadius: AppTheme.cornerRadius, style: .continuous)
@@ -158,7 +158,7 @@ private struct CompareBarRow: View {
             HStack {
                 Text(metric.title)
                     .font(.system(size: 14, weight: .heavy, design: .rounded))
-                    .foregroundStyle(.white.opacity(0.9))
+                    .foregroundColor(AppTheme.fontMain.opacity(0.9))
                 Spacer()
                 if metric.highlight {
                     Text(metric.multiplierText)
@@ -168,9 +168,6 @@ private struct CompareBarRow: View {
                         .padding(.vertical, 4)
                         .background(
                             Capsule().fill(AppTheme.primary)
-                        )
-                        .overlay(
-                            Capsule().stroke(.white.opacity(0.18), lineWidth: 1)
                         )
                         .accessibilityLabel("Increase \(metric.multiplierText)")
                 }
@@ -210,14 +207,14 @@ private struct PairBars: View {
             // Base (Without Crush AI)
             HStack(spacing: 10) {
                 Capsule()
-                    .fill(.white.opacity(0.28))
+                    .fill(AppTheme.fontMain.opacity(0.28))
                     .frame(width: barWidth(for: base, animated: animate), height: 12)
                     .overlay(
-                        Capsule().stroke(.white.opacity(0.18), lineWidth: 1)
+                        Capsule().stroke(AppTheme.fontMain.opacity(0.18), lineWidth: 1)
                     )
                 Text(valueText(base))
                     .font(.system(size: 12, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.white.opacity(0.8))
+                    .foregroundStyle(AppTheme.fontMain.opacity(0.8))
                 Spacer(minLength: 0)
             }
             
@@ -226,21 +223,21 @@ private struct PairBars: View {
                 Capsule()
                     .fill(AppTheme.primary)
                     .overlay(
-                        LinearGradient(colors: [.white.opacity(0.12), .clear],
+                        LinearGradient(colors: [AppTheme.fontMain.opacity(0.12), .clear],
                                        startPoint: .topLeading, endPoint: .bottomTrailing)
                             .clipShape(Capsule())
                     )
                     .frame(width: barWidth(for: crush, animated: animate), height: 14)
-                    .shadow(color: AppTheme.glow.opacity(0.35), radius: 10, x: 0, y: 6)
                     .overlay(
-                        Capsule().stroke(.white.opacity(0.18), lineWidth: 1)
+                        Capsule().stroke(AppTheme.fontMain.opacity(0.18), lineWidth: 1)
                     )
                 Text(valueText(crush))
                     .font(.system(size: 12, weight: .heavy, design: .rounded))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(AppTheme.fontMain)
                 Spacer(minLength: 0)
             }
         }
+
         // Анимация запускается, когда переключается флаг animate
         .animation(.spring(response: 0.6, dampingFraction: 0.9), value: animate)
     }
@@ -271,7 +268,7 @@ private struct LegendDot: View {
             .fill(color)
             .frame(width: 10, height: 10)
             .overlay(
-                Circle().stroke(.white.opacity(0.18), lineWidth: 1)
+                Circle().stroke(AppTheme.fontMain.opacity(0.18), lineWidth: 1)
             )
     }
 }
@@ -285,7 +282,7 @@ private struct BenefitRow: View {
         HStack(alignment: .top, spacing: 12) {
             ZStack {
                 RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .fill(.white.opacity(0.06))
+                    .fill(AppTheme.fontMain.opacity(0.06))
                     .frame(width: 36, height: 36)
                     .overlay(
                         RoundedRectangle(cornerRadius: 10, style: .continuous)
@@ -299,10 +296,10 @@ private struct BenefitRow: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text(title)
                     .font(.system(size: 14, weight: .heavy, design: .rounded))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(AppTheme.fontMain)
                 Text(subtitle)
                     .font(.system(size: 13, weight: .regular, design: .rounded))
-                    .foregroundStyle(.white.opacity(0.75))
+                    .foregroundStyle(AppTheme.fontMain.opacity(0.75))
             }
             Spacer()
         }
@@ -311,5 +308,5 @@ private struct BenefitRow: View {
 
 #Preview {
     StatisticsContent()
-        .preferredColorScheme(.dark)
+        .preferredColorScheme(.light)
 }

@@ -28,7 +28,6 @@ struct Home: View {
             
             MeshedGradient()
             
-            
             contentList
                 .scrollIndicators(.hidden)
                 .toolbar {
@@ -48,7 +47,7 @@ struct Home: View {
                     LinearGradient(
                         gradient: Gradient(colors: [
                             Color.clear,
-                            Color.black.opacity(0.5),
+                            Color.black.opacity(0.2),
                             Color.black.opacity(0.65)
                         ]),
                         startPoint: .top,
@@ -150,7 +149,6 @@ struct Home: View {
                     vmHome.showPaywall = false
                 }
             )
-            .preferredColorScheme(.dark)
         }
         // Ловим deep link из виджета и открываем загрузку скриншота
         .onOpenURL { url in
@@ -252,6 +250,5 @@ private extension Home {
 
 #Preview {
     Home()
-        .preferredColorScheme(.dark)
 }
 

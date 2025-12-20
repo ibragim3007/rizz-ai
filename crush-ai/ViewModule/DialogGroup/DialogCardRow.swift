@@ -172,7 +172,6 @@ struct DialogCardRow: View {
     return NavigationStack {
         VStack(spacing: 24) {
             DialogCardRow(dialog: d1)
-                .preferredColorScheme(.dark)
                 .padding(.top, 40)
         }
         .background(

@@ -114,26 +114,8 @@ private struct GlassBackground: View {
         // Лёгкий тинт цветом темы
             .overlay(
                 RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                    .fill(tint.opacity(0.20))
+                    .fill(.blue.opacity(0.75))
             )
-        // Тонкий «стеклянный» штрих с подсветкой
-            .overlay(
-                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                    .stroke(
-                        LinearGradient(
-                            colors: [
-                                .white.opacity(0.28),
-                                .white.opacity(0.10)
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        ),
-                        lineWidth: 1
-                    )
-            )
-        // Глоу от фирменного цвета + мягкая тень вниз
-            .shadow(color: AppTheme.glow.opacity(0.15), radius: 16, x: 0, y: 8)
-            .shadow(color: .black.opacity(0.25), radius: 20, x: 0, y: 12)
     }
 }
 
@@ -143,34 +125,18 @@ private struct BadgeView: View {
     let text: String
     
     var body: some View {
-        if #available(iOS 26.0, *) {
-            Text(text)
-                .font(.system(size: 16, weight: .bold, design: .rounded))
-                .foregroundStyle(.white)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .glassEffect()
-                .background(
-                    Circle()
-                        .fill(AppTheme.primaryGradient)
-                        .overlay(
-                            Circle().strokeBorder(.white.opacity(0.18), lineWidth: 1)
-                        )
-                        .shadow(color: AppTheme.glow.opacity(0.55), radius: 12, x: 0, y: 6)
-                )
-        } else {
-            Text(text)
-                .font(.system(size: 16, weight: .bold, design: .rounded))
-                .foregroundStyle(.white)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(
-                    Circle()
-                        .fill(AppTheme.primaryGradient)
-                        .overlay(
-                            Circle().strokeBorder(.white.opacity(0.18), lineWidth: 1)
-                        )
-                        .shadow(color: AppTheme.glow.opacity(0.55), radius: 12, x: 0, y: 6)
-                )
-        }
+        Text(text)
+            .font(.system(size: 16, weight: .bold, design: .rounded))
+            .foregroundStyle(.white)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(
+                Circle()
+                    .fill(AppTheme.primaryGradient)
+                    .overlay(
+                        Circle().strokeBorder(.white.opacity(0.18), lineWidth: 1)
+                    )
+                    .shadow(color: AppTheme.glow.opacity(0.55), radius: 12, x: 0, y: 6)
+            )
         
     }
 }
@@ -179,13 +145,6 @@ private struct BadgeView: View {
 
 #Preview("MessageBubble + AppTheme Glass") {
     ZStack {
-        LinearGradient(
-            colors: [AppTheme.backgroundTop, AppTheme.backgroundBottom],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
-        .ignoresSafeArea()
-        
         VStack(spacing: 24) {
             MessageBubble(
                 text: "Hi, cutie!",
@@ -196,5 +155,5 @@ private struct BadgeView: View {
             .padding(.horizontal, 20)
         }
     }
-    .preferredColorScheme(.dark)
+    .preferredColorScheme(.light)
 }

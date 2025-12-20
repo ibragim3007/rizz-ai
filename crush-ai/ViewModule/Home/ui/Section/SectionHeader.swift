@@ -18,7 +18,7 @@ struct SectionHeader: View {
         HStack {
             Text(section.title)
                 .font(.system(size: 18, weight: .heavy, design: .rounded))
-                .foregroundStyle(.white.opacity(0.8))
+                .foregroundColor(AppTheme.fontMain.opacity(0.9))
             
             Spacer()
             
@@ -33,7 +33,7 @@ struct SectionHeader: View {
             }
             .buttonStyle(.borderless)
             .tint(.white.opacity(0.4))
-            .foregroundStyle(.white.opacity(0.4))
+            .foregroundColor(AppTheme.fontMain.opacity(0.5))
             .font(.footnote)
             .accessibilityLabel(Text(NSLocalizedString("Delete all in section", comment: "Delete all in section")))
         }

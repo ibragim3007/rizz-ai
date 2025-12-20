@@ -93,5 +93,4 @@ struct RepliesList: View {
             startPoint: .top, endPoint: .bottom
         )
     )
-    .preferredColorScheme(.dark)
 }

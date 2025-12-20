@@ -21,7 +21,7 @@ struct BeforeAfterContent: View {
                         avatar: Image("girl-1")
                     )
                     .overlay {
-                        CapsuleLabel("Before 🥱", tint: .white.opacity(0.6))
+                        CapsuleLabel("Before 🥱", tint: AppTheme.fontMain.opacity(0.5))
                             .offset(x: 100, y: -48)
                     }
                 }.opacity(showBefore ? 1 : 0)
@@ -93,40 +93,24 @@ private struct CapsuleLabel: View {
         self.tint = tint
     }
     var body: some View {
-        if #available(iOS 26.0, *) {
-            Text(text.uppercased())
-                .font(.system(size: 18, weight: .bold, design: .rounded))
-                .foregroundStyle(.white)
-                .padding(.horizontal, 15)
-                .padding(.vertical, 7)
-            //            .background(
-            //                Capsule(style: .continuous)
-            //                    .fill(tint.opacity(0.25))
-            //                    .background(.ultraThinMaterial)
-            //                    .cornerRadius(20)
-            //            )
-                .glassEffect()
-        } else {
-            Text(text.uppercased())
-                .font(.system(size: 18, weight: .bold, design: .rounded))
-                .foregroundStyle(.white)
-                .padding(.horizontal, 15)
-                .padding(.vertical, 7)
-//                .background(.ultraThinMaterial)
-                        .background(
-                            Capsule(style: .continuous)
-                                .fill(tint.opacity(0.25))
-                                .background(.ultraThinMaterial)
-                                .cornerRadius(20)
-                        )
-        }
+        Text(text.uppercased())
+            .font(.system(size: 18, weight: .bold, design: .rounded))
+            .foregroundStyle(.white)
+            .padding(.horizontal, 15)
+            .padding(.vertical, 7)
+            .background(
+                Capsule(style: .continuous)
+                    .fill(tint.opacity(0.8))
+                    .background(.ultraThinMaterial)
+                    .cornerRadius(20)
+            )
     }
 }
 
 private struct DividerLine: View {
     var body: some View {
         Rectangle()
-            .fill(.white.opacity(0.10))
+            .fill(AppTheme.fontMain.opacity(0.10))
             .frame(height: 1)
             .cornerRadius(1)
     }
@@ -134,5 +118,5 @@ private struct DividerLine: View {
 
 #Preview {
     BeforeAfterContent()
-        .preferredColorScheme(.dark)
+        .preferredColorScheme(.light)
 }

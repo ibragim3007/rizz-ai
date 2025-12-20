@@ -153,7 +153,6 @@ struct DialogGroupView: View {
                     homeVm.showPaywall = false
                 }
             )
-            .preferredColorScheme(.dark)
         }
     }
     
@@ -299,6 +298,5 @@ private extension DialogGroupView {
     return NavigationStack {
         DialogGroupView(dialogGroup: group)
             .environmentObject(paywallViewModel)
-            .preferredColorScheme(.dark)
     }
 }
