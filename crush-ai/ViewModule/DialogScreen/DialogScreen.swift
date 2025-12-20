@@ -50,61 +50,26 @@ struct DialogScreen: View {
         ZStack {
             backgroundView
             list
-        }
-        // Тап по пустому фону закрывает клавиатуру
-        .contentShape(Rectangle())
-//        .onTapGesture { isContextFocused = false }
-        .navigationTitle(dialog.title)
-        .navigationBarTitleDisplayMode(.automatic)
-        .toolbar {
-            if #available(iOS 26.0, *) {
-                ToolbarItem (placement: .bottomBar) {
-                    ToneButtonView()
-                }
-                .sharedBackgroundVisibility(.hidden)
-            }
             
-            if #available(iOS 26.0, *) {
-                ToolbarSpacer(placement: .bottomBar)
+            VStack {
+                Spacer()
+                LinearGradient(
+                    gradient: Gradient(colors: [
+                        Color.clear,
+                        Color.black.opacity(0.5),
+                        Color.black.opacity(0.65)
+                    ]),
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .frame(height: 140)
+                .frame(maxWidth: .infinity)
+                .allowsHitTesting(false)
             }
-            if #available(iOS 26.0, *) {
-                ToolbarItem (placement: .bottomBar) {
-                    PrimaryCTAButton(
-                        title: dialogScreenVm.isLoading ? "Getting Reply…" : "Get Reply",
-                        isLoading: dialogScreenVm.isLoading
-                    ) {
-                        guard !dialogScreenVm.isLoading else { return }
-                        // Проверка подписки перед выполнением действия
-                        if !paywallViewModel.isSubscriptionActive {
-                            showPaywall = true
-                            return
-                        }
-                        performGetReply()
-                    }
-                }
-                .sharedBackgroundVisibility(.hidden)
-            }
-            ToolbarItem {
-                SettingsButton(destination: SettingsPlaceholderView())
-            }
-            if #available(iOS 26.0, *) {
-                ToolbarSpacer(.fixed)
-            }
-            ToolbarItem {
-                AddNewDialogButton(dialogGroup: dialogGroup)
-            }
-        }
-        .alert("Failed to analyze screenshot", isPresented: $dialogScreenVm.showingError) {
-            Button("OK", role: .cancel) { }
-        } message: {
-            Text(dialogScreenVm.errorText)
-        }
-        // На iOS < 26 рисуем свою нижнюю панель, чтобы кнопка заняла всю ширину.
-        .safeAreaInset(edge: .bottom) {
-            if #available(iOS 26.0, *) {
-                // Ничего не добавляем — на iOS 26+ используется Toolbar
-                EmptyView()
-            } else {
+            .ignoresSafeArea(edges: .bottom)
+            
+            VStack {
+                Spacer()
                 HStack(spacing: 12) {
                     ToneButtonView()
                     PrimaryCTAButton(
@@ -113,7 +78,6 @@ struct DialogScreen: View {
                         fullWidth: true
                     ) {
                         guard !dialogScreenVm.isLoading else { return }
-                        // Проверка подписки перед выполнением действия
                         if !paywallViewModel.isSubscriptionActive {
                             showPaywall = true
                             return
@@ -123,9 +87,26 @@ struct DialogScreen: View {
                     .frame(maxWidth: .infinity)
                 }
                 .padding(.horizontal, 16)
-                .padding(.vertical, 10)
-                .background(.bar) // визуально как тулбар
+                .padding(.bottom, 16)
             }
+        }
+        // Тап по пустому фону закрывает клавиатуру
+        .contentShape(Rectangle())
+//        .onTapGesture { isContextFocused = false }
+        .navigationTitle(dialog.title)
+        .navigationBarTitleDisplayMode(.automatic)
+        .toolbar {
+            ToolbarItem {
+                SettingsButton(destination: SettingsPlaceholderView())
+            }
+            ToolbarItem {
+                AddNewDialogButton(dialogGroup: dialogGroup)
+            }
+        }
+        .alert("Failed to analyze screenshot", isPresented: $dialogScreenVm.showingError) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text(dialogScreenVm.errorText)
         }
         // Paywall presentation
         .sheet(isPresented: $showPaywall) {
@@ -212,7 +193,7 @@ struct DialogScreen: View {
                 //                Elements
                 RepliesList(replies: dialog.replies)
             }
-            .padding(.bottom, 50)
+            .padding(.bottom, 120)
         }
         // Включаем именованное пространство для параллакса
         .coordinateSpace(name: "dialogScroll")

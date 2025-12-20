@@ -31,34 +31,42 @@ struct DialogGroupView: View {
         ZStack {
             backgroundView
             listView
+            
+            VStack {
+                Spacer()
+                LinearGradient(
+                    gradient: Gradient(colors: [
+                        Color.clear,
+                        Color.black.opacity(0.2),
+                        Color.black.opacity(0.35)
+                    ]),
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .frame(height: 140)
+                .frame(maxWidth: .infinity)
+                .allowsHitTesting(false)
+            }
+            .ignoresSafeArea(edges: .bottom)
+            
+            VStack {
+                Spacer()
+                PrimaryCTAButton(
+                    title: "Add Screenshot",
+                    height: 60,
+                    font: .system(size: 20, weight: .semibold, design: .rounded),
+                    fullWidth: true
+                ) {
+                    homeVm.uploadScreenshot()
+                }
+                .padding(.horizontal, 16)
+                .padding(.bottom, 16)
+            }
         }
         .navigationTitle(dialogGroup.title)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem { SettingsButton(destination: SettingsPlaceholderView()) }
-            if #available(iOS 26.0, *) {
-                ToolbarItem (placement: .bottomBar) {
-                    PrimaryCTAButton(
-                        title: "Add Screenshot",
-                        height: 60,
-                        font: .system(size: 20, weight: .semibold, design: .rounded),
-                        fullWidth: true
-                    ) {
-                        homeVm.uploadScreenshot()
-                    }
-                }.sharedBackgroundVisibility(.hidden)
-            } else {
-                ToolbarItem (placement: .bottomBar) {
-                    PrimaryCTAButton(
-                        title: "Add Screenshot",
-                        height: 60,
-                        font: .system(size: 20, weight: .semibold, design: .rounded),
-                        fullWidth: true
-                    ) {
-                        homeVm.uploadScreenshot()
-                    }
-                }
-            }
         }
         // Программная навигация к новосозданному диалогу (из добавления фото)
         .navigationDestination(isPresented: $homeVm.shouldNavigateToDialog) {
