@@ -38,38 +38,44 @@ struct Home: View {
                         ToolbarItem (placement: .topBarLeading) { Logo() }
                     }
                     ToolbarItem { SettingsButton(destination: SettingsPlaceholderView()) }
-                    if #available(iOS 26.0, *) {
-                        if(!dialogs.isEmpty) {
-                            ToolbarItem(placement: .bottomBar) {
-                                PrimaryCTAButton(
-                                    title: "Upload Screenshot",
-                                    height: 60,
-                                    font: .system(size: 20, weight: .semibold, design: .rounded),
-                                    fullWidth: true
-                                ) {
-                                    vmHome.uploadScreenshot()
-                                }
-                            }
-                            .sharedBackgroundVisibility(.hidden)
-                        }
-                    } else {
-                        if(!dialogs.isEmpty) {
-                            // Fallback on earlier versions
-                            ToolbarItem(placement: .bottomBar) {
-                                PrimaryCTAButton(
-                                    title: "Upload Screenshot",
-                                    height: 60,
-                                    font: .system(size: 20, weight: .semibold, design: .rounded),
-                                    fullWidth: true
-                                ) {
-                                    vmHome.uploadScreenshot()
-                                }
-                            }
-                        }
-                    }
                 }
                 .navigationTitle("Crush AI")
                 .navigationBarTitleDisplayMode(.inline)
+            
+            VStack {
+                Spacer()
+                if !dialogs.isEmpty {
+                    LinearGradient(
+                        gradient: Gradient(colors: [
+                            Color.clear,
+                            Color.black.opacity(0.5),
+                            Color.black.opacity(0.65)
+                        ]),
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                    .frame(height: 140)
+                    .frame(maxWidth: .infinity)
+                    .allowsHitTesting(false)
+                }
+            }
+            .ignoresSafeArea(edges: .bottom)
+            
+            VStack {
+                Spacer()
+                if !dialogs.isEmpty {
+                    PrimaryCTAButton(
+                        title: "Upload Screenshot",
+                        height: 60,
+                        font: .system(size: 20, weight: .semibold, design: .rounded),
+                        fullWidth: true
+                    ) {
+                        vmHome.uploadScreenshot()
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 16)
+                }
+            }
         }
         // Презентация PhotosPicker
         .photosPicker(
@@ -186,6 +192,7 @@ struct Home: View {
                     }
                 }
             }
+            .padding(.bottom, dialogs.isEmpty ? 0 : 100)
             .padding(.vertical, 30)
         }
     }
