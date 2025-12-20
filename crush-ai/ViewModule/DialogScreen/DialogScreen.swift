@@ -56,7 +56,7 @@ struct DialogScreen: View {
                 LinearGradient(
                     gradient: Gradient(colors: [
                         Color.clear,
-                        Color.black.opacity(0.5),
+                        Color.black.opacity(0.2),
                         Color.black.opacity(0.65)
                     ]),
                     startPoint: .top,

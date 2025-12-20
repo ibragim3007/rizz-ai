@@ -49,7 +49,7 @@ public struct PlanCard<Selection: Equatable>: View {
         } label: {
             ZStack(alignment: .topTrailing) {
                 RoundedRectangle(cornerRadius: 22, style: .continuous)
-                    .fill(.white.opacity(isSelected ? 0.10 : 0.06))
+                    .fill(AppTheme.primaryDark.opacity(isSelected ? 0.15 : 0.05))
                     .overlay(
                         RoundedRectangle(cornerRadius: 22, style: .continuous)
                             .stroke(
@@ -60,15 +60,14 @@ public struct PlanCard<Selection: Equatable>: View {
                                 lineWidth: 2
                             )
                     )
-                    .shadow(color: AppTheme.glow.opacity(isSelected ? 0.35 : 0.0), radius: 16, x: 0, y: 8)
                 
                 if let badge {
                     Text(badge)
                         .font(.system(size: 12, weight: .bold, design: .rounded))
-                        .foregroundStyle(.white)
+                        .foregroundColor(.white)
                         .padding(.horizontal, 10)
                         .padding(.vertical, 6)
-                        .background(.red)
+                        .background(AppTheme.primary)
                         .clipShape(Capsule())
                         .offset(x: -14, y: -12)
                 }
@@ -77,7 +76,7 @@ public struct PlanCard<Selection: Equatable>: View {
                     // Radio
                     ZStack {
                         Circle()
-                            .fill(.white.opacity(0.10))
+                            .fill(AppTheme.fontMain.opacity(0.10))
                             .frame(width: 36, height: 36)
                         if isSelected {
                             Circle()
@@ -86,12 +85,12 @@ public struct PlanCard<Selection: Equatable>: View {
                                 .overlay(
                                     Image(systemName: "checkmark")
                                         .font(.system(size: 12, weight: .bold))
-                                        .foregroundStyle(.white)
+                                        .foregroundColor(.white)
                                 )
                                 .transition(.scale.combined(with: .opacity))
                         } else {
                             Circle()
-                                .stroke(.white.opacity(0.8), lineWidth: 3)
+                                .stroke(AppTheme.fontMain.opacity(0.8), lineWidth: 3)
                                 .frame(width: 26, height: 26)
                         }
                     }
@@ -105,11 +104,11 @@ public struct PlanCard<Selection: Equatable>: View {
                             Text(title)
                         }
                         .font(.system(size: 18, weight: .semibold, design: .rounded))
-                        .foregroundStyle(.white)
+                        .foregroundColor(AppTheme.fontMain)
                         
                         Text(subtitle)
                             .font(.system(size: 16, weight: .medium, design: .rounded))
-                            .foregroundStyle(.white.opacity(0.85))
+                            .foregroundColor(AppTheme.fontMain.opacity(0.9))
                             .fixedSize(horizontal: false, vertical: true)
                     }
                     
@@ -124,3 +123,40 @@ public struct PlanCard<Selection: Equatable>: View {
         .accessibilityHint(Text(isSelected ? "Selected" : "Tap to select"))
     }
 }
+#if DEBUG
+import SwiftUI
+
+private enum PreviewPlan: String, CaseIterable, Equatable {
+    case monthly
+    case yearly
+}
+
+#Preview("PlanCard variations") {
+    @State var selected: PreviewPlan = .monthly
+
+    return VStack(spacing: 16) {
+        PlanCard(
+            selected: $selected,
+            plan: .monthly,
+            titlePrefix: "Monthly",
+            title: "$9.99",
+            subtitle: "Billed monthly. Cancel anytime.",
+            badge: "Popular"
+        )
+        .padding(.horizontal)
+
+        PlanCard(
+            selected: $selected,
+            plan: .yearly,
+            titlePrefix: "Yearly",
+            title: "$59.99",
+            subtitle: "Save 50% vs monthly billing",
+            badge: nil
+        )
+        .padding(.horizontal)
+    }
+    .frame(maxHeight: 200)
+    .padding(.vertical)
+}
+#endif
+

@@ -28,7 +28,7 @@ struct ReplyView: View {
             .background(
                 BubbleShape(cornerRadius: cornerRadius)
                     .fill(gradientForTone)
-                    .saturation(wasCopied ? 0.5 : 1)
+                    .saturation(wasCopied ? 0.5 : 0.9)
             )
             // Лёгкий «глянец», чтобы пузырёк выглядел живым
             .overlay(
@@ -71,8 +71,6 @@ struct ReplyView: View {
                 }
             }
             .contentShape(BubbleShape(cornerRadius: cornerRadius))
-            // Объёмные тени
-            .shadow(color: .black.opacity(0.25), radius: 6, x: 0, y: 2)
             // Лёгкое «вздрагивание» при копировании
             .modifier(ShakeEffect(amount: 3, shakesPerUnit: 2, animatableData: shakeTrigger))
             .onTapGesture(perform: copyToClipboard)

@@ -42,7 +42,9 @@ struct PaywallView: View {
     
     var body: some View {
         ZStack {
-            MeshedGradient().opacity(0.7)
+            
+            MeshedGradient()
+            
             ScrollView {
                 VStack(spacing: 20) {
                     carousel
@@ -109,7 +111,6 @@ struct PaywallView: View {
             }
             .scrollIndicators(.hidden)
         }
-        .preferredColorScheme(.dark)
         // Кнопка закрытия (крестик)
         .onAppear {
             Purchases.shared.getOfferings { offerings, error in
@@ -136,10 +137,10 @@ struct PaywallView: View {
                 VStack (alignment: .center, spacing: 5) {
                     Text("CrushAI Pro — Everything you need for smart replies")
                         .font(.system(size: 22, weight: .bold, design: .rounded))
-                        .foregroundStyle(.white)
+                        .foregroundColor(AppTheme.fontMain)
                     Text("Get AI answers for your chats and posts, with all features unlocked.")
                         .font(.system(size: 16, weight: .regular, design: .rounded))
-                        .foregroundStyle(.white.opacity(0.8))
+                        .foregroundColor(AppTheme.fontMain.opacity(0.8))
                 }
                 .multilineTextAlignment(.center)
             }
@@ -190,7 +191,7 @@ struct PaywallView: View {
             HStack(spacing: 8) {
                 ForEach(0..<carouselImages.count, id: \.self) { idx in
                     Circle()
-                        .fill(idx == currentPage ? AppTheme.primary : .white.opacity(0.25))
+                        .fill(idx == currentPage ? AppTheme.primary : AppTheme.fontMain.opacity(0.25))
                         .frame(width: idx == currentPage ? 10 : 8, height: idx == currentPage ? 10 : 8)
                         .animation(.easeInOut, value: currentPage)
                 }
