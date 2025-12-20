@@ -135,10 +135,10 @@ struct PaywallView: View {
         VStack(spacing: 10) {
             HStack (alignment: .firstTextBaseline) {
                 VStack (alignment: .center, spacing: 5) {
-                    Text("CrushAI Pro — Everything you need for smart replies")
+                    Text("Everything you need for smart replies")
                         .font(.system(size: 22, weight: .bold, design: .rounded))
                         .foregroundColor(AppTheme.fontMain)
-                    Text("Get AI answers for your chats and posts, with all features unlocked.")
+                    Text("Get answers for chats and posts, with all features unlocked")
                         .font(.system(size: 16, weight: .regular, design: .rounded))
                         .foregroundColor(AppTheme.fontMain.opacity(0.8))
                 }

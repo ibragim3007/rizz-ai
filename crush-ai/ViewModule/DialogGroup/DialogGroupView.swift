@@ -290,7 +290,7 @@ private extension DialogGroupView {
     let d2 = DialogEntity(id: "2", userId: "u", title: "Home screen, no chat", createdAt: .now.addingTimeInterval(-7200), updatedAt: .now.addingTimeInterval(-7200))
     let d3 = DialogEntity(id: "3", userId: "u", title: "Group chat banter about AI", createdAt: .now.addingTimeInterval(-60*60*26), updatedAt: .now.addingTimeInterval(-60*60*26))
     let d4 = DialogEntity(id: "4", userId: "u", title: "Group chat technical banter", createdAt: .now.addingTimeInterval(-60*60*28), updatedAt: .now.addingTimeInterval(-60*60*28))
-    let group = DialogGroupEntity(id: "g", userId: "u", title: "crush ai")
+    let group = DialogGroupEntity(id: "g", userId: "u", title: "Wingman AI")
     d1.image = cover
     group.dialogs = [d1, d2, d3, d4]
     group.cover = cover

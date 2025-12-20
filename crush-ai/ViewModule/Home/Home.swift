@@ -38,7 +38,7 @@ struct Home: View {
                     }
                     ToolbarItem { SettingsButton(destination: SettingsPlaceholderView()) }
                 }
-                .navigationTitle("Crush AI")
+                .navigationTitle("Wingman")
                 .navigationBarTitleDisplayMode(.inline)
             
             VStack {

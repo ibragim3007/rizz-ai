@@ -33,7 +33,7 @@ struct StatisticsContent: View {
     // MARK: - Header
     private var header: some View {
         VStack(spacing: 6) {
-            Text("How Crush AI boosts your results")
+            Text("How Wingman AI boosts your results")
                 .font(.system(size: 24, weight: .heavy, design: .rounded))
                 .foregroundStyle(AppTheme.fontMain)
                 .multilineTextAlignment(.center)
@@ -48,11 +48,11 @@ struct StatisticsContent: View {
             // Legend
             HStack(spacing: 14) {
                 LegendDot(color: AppTheme.fontMain.opacity(0.28))
-                Text("Without Crush AI")
+                Text("Without Wingman AI")
                     .font(.system(size: 13, weight: .semibold, design: .rounded))
                     .foregroundStyle(AppTheme.fontMain.opacity(0.7))
                 LegendDot(color: AppTheme.primary)
-                Text("With Crush AI")
+                Text("With Wingman AI")
                     .font(.system(size: 13, weight: .semibold, design: .rounded))
                     .foregroundStyle(AppTheme.fontMain.opacity(0.9))
                 Spacer()
@@ -90,7 +90,7 @@ struct StatisticsContent: View {
     // MARK: - Benefits
     private var benefitGrid: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Your benefits with Crush AI")
+            Text("Your benefits with Wingman AI")
                 .font(.system(size: 16, weight: .heavy, design: .rounded))
                 .foregroundStyle(AppTheme.fontMain.opacity(0.9))
             
