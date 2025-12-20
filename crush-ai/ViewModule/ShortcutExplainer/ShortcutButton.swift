@@ -61,8 +61,7 @@ struct ShortcutButton: View {
                 withAnimation(.spring(response: 0.32, dampingFraction: 0.95, blendDuration: 0.2)) {
                     showExplainerSheet = false
                 }
-            }
-            .preferredColorScheme(.dark)
+            }          
             .presentationDragIndicator(.visible)
             .presentationCornerRadius(20)
             .applyDetents70()

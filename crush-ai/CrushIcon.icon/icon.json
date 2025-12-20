@@ -1,66 +1,37 @@
 {
   "fill" : {
-    "linear-gradient" : [
-      "extended-gray:0.00000,1.00000",
-      "display-p3:0.15789,0.05019,0.19777,1.00000"
-    ],
-    "orientation" : {
-      "start" : {
-        "x" : 0.5,
-        "y" : 0
-      },
-      "stop" : {
-        "x" : 0.5,
-        "y" : 0.7
-      }
-    }
+    "automatic-gradient" : "display-p3:0.99854,0.99268,0.98340,1.00000"
   },
   "groups" : [
     {
       "blend-mode" : "normal",
+      "blur-material" : null,
+      "hidden" : false,
       "layers" : [
         {
-          "blend-mode" : "plus-lighter",
+          "blend-mode" : "normal",
+          "fill" : "none",
           "glass" : true,
-          "hidden" : false,
-          "image-name" : "Vector 27.png",
-          "name" : "Vector 27",
-          "position" : {
-            "scale" : 1,
-            "translation-in-points" : [
-              252.09984482594268,
-              0
-            ]
-          }
-        },
-        {
-          "blend-mode" : "plus-lighter",
-          "fill" : "automatic",
-          "glass" : true,
-          "hidden" : false,
-          "image-name" : "Subtract (4).png",
-          "name" : "Subtract (4)",
-          "position" : {
-            "scale" : 1,
-            "translation-in-points" : [
-              -56.12261850530638,
-              0
-            ]
-          }
-        },
-        {
-          "fill" : "automatic",
-          "glass" : true,
-          "hidden" : true,
-          "image-name" : "Frame 6.png",
-          "name" : "Frame 6"
+          "image-name" : "ChatGPT Image 20 дек. 2025 г., 12_31_11.png",
+          "name" : "ChatGPT Image 20 дек. 2025 г., 12_31_11"
         }
       ],
       "lighting" : "individual",
-      "shadow" : {
-        "kind" : "neutral",
-        "opacity" : 0.5
-      },
+      "shadow-specializations" : [
+        {
+          "value" : {
+            "kind" : "neutral",
+            "opacity" : 0.5
+          }
+        },
+        {
+          "idiom" : "square",
+          "value" : {
+            "kind" : "layer-color",
+            "opacity" : 0.5
+          }
+        }
+      ],
       "specular" : true,
       "translucency" : {
         "enabled" : false,

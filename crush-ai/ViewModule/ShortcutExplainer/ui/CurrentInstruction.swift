@@ -19,10 +19,10 @@ struct CurrentInstruction: View {
 
             Text(steps[currentStep - 1])
                 .font(.system(size: 20, weight: .heavy, design: .rounded))
-                .foregroundStyle(.white)
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: .infinity)
         }
+        .foregroundColor(AppTheme.fontMain)
         .padding(.top, 4)
     }
 }

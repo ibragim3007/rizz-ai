@@ -104,7 +104,6 @@ struct SettingsPlaceholderView: View {
                             showPaywall = false
                         }
                     )
-                    .preferredColorScheme(.dark)
                 }
             }
         }

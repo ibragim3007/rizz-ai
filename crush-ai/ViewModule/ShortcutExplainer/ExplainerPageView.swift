@@ -60,11 +60,12 @@ struct ExplainerPageView: View {
                 
                 Spacer(minLength: 40)
             }
+            .foregroundColor(AppTheme.fontMain)
             .padding(.bottom, 120)
         }
     }
 }
 
 #Preview {
-    ExplainerPageView().preferredColorScheme(.dark)
+    ExplainerPageView()
 }

@@ -43,7 +43,6 @@ struct DoubleTapFlow: View {
             .padding(.horizontal, 20)
             .padding(.vertical, 16)
         }
-        .preferredColorScheme(.dark)
         .animation(.easeInOut, value: currentStep)
         .onChange(of: currentStep) { _, _ in
 #if canImport(UIKit)
@@ -73,7 +72,6 @@ struct DoubleTapFlow: View {
                     .foregroundStyle(AppTheme.primary, .white.opacity(0.9))
                     .font(.system(size: 34, weight: .bold, design: .rounded))
             }
-            .shadow(color: AppTheme.glow.opacity(0.5), radius: 18, x: 0, y: 8)
         }
         .frame(maxWidth: .infinity)
         .padding(.top, 4)
@@ -117,5 +115,4 @@ struct DoubleTapFlow: View {
 
 #Preview {
     DoubleTapFlow()
-        .preferredColorScheme(.dark)
 }

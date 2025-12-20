@@ -84,5 +84,4 @@ struct MessageBubbles: View {
 #Preview {
     MessageBubbles()
         .padding(.horizontal, 20)
-        .preferredColorScheme(.dark)
 }

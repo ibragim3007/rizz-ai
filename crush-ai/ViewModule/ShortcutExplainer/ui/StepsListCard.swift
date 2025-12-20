@@ -24,7 +24,7 @@ struct StepsListCard: View {
 
                     Text(steps[index])
                         .font(.system(size: 16, weight: done ? .semibold : .regular, design: .rounded))
-                        .foregroundStyle(done ? .white : .secondary)
+                        .foregroundStyle(done ? AppTheme.fontMain : AppTheme.fontMain.opacity(0.8))
 
                     Spacer()
                 }
@@ -37,7 +37,7 @@ struct StepsListCard: View {
                 }
 
                 if index < steps.count - 1 {
-                    Divider().overlay(Color.white.opacity(0.12)).padding(.leading, 28)
+                    Divider().overlay(AppTheme.fontMain.opacity(0.12)).padding(.leading, 28)
                 }
             }
         }
@@ -48,6 +48,5 @@ struct StepsListCard: View {
                 .stroke(AppTheme.borderPrimaryGradient, lineWidth: 1)
                 .opacity(0.8)
         )
-        .shadow(color: .black.opacity(0.35), radius: 16, x: 0, y: 8)
     }
 }

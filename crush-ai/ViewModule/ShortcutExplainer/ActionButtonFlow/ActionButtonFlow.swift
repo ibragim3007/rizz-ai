@@ -41,7 +41,6 @@ struct ActionButtonFlow: View {
             .padding(.horizontal, 20)
             .padding(.vertical, 16)
         }
-        .preferredColorScheme(.dark)
         .animation(.easeInOut, value: currentStep)
         .onChange(of: currentStep) { _, _ in
 #if canImport(UIKit)

@@ -40,5 +40,4 @@ struct SecondScreenContent: View {
 
 #Preview {
     SecondScreenContent()
-        .preferredColorScheme(.dark)
 }

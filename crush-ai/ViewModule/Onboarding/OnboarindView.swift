@@ -31,7 +31,6 @@ struct OnboardingView: View {
             }
         }
         .background(AppTheme.background)
-        .preferredColorScheme(.dark)
         .animation(.easeInOut, value: viewModel.currentIndex)
         .accessibilityElement(children: .contain)
         .task {

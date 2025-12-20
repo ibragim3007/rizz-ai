@@ -135,7 +135,6 @@ struct DialogScreen: View {
 //                    giftMonthlyPackage = monthly
 //                }
             )
-            .preferredColorScheme(.dark)
         }
         // GiftView presentation сразу после закрытия пейвола
 //        .sheet(isPresented: $showGift) {

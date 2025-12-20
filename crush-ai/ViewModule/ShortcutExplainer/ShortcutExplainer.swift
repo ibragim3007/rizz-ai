@@ -173,5 +173,4 @@ private struct SecondaryCTAButton: View {
 
 #Preview {
     ShortcutExplainer()
-        .preferredColorScheme(.dark)
 }

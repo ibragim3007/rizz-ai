@@ -189,5 +189,5 @@ struct ScreenShotItem: View {
 }
 
 #Preview {
-    ScreenShotItem(imagePath: "sample-screen", title: "Karla from college").preferredColorScheme(.dark)
+    ScreenShotItem(imagePath: "sample-screen", title: "Karla from college")
 }

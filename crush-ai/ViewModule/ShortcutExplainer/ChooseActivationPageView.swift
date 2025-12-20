@@ -158,5 +158,5 @@ struct ChooseActivationPageView: View {
 }
 
 #Preview {
-    ChooseActivationPageView().preferredColorScheme(.dark)
+    ChooseActivationPageView()
 }

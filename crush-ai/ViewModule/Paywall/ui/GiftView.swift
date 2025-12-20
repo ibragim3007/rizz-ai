@@ -79,7 +79,6 @@ struct GiftView: View {
             }
             .padding(.top, 8)
         }
-        .preferredColorScheme(.dark)
         .onAppear {
             // Если пакет заранее не передали — подгрузим Offering, чтобы найти месячный
             if injectedMonthlyPackage == nil {
@@ -361,5 +360,4 @@ private struct ParticlesView: View {
 #Preview {
     GiftView()
         .environmentObject(PaywallViewModel(isPreview: false))
-        .preferredColorScheme(.dark)
 }
