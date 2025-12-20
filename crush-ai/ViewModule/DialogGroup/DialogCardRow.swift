@@ -53,7 +53,6 @@ struct DialogCardRow: View {
         .padding(.horizontal, 16)
         .padding(.vertical, 14)
         .background(glassBackground)
-        .overlay(glossTopHighlight)
         .contentShape(RoundedRectangle(cornerRadius: corner, style: .continuous))
         .padding(.horizontal, 20)
     }
@@ -125,11 +124,12 @@ struct DialogCardRow: View {
     private var glassBackground: some View {
         RoundedRectangle(cornerRadius: corner, style: .continuous)
         // Материал (blur)
-            .fill(.ultraThinMaterial)
+//            .fill(.ultraThinMaterial)
         // Тинт фирменным цветом
             .overlay(
                 RoundedRectangle(cornerRadius: corner, style: .continuous)
-                    .fill(AppTheme.primaryDark.opacity(0.20))
+                    .fill(AppTheme.primary)
+                    .saturation(0.7)
             )
         // Глубина: glow + мягкие тени
 //            .shadow(color: AppTheme.primary.opacity(0.14), radius: 16, x: 0, y: 8)
@@ -174,10 +174,5 @@ struct DialogCardRow: View {
             DialogCardRow(dialog: d1)
                 .padding(.top, 40)
         }
-        .background(
-            LinearGradient(colors: [AppTheme.backgroundTop, AppTheme.backgroundBottom],
-                           startPoint: .topLeading, endPoint: .bottomTrailing)
-                .ignoresSafeArea()
-        )
     }
 }

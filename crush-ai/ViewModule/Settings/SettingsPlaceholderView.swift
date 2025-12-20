@@ -20,7 +20,7 @@ struct SettingsPlaceholderView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                MeshedGradient().opacity(0.5)
+                MeshedGradient()
                 List {
                     // Premium section with a subscribe button
                     Section("Premium") {

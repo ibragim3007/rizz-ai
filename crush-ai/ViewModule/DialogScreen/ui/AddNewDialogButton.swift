@@ -29,7 +29,7 @@ struct AddNewDialogButton: View {
         }) {
             Image(systemName: "plus.viewfinder")
                 .font(.system(size: 18, weight: .semibold))
-                .foregroundStyle(.white.opacity(0.8))
+                .foregroundStyle(AppTheme.fontMain.opacity(0.8))
         }
         .buttonStyle(.plain)
         // Late inject context into VM

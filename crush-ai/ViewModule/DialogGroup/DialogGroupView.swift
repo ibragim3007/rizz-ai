@@ -202,7 +202,7 @@ struct DialogGroupView: View {
                         HStack {
                             Text(section.title)
                                 .font(.system(size: 20, weight: .heavy, design: .rounded))
-                                .foregroundStyle(.white.opacity(0.85))
+                                .foregroundStyle(AppTheme.fontMain.opacity(0.85))
                             
                             Spacer()
                             
@@ -218,8 +218,8 @@ struct DialogGroupView: View {
                                 }
                             }
                             .buttonStyle(.borderless)
-                            .tint(.white.opacity(0.4))
-                            .foregroundStyle(.white.opacity(0.4))
+                            .tint(AppTheme.fontMain.opacity(0.5))
+                            .foregroundStyle(AppTheme.fontMain.opacity(0.5))
                             .font(.footnote)
                             .accessibilityLabel(Text(NSLocalizedString("Delete all in section", comment: "Delete all in section")))
                         }
