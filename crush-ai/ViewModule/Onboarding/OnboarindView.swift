@@ -51,7 +51,7 @@ struct OnboardingView: View {
     
     var buttonTitle: LocalizedStringKey {
         if viewModel.steps.count <= 1 { return "Get Started" }
-        return viewModel.isLast ? "Finish" : (viewModel.currentIndex == 0 ? "Get Started" : "Next")
+        return viewModel.isLast ? "Get Started" : (viewModel.currentIndex == 0 ? "Get Started" : "Next")
     }
     
     func onPrimaryButtonTap() {

@@ -37,7 +37,13 @@ final class DialogScreenViewModel: ObservableObject {
     }
     
     // MARK: - Public API
-    func getReply(modelContext: ModelContext, tone: ToneTypes, replyLanguage: String?) async {
+    func getReply(
+        modelContext: ModelContext,
+        tone: ToneTypes,
+        replyLanguage: String?,
+        useEmojis: Bool?,
+        paymentToken: String?)
+    async {
         guard !isLoading else { return }
         isLoading = true
         defer { isLoading = false }
@@ -45,15 +51,17 @@ final class DialogScreenViewModel: ObservableObject {
         // Сжимаем: даунскейл до 60% и JPEG качество 0.6
         let base64Image = DialogScreenViewModel.makeBase64(
             from: currentImageUrl,
-            downscaleFactor: 0.6,
-            jpegQuality: 0.6
+            downscaleFactor: 0.8,
+            jpegQuality: 0.8
         )
         
         let body = AnalyzeScreenshotRequest(
             screenshotBase64: base64Image,
             tone: tone,
             context: dialog.context,
-            language: replyLanguage
+            language: replyLanguage,
+            useEmojis: useEmojis,
+            paymentToken: paymentToken
         )
         
         do {

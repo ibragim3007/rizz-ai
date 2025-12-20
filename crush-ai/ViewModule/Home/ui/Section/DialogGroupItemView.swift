@@ -14,10 +14,15 @@ struct DialogGroupItemView: View {
     
     var body: some View {
         NavigationLink(destination: DialogGroupView(dialogGroup: dialogGroup)) {
-            ScreenShotItem(imageURL: dialogGroup.cover?.localFileURL, title: dialogGroup.title)
+            ScreenShotItem(
+                imageURL: dialogGroup.cover?.localFileURL, title: dialogGroup.title)
                 .contentTransition(.opacity)
-                .transition(.asymmetric(insertion: .opacity.combined(with: .scale(scale: 0.98)),
-                                        removal: .opacity.combined(with: .scale(scale: 0.9))))
+                .transition(
+                    .asymmetric(
+                        insertion: .opacity.combined(with: .scale(scale: 0.98)),
+                        removal: .opacity.combined(with: .scale(scale: 0.9))
+                    )
+                )
         }
         .contextMenu {
             // Pin / Unpin
@@ -34,7 +39,13 @@ struct DialogGroupItemView: View {
             }
             // Delete
             Button(role: .destructive, action: onDelete) {
-                Label(NSLocalizedString("Delete - " + dialogGroup.title, comment: "Delete group"), systemImage: "trash")
+                
+                let isThereTitle = !dialogGroup.title.isEmpty
+                let deleteText = isThereTitle ? "Delete" + " - " + dialogGroup.title : "Delete"
+                
+                let commentText = isThereTitle ? "This will delete the item: " + dialogGroup.title : "This will delete the item without a title."
+                
+                Label(NSLocalizedString(deleteText, comment: commentText), systemImage: "trash")
             }
         }
         .preferredColorScheme(.dark)

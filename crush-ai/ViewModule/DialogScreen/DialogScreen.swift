@@ -7,20 +7,30 @@
 
 import SwiftUI
 import SwiftData
+import RevenueCat
+import StoreKit
 
 struct DialogScreen: View {
     @AppStorage("tone") private var currentTone: ToneTypes = .RIZZ
     @AppStorage("replyLanguage") private var replyLanguage: String = "auto"
+    @AppStorage("useEmojis") private var useEmojis: Bool = false
     
     var dialog: DialogEntity
     var dialogGroup: DialogGroupEntity
     var defaultImage = "https://cdsassets.apple.com/live/7WUAS350/images/ios/ios-26-iphone-16-pro-take-a-screenshot-options.png"
     
     @Environment(\.modelContext) private var modelContext
+    @EnvironmentObject private var paywallViewModel: PaywallViewModel
+    @Environment(\.requestReview) private var requestReview
     
     @StateObject private var dialogScreenVm: DialogScreenViewModel
     @State private var selectedChips: Set<String> = []
     @FocusState private var isContextFocused: Bool
+    @State private var showPaywall: Bool = false
+    
+    // Новый стейт для показа GiftView и передачи месячного пакета
+    @State private var showGift: Bool = false
+    @State private var giftMonthlyPackage: Package? = nil
     
     init(dialog: DialogEntity, dialogGroup: DialogGroupEntity) {
         self.dialog = dialog
@@ -43,7 +53,7 @@ struct DialogScreen: View {
         }
         // Тап по пустому фону закрывает клавиатуру
         .contentShape(Rectangle())
-        .onTapGesture { isContextFocused = false }
+//        .onTapGesture { isContextFocused = false }
         .navigationTitle(dialog.title)
         .navigationBarTitleDisplayMode(.automatic)
         .toolbar {
@@ -64,9 +74,12 @@ struct DialogScreen: View {
                         isLoading: dialogScreenVm.isLoading
                     ) {
                         guard !dialogScreenVm.isLoading else { return }
-                        // Sync input context into the dialog before request
-                        dialog.context = dialogScreenVm.context
-                        Task { await dialogScreenVm.getReply(modelContext: modelContext, tone: currentTone, replyLanguage: replyLanguage) }
+                        // Проверка подписки перед выполнением действия
+                        if !paywallViewModel.isSubscriptionActive {
+                            showPaywall = true
+                            return
+                        }
+                        performGetReply()
                     }
                 }
                 .sharedBackgroundVisibility(.hidden)
@@ -100,15 +113,83 @@ struct DialogScreen: View {
                         fullWidth: true
                     ) {
                         guard !dialogScreenVm.isLoading else { return }
-                        // Sync input context into the dialog before request
-                        dialog.context = dialogScreenVm.context
-                        Task { await dialogScreenVm.getReply(modelContext: modelContext, tone: currentTone,replyLanguage: replyLanguage) }
+                        // Проверка подписки перед выполнением действия
+                        if !paywallViewModel.isSubscriptionActive {
+                            showPaywall = true
+                            return
+                        }
+                        performGetReply()
                     }
                     .frame(maxWidth: .infinity)
                 }
                 .padding(.horizontal, 16)
                 .padding(.vertical, 10)
                 .background(.bar) // визуально как тулбар
+            }
+        }
+        // Paywall presentation
+        .sheet(isPresented: $showPaywall) {
+            PaywallView(
+                onContinue: {
+                    // Покупка могла пройти — закрываем пейвол
+                    showPaywall = false
+                    if paywallViewModel.isSubscriptionActive {
+                        performGetReply()
+                    }
+                },
+                onRestore: {
+                    showPaywall = false
+                    if paywallViewModel.isSubscriptionActive {
+                        performGetReply()
+                    }
+                },
+                onDismiss: {
+                    // Пользователь закрыл пейвол — покажем GiftView
+                    showPaywall = false
+                    // Если по UX GiftView нужно показывать всегда на dismiss — просто включаем ниже
+                    showGift = true
+                },
+//                onDismissWithMonthly: { monthly in
+//                    // Сохраняем месячный пакет, полученный из PaywallView
+//                    giftMonthlyPackage = monthly
+//                }
+            )
+            .preferredColorScheme(.dark)
+        }
+        // GiftView presentation сразу после закрытия пейвола
+//        .sheet(isPresented: $showGift) {
+//            GiftView(injectedMonthlyPackage: giftMonthlyPackage)
+//                .preferredColorScheme(.dark)
+//        }
+        // Покрываем кейс свайпа по sheet: когда showPaywall стал false, а подписки нет — показываем GiftView
+//        .onChange(of: showPaywall) { isPresented in
+//            if isPresented == false && !paywallViewModel.isSubscriptionActive {
+//                showGift = true
+//            }
+//        }
+    }
+    
+    private func performGetReply() {
+        // Синхронизируем введенный контекст перед запросом
+        dialog.context = dialogScreenVm.context
+        
+        // Запоминаем количество ответов до запроса
+        let initialCount = dialog.replies.count
+        
+        Task {
+            await dialogScreenVm.getReply(
+                modelContext: modelContext,
+                tone: currentTone,
+                replyLanguage: replyLanguage,
+                useEmojis: useEmojis,
+                paymentToken: paywallViewModel.appUserID
+            )
+            
+            // Проверяем успешность: нет показанной ошибки и появились новые ответы
+            let hasNewReplies = dialog.replies.count > initialCount
+            if !dialogScreenVm.showingError && hasNewReplies {
+                // Запрос системного промпта оценки
+                requestReview()
             }
         }
     }
@@ -133,8 +214,10 @@ struct DialogScreen: View {
             }
             .padding(.bottom, 50)
         }
+        // Включаем именованное пространство для параллакса
+        .coordinateSpace(name: "dialogScroll")
         // Тап по прокрутке вне инпута тоже закрывает клавиатуру
-        .simultaneousGesture(TapGesture().onEnded { isContextFocused = false })
+//        .simultaneousGesture(TapGesture().onEnded { isContextFocused = false })
     }
     
     private var Elements: some View {
@@ -184,219 +267,49 @@ struct ImageView: View {
     var image: ImageEntity?
     var isLoading: Bool
     
-    var body: some View {
-        if let img = image {
-            LargeImageDisplay(isLoading: isLoading, imageEntity: img)
-                .padding(.horizontal, 20)
-        } else {
-            RoundedRectangle(cornerRadius: 24, style: .continuous)
-                .overlay {
-                    Image(systemName: "photo")
-                        .font(.system(size: 36, weight: .semibold))
-                        .foregroundStyle(.white.opacity(0.85))
-                }
-                .padding()
-        }
-    }
-}
-
-
-struct LargeImageDisplay: View {
-    
-    var isLoading: Bool = false
-    var imageEntity: ImageEntity
-    
-    private let corner: CGFloat = 24
-    
-    // Состояние анимации «сканирования»
-    @State private var startScan = false
+    // Базовая высота области изображения (синхронизирована с maxHeight внутри LargeImageDisplay)
+    private let baseHeight: CGFloat = 450
     
     var body: some View {
-        ZStack {
-            content
-            //                .overlay(RoundedRectangle(cornerRadius: corner, style: .continuous).stroke(AppTheme.borderPrimaryGradient, lineWidth: 1))
+        GeometryReader { geo in
+            // Позиция контейнера относительно скролла
+            let minY = geo.frame(in: .named("dialogScroll")).minY
+            let pullDown = max(0, minY)          // тянем вниз
+            let scrollUp = min(0, minY)          // скроллим вверх (отрицательное)
             
-            if isLoading {
-                RoundedRectangle(cornerRadius: corner, style: .continuous)
-                    .fill(.black.opacity(0.25))
-                    .overlay {
-                        ZStack {
-                            // Лёгкая сетка как намёк на «анализ»
-                            GeometryReader { geo in
-                                let spacing: CGFloat = 22
-                                Canvas { context, size in
-                                    var path = Path()
-                                    // Вертикальные линии
-                                    var x: CGFloat = 0
-                                    while x <= size.width {
-                                        path.move(to: CGPoint(x: x, y: 0))
-                                        path.addLine(to: CGPoint(x: x, y: size.height))
-                                        x += spacing
-                                    }
-                                    // Горизонтальные линии
-                                    var y: CGFloat = 0
-                                    while y <= size.height {
-                                        path.move(to: CGPoint(x: 0, y: y))
-                                        path.addLine(to: CGPoint(x: size.width, y: y))
-                                        y += spacing
-                                    }
-                                    context.stroke(path, with: .color(.white.opacity(0.08)), lineWidth: 0.5)
-                                }
-                                .blendMode(.plusLighter)
-                                .allowsHitTesting(false)
-                                
-                                // Двигающийся «луч» сканирования
-                                let beamHeight = max(40, geo.size.height * 0.18)
-                                LinearGradient(
-                                    colors: [
-                                        .clear,
-                                        .white.opacity(0.35),
-                                        .white.opacity(0.55),
-                                        .white.opacity(0.35),
-                                        .clear
-                                    ],
-                                    startPoint: .top,
-                                    endPoint: .bottom
-                                )
-                                .frame(height: beamHeight)
-                                .blur(radius: 6)
-                                .mask(
-                                    RoundedRectangle(cornerRadius: corner, style: .continuous)
-                                        .fill(.white)
-                                )
-                                .offset(y: startScan ? geo.size.height + beamHeight : -beamHeight)
-                                .animation(
-                                    .easeInOut(duration: 1.6)
-                                    .repeatForever(autoreverses: false),
-                                    value: startScan
-                                )
-                            }
-                            
-                            // Угловые маркеры
-                            CornerMarks(cornerRadius: corner)
-                                .stroke(.white.opacity(0.9), style: StrokeStyle(lineWidth: 2, lineCap: .round))
-                                .shadow(color: .white.opacity(0.25), radius: 2, x: 0, y: 0)
-                                .blendMode(.plusLighter)
-                            
-                            // Центр. индикатор
-                            ProgressView()
-                                .tint(.white)
-                                .scaleEffect(1.1)
-                                .shadow(color: .black.opacity(0.4), radius: 4, x: 0, y: 2)
+            // Лёгкий параллакс при прокрутке вверх (картинка «отстаёт»)
+            let parallaxOffset = -scrollUp * 0.25
+            
+            // Небольшой скейл при вытягивании вниз
+            let scale = 1.0 + (pullDown / 600.0)
+            
+            // Плавное затухание при прокрутке вверх, минимум 0.2
+            let fade = max(0.2, 1.0 + (scrollUp / 600.0))
+            
+            ZStack {
+                if let img = image {
+                    LargeImageDisplay(isLoading: isLoading, imageEntity: img)
+                        .scaleEffect(scale, anchor: .center)
+                        .offset(y: parallaxOffset)
+                        .opacity(fade)
+                } else {
+                    RoundedRectangle(cornerRadius: 24, style: .continuous)
+                        .overlay {
+                            Image(systemName: "photo")
+                                .font(.system(size: 36, weight: .semibold))
+                                .foregroundStyle(.white.opacity(0.85))
                         }
-                        .clipShape(RoundedRectangle(cornerRadius: corner, style: .continuous))
-                        .onAppear { startScan = true }
-                    }
+                        .scaleEffect(scale, anchor: .center)
+                        .offset(y: parallaxOffset)
+                        .opacity(fade)
+                }
             }
+            .padding(.horizontal, 20)
         }
-        .contentTransition(.opacity)
-    }
-    
-    // Type-erased to keep the compiler happy across branches
-    private var content: some View {
-        Group {
-            if let url = imageEntity.localFileURL, let img = loadImage(from: url) {
-                AnyView(
-                    img
-                        .resizable()
-                        .scaledToFit()
-                        .clipShape(RoundedRectangle(cornerRadius: corner, style: .continuous))
-                        .frame(maxWidth: .infinity, maxHeight: 450)
-                )
-            } else if let url = imageEntity.remoteHTTPURL {
-                AnyView(
-                    AsyncImage(url: url) { phase in
-                        switch phase {
-                        case .success(let image):
-                            AnyView(
-                                image
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(maxWidth: .infinity, maxHeight: 500)
-                            )
-                        case .failure:
-                            AnyView(placeholder)
-                        case .empty:
-                            AnyView(
-                                ZStack {
-                                    RoundedRectangle(cornerRadius: corner, style: .continuous)
-                                        .fill(.white.opacity(0.06))
-                                    ProgressView()
-                                        .tint(.white.opacity(0.85))
-                                }
-                            )
-                        @unknown default:
-                            AnyView(placeholder)
-                        }
-                    } .clipShape(RoundedRectangle(cornerRadius: corner, style: .continuous))
-                )
-            } else {
-                AnyView(placeholder)
-            }
-        }
-    }
-    
-    private var placeholderBase: some View {
-        RoundedRectangle(cornerRadius: corner, style: .continuous)
-            .fill(.white.opacity(0.06))
-    }
-    
-    private var placeholder: some View {
-        ZStack {
-            placeholderBase
-            Image(systemName: "photo")
-                .font(.system(size: 36, weight: .semibold))
-                .foregroundStyle(.white.opacity(0.85))
-        }
-        .frame(width: 300, height: 500)
-    }
-    
-    private func loadImage(from url: URL) -> Image? {
-#if canImport(UIKit)
-        if let ui = UIImage(contentsOfFile: url.path) { return Image(uiImage: ui) }
-#elseif canImport(AppKit)
-        if let ns = NSImage(contentsOf: url) { return Image(nsImage: ns) }
-#endif
-        return nil
+        // GeometryReader требует зафиксированной высоты
+        .frame(height: baseHeight)
     }
 }
-
-// Декоративные угловые маркеры для состояния загрузки
-private struct CornerMarks: Shape {
-    var cornerRadius: CGFloat
-    var inset: CGFloat = 6
-    var length: CGFloat = 24
-    
-    func path(in rect: CGRect) -> Path {
-        var p = Path()
-        let r = cornerRadius
-        _ = r // зарезервировано на случай будущей логики, сейчас не влияет на форму
-        
-        // Top-left
-        p.move(to: CGPoint(x: rect.minX + inset, y: rect.minY + inset + length))
-        p.addLine(to: CGPoint(x: rect.minX + inset, y: rect.minY + inset))
-        p.addLine(to: CGPoint(x: rect.minX + inset + length, y: rect.minY + inset))
-        
-        // Top-right
-        p.move(to: CGPoint(x: rect.maxX - inset - length, y: rect.minY + inset))
-        p.addLine(to: CGPoint(x: rect.maxX - inset, y: rect.minY + inset))
-        p.addLine(to: CGPoint(x: rect.maxX - inset, y: rect.minY + inset + length))
-        
-        // Bottom-right
-        p.move(to: CGPoint(x: rect.maxX - inset, y: rect.maxY - inset - length))
-        p.addLine(to: CGPoint(x: rect.maxX - inset, y: rect.maxY - inset))
-        p.addLine(to: CGPoint(x: rect.maxX - inset - length, y: rect.maxY - inset))
-        
-        // Bottom-left
-        p.move(to: CGPoint(x: rect.minX + inset + length, y: rect.maxY - inset))
-        p.addLine(to: CGPoint(x: rect.minX + inset, y: rect.maxY - inset))
-        p.addLine(to: CGPoint(x: rect.minX + inset, y: rect.maxY - inset - length))
-        
-        return p
-    }
-}
-
-// MARK: - Context Input Card
 
 
 #Preview {
@@ -419,4 +332,3 @@ private struct CornerMarks: Shape {
     
     return DialogScreen(dialog: dialog, dialogGroup: dialogGroup).preferredColorScheme(.dark)
 }
-

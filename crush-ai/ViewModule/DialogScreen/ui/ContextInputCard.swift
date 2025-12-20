@@ -16,7 +16,7 @@ struct ContextInputCard: View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Extra context")
                 .font(.footnote.weight(.semibold))
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.secondary.opacity(0.5))
                 .padding(.leading, 6)
                 .accessibilityHidden(true)
             
@@ -36,8 +36,8 @@ struct ContextInputCard: View {
                     .font(.system(size: 16, weight: .regular, design: .rounded))
                     .foregroundStyle(.primary)
                     .scrollContentBackground(.hidden)
-                    .padding(12)
-                    .frame(minHeight: 80, maxHeight: 150, alignment: .topLeading)
+                    .padding(15)
+//                    .frame(minHeight: 80, maxHeight: 150, alignment: .topLeading)
                     .accessibilityLabel("Extra context")
                 // Скрывать клавиатуру по Return:
                     .onChange(of: text) { _, newValue in
@@ -52,8 +52,8 @@ struct ContextInputCard: View {
                 if text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                     Text("Add any details to help generate a better reply…")
                         .font(.system(size: 16, weight: .regular, design: .rounded))
-                        .foregroundStyle(.secondary)
-                        .padding(16)
+                        .foregroundStyle(.secondary.opacity(0.5))
+                        .padding(15)
                         .allowsHitTesting(false)
                         .accessibilityHidden(true)
                 }
@@ -63,3 +63,11 @@ struct ContextInputCard: View {
     }
 }
 
+
+#Preview {
+    
+    @Previewable @State var text = "asdasd"
+    @FocusState var isFocused
+    
+    ContextInputCard(text: $text, isFocused: $isFocused)
+}

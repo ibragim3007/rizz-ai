@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SwiftData
+import RevenueCat
 
 // MARK: - AppActions environment (для системных действий приложения, напр. Reset Store)
 struct AppActions {
@@ -26,7 +27,6 @@ extension EnvironmentValues {
 
 @main
 struct crush_aiApp: App {
-    
     // Делаем контейнер заменяемым, чтобы можно было пересоздать после wipe
     @State private var container: ModelContainer = crush_aiApp.makeContainer()
     
@@ -47,6 +47,17 @@ struct crush_aiApp: App {
         return container
     }
     
+    
+    
+    init () {
+        // инициализация revenuecat
+        Purchases.logLevel = .debug
+        Purchases.configure(withAPIKey: "appl_LwbkcAhtxVUApPlwfEPnGaftWRc")
+        
+    }
+    
+    @StateObject var paywallViewModel = PaywallViewModel()
+    
     var body: some Scene {
         WindowGroup {
             ContentView()
@@ -55,6 +66,7 @@ struct crush_aiApp: App {
         .environment(\.appActions, AppActions(resetStore: { [weak _container = containerRef] in
             await resetStore()
         }))
+        .environmentObject(paywallViewModel)
         // Хак: захват ссылки на self.container в замыкании environment
         .onChange(of: container) { _, _ in
             // no-op, просто держим State живым

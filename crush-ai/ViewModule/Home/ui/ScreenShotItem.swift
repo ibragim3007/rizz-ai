@@ -53,7 +53,7 @@ struct ScreenShotItem: View {
     var body: some View {
         GeometryReader { geo in
             let size = geo.size
-            let cornerRadius: CGFloat = 15
+            let cornerRadius: CGFloat = 16
             
             RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                 .fill(.white.opacity(0.1))
@@ -114,20 +114,22 @@ struct ScreenShotItem: View {
                     let hasTitle = !(title?.isEmpty ?? true)
                     let displayTitle = hasTitle ? title! : "Not named"
                     
-                    Text(displayTitle)
-                        .font(.system(size: 12, weight: .semibold, design: .rounded))
-                        .foregroundStyle(.white)
-                        .opacity(hasTitle ? 1.0 : 0.5)
-                        .padding(.horizontal, 3)
-                        .padding(.vertical, 7)
-                        .frame(width: (size.width - 10))
-                        .background(.ultraThinMaterial)
-                        .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
-                        .offset(y: -4)
+                    if hasTitle {
+                        Text(displayTitle)
+                            .font(.system(size: 12, weight: .semibold, design: .rounded))
+                            .foregroundStyle(.white)
+                            .opacity(hasTitle ? 1.0 : 0.5)
+                            .padding(.horizontal, 3)
+                            .padding(.vertical, 7)
+                            .frame(width: (size.width - 10))
+                            .background(.ultraThinMaterial)
+                            .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+                            .offset(y: -4)
+                    }
                 }
                 .frame(width: size.width, height: size.height)
         }
-        .aspectRatio(0.618, contentMode: .fit)
+        .aspectRatio(0.62, contentMode: .fit)
         .task(id: imageURL) {
             await loadIfNeeded()
         }
@@ -169,7 +171,7 @@ struct ScreenShotItem: View {
         let imageResult: Image? = await Task.detached(priority: .userInitiated) { () -> Image? in
             #if canImport(UIKit)
             guard let ui = UIImage(contentsOfFile: url.path) else { return nil }
-            ImageMemoryCache.shared.set(ui, forKey: url.path)
+            await ImageMemoryCache.shared.set(ui, forKey: url.path)
             return Image(uiImage: ui)
             #elseif canImport(AppKit)
             guard let ns = NSImage(contentsOf: url) else { return nil }

@@ -22,7 +22,7 @@ struct RateUsUI: View {
             content
                 .task {
                     // Задержка 2 секунды перед показом запроса оценки
-                    try? await Task.sleep(nanoseconds: 2_000_000_000)
+                    try? await Task.sleep(nanoseconds: 1_700_000_000)
                     await MainActor.run {
                         // Используем универсальную функцию, чтобы корректно работать на разных версиях iOS
                         askForReview()
@@ -32,7 +32,7 @@ struct RateUsUI: View {
     }
 
     private var content: some View {
-        VStack(spacing: 24) {
+        VStack(spacing: 0) {
             
             Spacer(minLength: 0)
 
@@ -45,16 +45,13 @@ struct RateUsUI: View {
             Spacer()
 
             starsRow
-
-            Spacer(minLength: 0)
-
         }
     }
 
     private var header: some View {
         VStack(spacing: 8) {
             Text(title)
-                .font(.system(size: 40, design: .rounded))
+                .font(.system(size: 36, design: .rounded))
                 .fontWeight(.bold)
                 .multilineTextAlignment(.center)
 
@@ -77,8 +74,8 @@ struct RateUsUI: View {
                 .frame(width: 70)
                 .offset(x: 120)
         }
-        .frame(width: 300, height: 300)
-        .padding(30)
+        .frame(width: 250, height: 250)
+        .padding(.horizontal, 30)
         .clipShape(RoundedRectangle(cornerRadius: 30, style: .continuous))
         .offset(x: -15)
     }
@@ -87,7 +84,7 @@ struct RateUsUI: View {
         HStack(spacing: 12) {
             ForEach(0..<5, id: \.self) { _ in
                 Image(systemName: "star.fill")
-                    .font(.system(size: 32))
+                    .font(.system(size: 28))
                     .foregroundColor(.yellow)
                     .shadow(color: .yellow.opacity(0.35), radius: 8, x: 0, y: 4)
             }

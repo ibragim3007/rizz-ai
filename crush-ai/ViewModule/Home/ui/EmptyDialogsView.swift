@@ -8,222 +8,385 @@
 import SwiftUI
 
 struct EmptyDialogsView: View {
-    // Пошаговая анимация появления
-    @State private var showHeader = false
-    @State private var showStep1 = false
-    @State private var showStep2 = false
-    @State private var showStep3 = false
-    @State private var showFooter = false
+    // Минимальный набор анимаций
+    @State private var showHero = false
+    @State private var showChips = false
+    
+    // Статичное изображение
+    private let heroImages = ["welcome-image-1", "welcome-image-2", "welcome-image-3"]
+    
+    // Единый вход в поток импорта
+    var onImportTapped: () -> Void = {}
     
     var body: some View {
-        ScrollView(showsIndicators: false) {
-            VStack(spacing: 24) {
-                // Header / Illustration block
+        VStack(spacing: 20) {
+            
+            // Hero / Illustration block
+            VStack (spacing: 15) {
                 ZStack {
-                    // Card background with subtle depth
-                    RoundedRectangle(cornerRadius: 24, style: .continuous)
-                        .fill(
-                            LinearGradient(
-                                colors: [
-                                    Color.white.opacity(0.1),
-                                    Color.white.opacity(0.03)
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
+                    RoundedRectangle(cornerRadius: 30, style: .continuous)
+                        .fill(.clear)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 30, style: .continuous)
+                                .stroke(AppTheme.borderPrimaryGradient, lineWidth: 1)
                         )
                     
-                    HStack(spacing: 18) {
-                        Image("girl-4")
+                    ZStack(alignment: .bottomTrailing) {
+                        
+                        Image(heroImages.first ?? "welcome-image-1")
                             .resizable()
                             .scaledToFill()
-                            .frame(maxWidth: 110, maxHeight: 120)
-                            .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-                            .accessibilityHidden(true)
+                            .frame(height: 250)
+                            .clipped()
                         
-                        VStack(alignment: .leading, spacing: 10) {
-                            Text("Getting Started")
-                                .font(.system(size: 24, weight: .bold, design: .rounded))
-                            Text("Create your first conversation in three simple steps.")
-                                .font(.system(.subheadline, design: .rounded))
-                                .foregroundStyle(.secondary)
-                                .fixedSize(horizontal: false, vertical: true)
+                        
+                            LinearGradient(
+                                colors: [Color.black.opacity(0.0), Color.black.opacity(0.8)],
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                            .frame(maxHeight: 150)
+                        
+                        VStack {
+                            ReplyView(content: "keep texting like that and i might start charging rent for my attention", tone: .RIZZ)
                         }
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .scaleEffect(0.65)
+                        .offset(x: 50, y: -5)
+
                     }
-                    .padding(10)
-                }
-                // Анимация появления хедера
-                .opacity(showHeader ? 1 : 0)
-                .offset(y: showHeader ? 0 : 16)
-                .animation(.snappy(duration: 0.6), value: showHeader)
-                
-                // Steps
-                VStack(spacing: 16) {
-                    StepCard(
-                        number: 1,
-                        title: "Upload a screenshot",
-                        subtitle: "Choose or drag & drop a screenshot to start a new dialog.",
-                        systemImage: "photo.on.rectangle.angled"
-                    )
-                    .opacity(showStep1 ? 1 : 0)
-                    .offset(y: showStep1 ? 0 : 14)
-                    .scaleEffect(showStep1 ? 1.0 : 0.98)
-                    .animation(.snappy(duration: 0.55), value: showStep1)
+                    .clipShape(RoundedRectangle(cornerRadius: 30, style: .continuous))
                     
-                    StepCard(
-                        number: 2,
-                        title: "Tap \"Get Reply\"",
-                        subtitle: "We’ll analyze the content and prepare a tailored response.",
-                        systemImage: "sparkles"
-                    )
-                    .opacity(showStep2 ? 1 : 0)
-                    .offset(y: showStep2 ? 0 : 14)
-                    .scaleEffect(showStep2 ? 1.0 : 0.98)
-                    .animation(.snappy(duration: 0.55), value: showStep2)
-                    
-                    StepCard(
-                        number: 3,
-                        title: "Enjoy the result",
-                        subtitle: "Review, refine, and continue the conversation effortlessly.",
-                        systemImage: "face.smiling"
-                    )
-                    .opacity(showStep3 ? 1 : 0)
-                    .offset(y: showStep3 ? 0 : 14)
-                    .scaleEffect(showStep3 ? 1.0 : 0.98)
-                    .animation(.snappy(duration: 0.55), value: showStep3)
                 }
+                .opacity(showHero ? 1 : 0)
+                .animation(.snappy(duration: 0.6), value: showHero)
                 
-                // Footer hint
-                Text("Pro tip: You can add more screenshots later to improve context.")
-                    .font(.system(.footnote, design: .rounded))
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 24)
-                    .padding(.top, 4)
-                    .opacity(showFooter ? 1 : 0)
-                    .offset(y: showFooter ? 0 : 10)
-                    .animation(.snappy(duration: 0.5), value: showFooter)
+                Spacer(minLength: 20)
+                
+                
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Start a new dialog")
+                        .font(.system(size: 24, weight: .bold, design: .rounded))
+                    
+                    Text("Drop a screenshot — we’ll do the rest.")
+                        .font(.system(.subheadline, design: .rounded))
+                        .fixedSize(horizontal: false, vertical: true)
+                        .foregroundStyle(.white.opacity(0.85))
+                }
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 20)
+                
+                Spacer()
+                
+                FlowChipsVertical(
+                    show: showChips,
+                    onImport: onImportTapped
+                )
+                .animation(.snappy(duration: 0.5), value: showChips)
+                .padding(.horizontal, 20)
             }
-            .padding(.vertical, 28)
+            
+            // Главное действие
+            //            ShortcutButton()
+            //                .opacity(showHero ? 1 : 0)
+            //                .offset(y: showHero ? 0 : 10)
+            //                .animation(.snappy(duration: 0.5).delay(0.05), value: showHero)
         }
+        .padding(.vertical, 28)
         .task {
-            // Запускаем «каскад» появления с небольшими задержками
-            await animateSequence()
+            await animateIn()
         }
     }
     
-    // MARK: - Animation sequence
+    // MARK: - Simple animation
     
-    private func animateSequence() async {
-        // Сброс (на случай повторного входа)
-        showHeader = false
-        showStep1 = false
-        showStep2 = false
-        showStep3 = false
-        showFooter = false
-        
-        // Небольшая пауза после появления экрана
-        try? await Task.sleep(nanoseconds: 150_000_000)
-        withAnimation(.snappy(duration: 0.6)) { showHeader = true }
+    private func animateIn() async {
+        showHero = false
+        showChips = false
         
         try? await Task.sleep(nanoseconds: 120_000_000)
-        withAnimation(.snappy(duration: 0.55)) { showStep1 = true }
+        withAnimation(.snappy(duration: 0.6)) { showHero = true }
         
         try? await Task.sleep(nanoseconds: 120_000_000)
-        withAnimation(.snappy(duration: 0.55)) { showStep2 = true }
-        
-        try? await Task.sleep(nanoseconds: 120_000_000)
-        withAnimation(.snappy(duration: 0.55)) { showStep3 = true }
-        
-        try? await Task.sleep(nanoseconds: 140_000_000)
-        withAnimation(.snappy(duration: 0.5)) { showFooter = true }
+        withAnimation(.snappy(duration: 0.5)) { showChips = true }
     }
 }
 
-// MARK: - Step Card
+// MARK: - Vertical flow chips column (Timeline)
 
-private struct StepCard: View {
-    let number: Int
-    let title: String
-    let subtitle: String
-    let systemImage: String
+private struct FlowChipsVertical: View {
+    let show: Bool
+    let onImport: () -> Void
     
     var body: some View {
-        HStack(alignment: .top, spacing: 14) {
-            NumberBadge(number: number)
+        VStack(alignment: .leading, spacing: 14) {
+            // 1) Import screenshot — active & interactive
+            TimelineStepRow(
+                index: 0,
+                isFirst: true,
+                isLast: false,
+                state: .active,
+                title: "Import screenshot",
+                icon: "photo.on.rectangle.angled",
+                action: {
+#if canImport(UIKit)
+                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+#endif
+                    onImport()
+                }
+            )
             
-            VStack(alignment: .leading, spacing: 8) {
-                HStack(spacing: 8) {
-                    if #available(iOS 18.0, *) {
-                        Image(systemName: systemImage)
-                            .font(.system(size: 16, weight: .semibold))
-                            //                        .foregroundStyle(AppTheme.primary)
-                            .accessibilityHidden(true)
-                            .symbolRenderingMode(.monochrome)
-                            .symbolEffect(.wiggle.up)
-                    } else {
-                        Image(systemName: systemImage)
-                            .font(.system(size: 16, weight: .semibold))
-                            //                        .foregroundStyle(AppTheme.primary)
-                            .accessibilityHidden(true)
-                            .symbolRenderingMode(.monochrome)
-                    }
-                    
-                    Text(title)
-                        .font(.system(.headline, design: .rounded))
-                        .foregroundStyle(.primary)
+            // 2) Analyze — upcoming
+            TimelineStepRow(
+                index: 1,
+                isFirst: false,
+                isLast: false,
+                state: .upcoming,
+                title: "Analyze",
+                icon: "sparkles"
+            )
+            
+            // 3) Copy reply — upcoming
+            TimelineStepRow(
+                index: 2,
+                isFirst: false,
+                isLast: true,
+                state: .upcoming,
+                title: "Copy reply",
+                icon: "doc.on.doc"
+            )
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .opacity(show ? 1 : 0)
+        //        .offset(y: show ? 0 : 10)
+        .accessibilityElement(children: .contain)
+    }
+}
+
+// MARK: - Timeline row
+
+private enum StepState {
+    case active
+    case completed
+    case upcoming
+}
+
+private struct TimelineStepRow: View {
+    let index: Int
+    let isFirst: Bool
+    let isLast: Bool
+    let state: StepState
+    let title: String
+    let icon: String
+    var action: (() -> Void)? = nil
+    
+    // Размеры
+    private let railWidth: CGFloat = 44
+    private let circleSize: CGFloat = 25
+    private let innerDot: CGFloat = 7
+    private let corner: CGFloat = 18
+    
+    // Анимации взаимодействия
+    @GestureState private var isPressed: Bool = false
+    @State private var pulse: Bool = false
+    @State private var shakePhase: CGFloat = 0
+    
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            // Left rail + marker
+            ZStack {
+                // Верхняя часть линии (до кружка)
+                if !isFirst {
+                    Rectangle()
+                        .fill(railColor.opacity(state == .upcoming ? 0.25 : 1))
+                        .frame(width: 3)
+                        .offset(y: -circleSize/2 - 16)
+                        .frame(maxHeight: 32, alignment: .top)
+                }
+                // Нижняя часть линии (после кружка)
+                if !isLast {
+                    Rectangle()
+                        .fill(railColor.opacity(state == .upcoming ? 0.25 : 1))
+                        .frame(width: 3)
+                        .offset(y: circleSize/2 + 6)
+                        .frame(maxHeight: 10, alignment: .bottom)
                 }
                 
-                Text(subtitle)
-                    .font(.system(.subheadline, design: .rounded))
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
+                // Маркер шага
+                ZStack {
+                    Circle()
+                        .fill(markerFill)
+                        .overlay(
+                            Circle()
+                                .stroke(AppTheme.borderPrimaryGradient, lineWidth: 1)
+                                .opacity(0.9)
+                        )
+                    
+                    Circle()
+                        .fill(innerFill)
+                        .frame(width: innerDot, height: innerDot)
+                }
+                .frame(width: circleSize, height: circleSize)
             }
+            .frame(width: railWidth, height: 54)
+            
+            // Content card
+            contentCard
+                .contentShape(RoundedRectangle(cornerRadius: corner, style: .continuous))
+                .onTapGesture {
+                    action?()
+                }
+                .simultaneousGesture(
+                    LongPressGesture(minimumDuration: 0.0)
+                        .updating($isPressed) { _, state, _ in
+                            state = true
+                        }
+                )
+                .accessibilityLabel("\(title)")
+                .accessibilityAddTraits(state == .active ? .isButton : [])
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .onAppear {
+            // Мягкое пульсирующее свечение и легкая дрожь только для активного шага
+            guard state == .active else { return }
+            withAnimation(.easeInOut(duration: 1.4).repeatForever(autoreverses: true)) {
+                pulse.toggle()
+            }
+            withAnimation(.easeInOut(duration: 0.9).repeatForever(autoreverses: true)) {
+                shakePhase = 1
+            }
+        }
+    }
+    
+    // MARK: - Content card
+    
+    @ViewBuilder
+    private var contentCard: some View {
+        let isActive = (state == .active)
+        HStack(spacing: 10) {
+            Image(systemName: icon)
+                .font(.system(size: 14, weight: .semibold))
+                .symbolRenderingMode(.monochrome)
+                .foregroundStyle(isActive ? .white : .white.opacity(0.85))
+                .accessibilityHidden(true)
+            
+            Text(title)
+                .font(.system(.subheadline, design: .rounded))
+                .fontWeight(.semibold)
+                .foregroundStyle(isActive ? .white : .white.opacity(0.92))
             
             Spacer(minLength: 0)
         }
-        .padding(16)
+        .frame(height: 48)
+        .padding(.horizontal, 16)
         .background(
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .fill(
-                    LinearGradient(
-                        colors: [
-                            Color.white.opacity(0.06),
-                            Color.white.opacity(0.03)
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
+            Group {
+                if isActive {
+                    RoundedRectangle(cornerRadius: corner, style: .continuous)
+                        .fill(AppTheme.primaryGradient)
+                } else {
+                    RoundedRectangle(cornerRadius: corner, style: .continuous)
+                        .fill(Color.white.opacity(0.03))
+                }
+            }
         )
+        .buttonStyle(PrimaryGradientButtonStyleShimmer(isShimmering: true))
         .overlay(
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
+            RoundedRectangle(cornerRadius: corner, style: .continuous)
                 .stroke(AppTheme.borderPrimaryGradient, lineWidth: 1)
+                .opacity(isActive ? 1.0 : 0.8)
         )
-        .shadow(color: AppTheme.glow.opacity(0.18), radius: 10, x: 0, y: 6)
+        // Иконка "tap" справа как подсказка (только для активного шага)
+        .overlay(alignment: .trailing) {
+            if isActive {
+                Image(systemName: "hand.tap")
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundStyle(.white.opacity(0.95))
+                    .padding(.trailing, 16)
+            }
+        }
+        .scaleEffect(isActive && isPressed ? 0.97 : 1.0)
+        // Легкая дрожь по оси X
+        .modifier(
+            isActive
+            ? ShakeEffect(amount: 1.5, shakesPerUnit: 1.2, animatableData: shakePhase)
+            : ShakeEffect(amount: 0, shakesPerUnit: 0, animatableData: 0)
+        )
+        .animation(.snappy(duration: 0.15), value: isPressed)
+    }
+    
+    // MARK: - Colors
+    
+    private var railColor: Color {
+        switch state {
+        case .completed, .active: return AppTheme.primary
+        case .upcoming: return .white
+        }
+    }
+    
+    private var markerFill: Color {
+        switch state {
+        case .active: return AppTheme.primary
+        case .completed: return AppTheme.primary.opacity(0.25)
+        case .upcoming: return Color.white.opacity(0.06)
+        }
+    }
+    
+    private var innerFill: Color {
+        switch state {
+        case .active: return .white
+        case .completed: return AppTheme.primary
+        case .upcoming: return .white.opacity(0.55)
+        }
+    }
+    
+    private var markerShadow: Color {
+        switch state {
+        case .active: return AppTheme.glow.opacity(0.45)
+        case .completed: return AppTheme.glow.opacity(0.25)
+        case .upcoming: return .black.opacity(0.25)
+        }
     }
 }
 
-// MARK: - Number Badge
+// MARK: - Легкий shake-эффект
 
-private struct NumberBadge: View {
-    let number: Int
+private struct ShakeEffect: GeometryEffect {
+    var amount: CGFloat = 2
+    var shakesPerUnit: CGFloat = 1.5
+    var animatableData: CGFloat
+    
+    func effectValue(size: CGSize) -> ProjectionTransform {
+        let translation = amount * sin(animatableData * .pi * 2 * shakesPerUnit)
+        return ProjectionTransform(CGAffineTransform(translationX: translation, y: 0))
+    }
+}
+
+// MARK: - Legacy chip (kept for reference; not used now)
+
+private struct Chip: View {
+    let icon: String
+    let text: String
     
     var body: some View {
-        ZStack {
-            Circle()
-                .fill(.ultraThinMaterial.opacity(0.5))
-                .overlay(
-                    Circle()
-                        .stroke(AppTheme.borderPrimaryGradient, lineWidth: 1)
-                )
-            Text("\(number)")
-                .font(.system(.headline, design: .rounded))
-                .fontWeight(.semibold)
-                .foregroundStyle(.white.opacity(0.95))
+        HStack(spacing: 8) {
+            Image(systemName: icon)
+                .font(.system(size: 14, weight: .semibold))
+                .symbolRenderingMode(.monochrome)
+                .accessibilityHidden(true)
+            
+            Text(text)
+                .font(.system(.subheadline, design: .rounded))
         }
-        .frame(width: 36, height: 36)
-        .accessibilityHidden(true)
+        .padding(.vertical, 8)
+        .padding(.horizontal, 12)
+        .background(
+            RoundedRectangle(cornerRadius: 15, style: .continuous)
+                .fill(Color.white.opacity(0.06))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 15, style: .continuous)
+                .stroke(AppTheme.borderPrimaryGradient, lineWidth: 1)
+        )
     }
 }

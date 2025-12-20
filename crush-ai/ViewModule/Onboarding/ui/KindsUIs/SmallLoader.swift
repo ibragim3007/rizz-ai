@@ -14,7 +14,6 @@ struct SmallLoader: View {
 
     @State private var progress: CGFloat = 0
     @State private var started = false
-    @State private var sleeper: Task<Void, Never>?
     @State private var ticker: Task<Void, Never>?
 
     // Частицы для «живости»
@@ -54,6 +53,7 @@ struct SmallLoader: View {
                     .monospacedDigit()
                     .foregroundStyle(.white.opacity(0.95))
                     .shadow(color: .black.opacity(0.35), radius: 8, x: 0, y: 2)
+                    .contentTransition(.numericText(value: progress))
             }
         }
         .padding(.horizontal, 24)
@@ -76,6 +76,13 @@ struct SmallLoader: View {
                                 progress = 1.0
                             }
                         }
+
+                        // Дополнительная пауза 1 секунда после достижения 100%
+                        try? await Task.sleep(nanoseconds: 1_000_000_000)
+
+                        if !Task.isCancelled {
+                            await MainActor.run { onFinish() }
+                        }
                         break
                     } else {
                         // Небольшие случайные шажки и паузы — «живая» анимация
@@ -95,19 +102,8 @@ struct SmallLoader: View {
                     }
                 }
             }
-
-            // По окончании общего времени — вызываем onFinish
-            sleeper = Task {
-                do {
-                    try await Task.sleep(nanoseconds: UInt64(duration * 1_000_000_000))
-                    if !Task.isCancelled {
-                        await MainActor.run { onFinish() }
-                    }
-                } catch { /* cancelled */ }
-            }
         }
         .onDisappear {
-            sleeper?.cancel()
             ticker?.cancel()
         }
     }

@@ -14,11 +14,9 @@ struct DialogGroupView: View {
     var dialogGroup: DialogGroupEntity
     
     @Environment(\.modelContext) private var modelContext
+    @EnvironmentObject private var paywallViewModel: PaywallViewModel
     @StateObject private var homeVm = HomeViewModel()
     @StateObject private var groupVm = DialogGroupViewModel()
-    
-    @State private var showPhotoPicker = false
-    @State private var selectedPhotoItem: PhotosPickerItem?
     
     // Delete-all confirmation state (like Home.swift)
     @State private var showDeleteAllConfirm = false
@@ -46,10 +44,7 @@ struct DialogGroupView: View {
                         font: .system(size: 20, weight: .semibold, design: .rounded),
                         fullWidth: true
                     ) {
-#if canImport(UIKit)
-                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-#endif
-                        showPhotoPicker = true
+                        homeVm.uploadScreenshot()
                     }
                 }.sharedBackgroundVisibility(.hidden)
             } else {
@@ -60,10 +55,7 @@ struct DialogGroupView: View {
                         font: .system(size: 20, weight: .semibold, design: .rounded),
                         fullWidth: true
                     ) {
-#if canImport(UIKit)
-                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-#endif
-                        showPhotoPicker = true
+                        homeVm.uploadScreenshot()
                     }
                 }
             }
@@ -85,27 +77,31 @@ struct DialogGroupView: View {
             }
         }
         .onAppear {
-            // Late injection of model contexts
+            // Late injection of dependencies
             if homeVm.modelContext == nil {
                 homeVm.modelContext = modelContext
+            }
+            // Важно: пробрасываем менеджер подписки в VM
+            if homeVm.paywallViewModel == nil {
+                homeVm.paywallViewModel = paywallViewModel
             }
             if groupVm.modelContext == nil {
                 groupVm.modelContext = modelContext
             }
         }
-        // Фото-пикер
+        // Фото-пикер (используем состояние из homeVm)
         .photosPicker(
-            isPresented: $showPhotoPicker,
-            selection: $selectedPhotoItem,
+            isPresented: $homeVm.showPhotoPicker,
+            selection: $homeVm.selectedPhotoItem,
             matching: .images
         )
-        .onChange(of: selectedPhotoItem) { _, newItem in
+        .onChange(of: homeVm.selectedPhotoItem) { _, newItem in
             guard let item = newItem else { return }
             Task {
                 await homeVm.handlePickedPhoto(item, for: dialogGroup)
                 // Сбрасываем выбор, чтобы можно было выбрать то же фото снова при желании
                 await MainActor.run {
-                    selectedPhotoItem = nil
+                    homeVm.selectedPhotoItem = nil
                 }
             }
         }
@@ -128,6 +124,28 @@ struct DialogGroupView: View {
             }
         } message: {
             Text(NSLocalizedString("This action cannot be undone.", comment: "Delete all warning"))
+        }
+        // Paywall sheet (контролируется VM)
+        .sheet(isPresented: $homeVm.showPaywall) {
+            PaywallView(
+                onContinue: {
+                    // Закрываем paywall и повторяем сценарий добавления
+                    homeVm.showPaywall = false
+                    if paywallViewModel.isSubscriptionActive {
+                        homeVm.uploadScreenshot()
+                    }
+                },
+                onRestore: {
+                    homeVm.showPaywall = false
+                    if paywallViewModel.isSubscriptionActive {
+                        homeVm.uploadScreenshot()
+                    }
+                },
+                onDismiss: {
+                    homeVm.showPaywall = false
+                }
+            )
+            .preferredColorScheme(.dark)
         }
     }
     
@@ -162,6 +180,7 @@ struct DialogGroupView: View {
                             .contextMenu {
                                 Button(role: .destructive) {
                                     groupVm.requestDelete(dialog)
+                                    groupVm.confirmDelete(in: dialogGroup)
                                 } label: {
                                     Label("Delete", systemImage: "trash")
                                 }
@@ -256,6 +275,8 @@ private extension DialogGroupView {
 }
 
 #Preview {
+    @Previewable @StateObject var paywallViewModel = PaywallViewModel()
+    
     // Пример превью с фиктивными данными
     let cover = ImageEntity(id: "img1", localUrl: "girl-3", remoteUrl: "girl-3")
     let d1 = DialogEntity(id: "1", userId: "u", title: "Home screen opener prep", createdAt: .now.addingTimeInterval(-3600), updatedAt: .now.addingTimeInterval(-3600))
@@ -269,6 +290,7 @@ private extension DialogGroupView {
     
     return NavigationStack {
         DialogGroupView(dialogGroup: group)
+            .environmentObject(paywallViewModel)
             .preferredColorScheme(.dark)
     }
 }

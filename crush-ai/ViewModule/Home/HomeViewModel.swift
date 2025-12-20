@@ -19,6 +19,9 @@ final class HomeViewModel: ObservableObject {
     @Published var showPhotoPicker = false
     @Published var selectedPhotoItem: PhotosPickerItem?
     
+    // Paywall presentation controlled from VM
+    @Published var showPaywall: Bool = false
+    
     // Navigation intent to DialogScreen
     @Published var navigateDialog: DialogEntity?
     @Published var navigateDialogGroup: DialogGroupEntity?
@@ -26,6 +29,9 @@ final class HomeViewModel: ObservableObject {
     
     // Allow late injection from the View
     var modelContext: ModelContext?
+    
+    // Subscription state (inject from View via EnvironmentObject)
+    var paywallViewModel: PaywallViewModel?
     
     init() {}
     
@@ -47,7 +53,7 @@ final class HomeViewModel: ObservableObject {
                                                     quality: 0.6) ?? originalData
 
             // Сохраняем в файловую систему (Documents)
-            let fileURL = try saveImageDataToDocuments(
+            let fileURL = try Self.saveImageDataToDocuments(
                 data: jpegData,
                 suggestedName: await suggestedFilename(from: item),
                 forceExtension: "jpg"
@@ -116,7 +122,7 @@ final class HomeViewModel: ObservableObject {
                                                     quality: 0.6) ?? originalData
             
             // 2) Сохранение файла в Documents
-            let fileURL = try saveImageDataToDocuments(
+            let fileURL = try Self.saveImageDataToDocuments(
                 data: jpegData,
                 suggestedName: await suggestedFilename(from: item),
                 forceExtension: "jpg"
@@ -180,6 +186,13 @@ final class HomeViewModel: ObservableObject {
         #if canImport(UIKit)
         UIImpactFeedbackGenerator(style: .light).impactOccurred()
         #endif
+        
+        // Проверка подписки централизована в VM
+//        if let paywall = paywallViewModel, paywall.isSubscriptionActive == false {
+//            showPaywall = true
+//            return
+//        }
+        // Нет Paywall или подписка активна — открываем пикер
         showPhotoPicker = true
     }
 
@@ -244,7 +257,7 @@ final class HomeViewModel: ObservableObject {
 
     // MARK: - File saving helpers
 
-    func saveImageDataToDocuments(data: Data, suggestedName: String?, forceExtension: String? = nil) throws -> URL {
+    static func saveImageDataToDocuments(data: Data, suggestedName: String?, forceExtension: String? = nil) throws -> URL {
         let fm = FileManager.default
         let docs = try fm.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
         let baseName = (suggestedName?.isEmpty == false ? suggestedName! : UUID().uuidString)
@@ -314,4 +327,3 @@ final class HomeViewModel: ObservableObject {
         }
     }
 }
-

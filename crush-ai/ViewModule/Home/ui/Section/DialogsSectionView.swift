@@ -16,7 +16,7 @@ struct DialogsSectionView: View {
     
     var body: some View {
         Section {
-            LazyVGrid(columns: columns, spacing: 16) {
+            LazyVGrid(columns: columns, spacing: 12) {
                 ForEach(section.items, id: \.id) { dialogGroup in
                     DialogGroupItemView(
                         dialogGroup: dialogGroup,

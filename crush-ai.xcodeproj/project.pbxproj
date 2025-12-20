@@ -6,7 +6,26 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		1FA748542EA05D3300477944 /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = 1FA748532EA05D3300477944 /* RevenueCat */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		1F7050B42EA162C0001F773C /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		1F70509F2EA162BE001F773C /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		1F7050A12EA162BE001F773C /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		1F91AA252E8E07410048E4F7 /* crush-ai.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "crush-ai.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -23,16 +42,27 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1FA748542EA05D3300477944 /* RevenueCat in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		1F70509E2EA162BE001F773C /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				1F70509F2EA162BE001F773C /* WidgetKit.framework */,
+				1F7050A12EA162BE001F773C /* SwiftUI.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		1F91AA1C2E8E07410048E4F7 = {
 			isa = PBXGroup;
 			children = (
 				1F91AA272E8E07410048E4F7 /* crush-ai */,
+				1F70509E2EA162BE001F773C /* Frameworks */,
 				1F91AA262E8E07410048E4F7 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -55,6 +85,7 @@
 				1F91AA212E8E07410048E4F7 /* Sources */,
 				1F91AA222E8E07410048E4F7 /* Frameworks */,
 				1F91AA232E8E07410048E4F7 /* Resources */,
+				1F7050B42EA162C0001F773C /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
@@ -65,6 +96,7 @@
 			);
 			name = "crush-ai";
 			packageProductDependencies = (
+				1FA748532EA05D3300477944 /* RevenueCat */,
 			);
 			productName = "crush-ai";
 			productReference = 1F91AA252E8E07410048E4F7 /* crush-ai.app */;
@@ -94,6 +126,9 @@
 			);
 			mainGroup = 1F91AA1C2E8E07410048E4F7;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				1FA748522EA05D3300477944 /* XCRemoteSwiftPackageReference "purchases-ios-spm" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 1F91AA262E8E07410048E4F7 /* Products */;
 			projectDirPath = "";
@@ -272,12 +307,16 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "ibragim.crush-ai";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -307,12 +346,16 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "ibragim.crush-ai";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
@@ -338,6 +381,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		1FA748522EA05D3300477944 /* XCRemoteSwiftPackageReference "purchases-ios-spm" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/RevenueCat/purchases-ios-spm.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.44.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		1FA748532EA05D3300477944 /* RevenueCat */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1FA748522EA05D3300477944 /* XCRemoteSwiftPackageReference "purchases-ios-spm" */;
+			productName = RevenueCat;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 1F91AA1D2E8E07410048E4F7 /* Project object */;
 }

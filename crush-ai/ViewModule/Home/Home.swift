@@ -14,6 +14,7 @@ struct Home: View {
     // Диалоги теперь подтягиваем из SwiftData, чтобы список обновлялся сам
     @Query(sort: \DialogGroupEntity.updatedAt, order: .reverse) private var dialogs: [DialogGroupEntity]
     @StateObject var vmHome = HomeViewModel()
+    @EnvironmentObject private var paywallViewModel: PaywallViewModel
     
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 12, alignment: .top), count: 3)
     
@@ -24,16 +25,9 @@ struct Home: View {
     
     var body: some View {
         ZStack {
-
+            
             MeshedGradient()
             
-            if dialogs.isEmpty {
-                EmptyDialogsView()
-                    .padding(.horizontal, 24)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-                    .allowsHitTesting(false)
-                    .transition(.opacity)
-            }
             
             contentList
                 .scrollIndicators(.hidden)
@@ -45,27 +39,31 @@ struct Home: View {
                     }
                     ToolbarItem { SettingsButton(destination: SettingsPlaceholderView()) }
                     if #available(iOS 26.0, *) {
-                        ToolbarItem(placement: .bottomBar) {
-                            PrimaryCTAButton(
-                                title: "Upload Screenshot",
-                                height: 60,
-                                font: .system(size: 20, weight: .semibold, design: .rounded),
-                                fullWidth: true
-                            ) {
-                                vmHome.uploadScreenshot()
+                        if(!dialogs.isEmpty) {
+                            ToolbarItem(placement: .bottomBar) {
+                                PrimaryCTAButton(
+                                    title: "Upload Screenshot",
+                                    height: 60,
+                                    font: .system(size: 20, weight: .semibold, design: .rounded),
+                                    fullWidth: true
+                                ) {
+                                    vmHome.uploadScreenshot()
+                                }
                             }
+                            .sharedBackgroundVisibility(.hidden)
                         }
-                        .sharedBackgroundVisibility(.hidden)
                     } else {
-                        // Fallback on earlier versions
-                        ToolbarItem(placement: .bottomBar) {
-                            PrimaryCTAButton(
-                                title: "Upload Screenshot",
-                                height: 60,
-                                font: .system(size: 20, weight: .semibold, design: .rounded),
-                                fullWidth: true
-                            ) {
-                                vmHome.uploadScreenshot()
+                        if(!dialogs.isEmpty) {
+                            // Fallback on earlier versions
+                            ToolbarItem(placement: .bottomBar) {
+                                PrimaryCTAButton(
+                                    title: "Upload Screenshot",
+                                    height: 60,
+                                    font: .system(size: 20, weight: .semibold, design: .rounded),
+                                    fullWidth: true
+                                ) {
+                                    vmHome.uploadScreenshot()
+                                }
                             }
                         }
                     }
@@ -85,8 +83,11 @@ struct Home: View {
             guard let item = newItem else { return }
             Task { await vmHome.handlePickedPhoto(item) }
         }
-        // Inject ModelContext after the view appears
-        .onAppear { vmHome.modelContext = modelContext }
+        // Inject dependencies after the view appears
+        .onAppear {
+            vmHome.modelContext = modelContext
+            vmHome.paywallViewModel = paywallViewModel
+        }
         // Подтверждение удаления всех элементов секции
         .alert(
             String(format: NSLocalizedString("Delete all in “%@”?", comment: "Delete all confirmation title"), pendingDeleteTitle),
@@ -123,10 +124,51 @@ struct Home: View {
                 EmptyView()
             }
         }
+        // Paywall sheet (controlled by VM)
+        .sheet(isPresented: $vmHome.showPaywall) {
+            PaywallView(
+                onContinue: {
+                    // При успешной покупке можно автоматически открыть загрузку
+                    vmHome.showPaywall = false
+                    if paywallViewModel.isSubscriptionActive {
+                        vmHome.uploadScreenshot()
+                    }
+                },
+                onRestore: {
+                    vmHome.showPaywall = false
+                    if paywallViewModel.isSubscriptionActive {
+                        vmHome.uploadScreenshot()
+                    }
+                },
+                onDismiss: {
+                    vmHome.showPaywall = false
+                }
+            )
+            .preferredColorScheme(.dark)
+        }
+        // Ловим deep link из виджета и открываем загрузку скриншота
+        .onOpenURL { url in
+            guard url.scheme?.lowercased() == "crushai" else { return }
+            // Поддержим оба варианта: crushai://upload_screenshot и crushai:///upload_screenshot
+            let host = url.host?.lowercased()
+            let path = url.path.lowercased()
+            if host == "upload_screenshot" || path == "/upload_screenshot" {
+                vmHome.uploadScreenshot()
+            }
+        }
     }
     
     private var contentList: some View {
-        ScrollView {
+        ScrollView {   
+            if(dialogs.isEmpty) {
+                EmptyDialogsView(onImportTapped: {
+                    vmHome.uploadScreenshot()
+                })
+                .padding(.horizontal, 24)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+                //                    .allowsHitTesting(false)
+                .transition(.opacity)
+            }
             LazyVStack(alignment: .leading, spacing: 24) {
                 ForEach(sections, id: \.title) { section in
                     if !section.items.isEmpty {
@@ -159,7 +201,7 @@ struct GroupSection {
 
 private extension Home {
     var sections: [GroupSection] {
-//        let items = dialogs.sorted { $0.updatedAt > $1.updatedAt }
+        //        let items = dialogs.sorted { $0.updatedAt > $1.updatedAt }
         return makeSections(from: dialogs)
     }
     
@@ -205,3 +247,4 @@ private extension Home {
     Home()
         .preferredColorScheme(.dark)
 }
+
