@@ -13,7 +13,7 @@ struct EmptyDialogsView: View {
     @State private var showChips = false
     
     // Статичное изображение
-    private let heroImages = ["welcome-image-1", "welcome-image-2", "welcome-image-3"]
+    private let heroImages = ["welcome-image-2", "welcome-image-2", "welcome-image-3"]
     
     // Единый вход в поток импорта
     var onImportTapped: () -> Void = {}
@@ -70,9 +70,9 @@ struct EmptyDialogsView: View {
                     Text("Drop a screenshot — we’ll do the rest.")
                         .font(.system(.subheadline, design: .rounded))
                         .fixedSize(horizontal: false, vertical: true)
-                        .foregroundStyle(.white.opacity(0.85))
+                        .foregroundStyle(AppTheme.fontMain.opacity(0.85))
                 }
-                .foregroundStyle(.white)
+                .foregroundStyle(AppTheme.fontMain)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, 20)
                 
@@ -218,7 +218,7 @@ private struct TimelineStepRow: View {
                         .fill(markerFill)
                         .overlay(
                             Circle()
-                                .stroke(AppTheme.borderPrimaryGradient, lineWidth: 1)
+                                .stroke(AppTheme.primaryLight, lineWidth: 1)
                                 .opacity(0.9)
                         )
                     
@@ -286,7 +286,7 @@ private struct TimelineStepRow: View {
                         .fill(AppTheme.primaryGradient)
                 } else {
                     RoundedRectangle(cornerRadius: corner, style: .continuous)
-                        .fill(Color.white.opacity(0.03))
+                        .fill(AppTheme.primaryLight.opacity(0.5))
                 }
             }
         )
@@ -320,7 +320,7 @@ private struct TimelineStepRow: View {
     private var railColor: Color {
         switch state {
         case .completed, .active: return AppTheme.primary
-        case .upcoming: return .white
+        case .upcoming: return AppTheme.primaryLight
         }
     }
     
@@ -328,7 +328,7 @@ private struct TimelineStepRow: View {
         switch state {
         case .active: return AppTheme.primary
         case .completed: return AppTheme.primary.opacity(0.25)
-        case .upcoming: return Color.white.opacity(0.06)
+        case .upcoming: return AppTheme.primaryLight.opacity(0.06)
         }
     }
     
@@ -336,7 +336,7 @@ private struct TimelineStepRow: View {
         switch state {
         case .active: return .white
         case .completed: return AppTheme.primary
-        case .upcoming: return .white.opacity(0.55)
+        case .upcoming: return AppTheme.primaryLight.opacity(0.55)
         }
     }
     

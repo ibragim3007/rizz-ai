@@ -69,16 +69,10 @@ struct RateUsUI: View {
                 .resizable()
                 .scaledToFit()
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-            Image("heart-image")
-                .resizable()
-                .scaledToFit()
-                .frame(width: 70)
-                .offset(x: 120)
         }
         .frame(width: 250, height: 250)
         .padding(.horizontal, 30)
         .clipShape(RoundedRectangle(cornerRadius: 30, style: .continuous))
-        .offset(x: -15)
     }
 
     private var starsRow: some View {
