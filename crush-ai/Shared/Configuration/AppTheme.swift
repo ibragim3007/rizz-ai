@@ -14,8 +14,11 @@ enum AppTheme {
     static let primaryBase: Color = Color("Primary") // фиолетовый по умолчанию
     static let backgroundBase: Color = Color("Background")
     
+    static let fontMainBase: Color = Color("FontColor")
+    
     // Производные оттенки и эффекты
     static var primary: Color { primaryBase }
+    static var fontMain: Color { fontMainBase }
     static var primaryLight: Color { primaryBase.tune(saturation: -0.15, brightness: 0.20) }
     static var primaryDark: Color { primaryBase.tune(saturation: 0.10, brightness: -0.25) }
     static var glow: Color { primaryBase.tune(saturation: 0.00, brightness: 0.35) }

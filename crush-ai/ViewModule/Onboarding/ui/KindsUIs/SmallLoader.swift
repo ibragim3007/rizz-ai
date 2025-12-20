@@ -33,8 +33,8 @@ struct SmallLoader: View {
         VStack(spacing: 24) {
             Text(title)
                 .font(.system(.title3, design: .rounded).weight(.heavy))
-                .foregroundStyle(.white)
                 .multilineTextAlignment(.center)
+                .foregroundColor(AppTheme.fontMain)
 
             ZStack {
                 // Мягкая аура позади бара
@@ -193,8 +193,6 @@ private struct CapsuleProgressBar: View {
                                 lineWidth: 1
                             )
                     )
-                    .shadow(color: .black.opacity(0.25), radius: 14, x: 0, y: 8)
-                    .shadow(color: AppTheme.glow.opacity(0.25), radius: 22, x: 0, y: 10)
             }
 
             // Заполнение
@@ -218,7 +216,6 @@ private struct CapsuleProgressBar: View {
                             )
                         )
                         .frame(width: filled)
-                        .shadow(color: AppTheme.glow.opacity(0.35), radius: 16, x: 0, y: 0)
 
                     // Верхний световой отблеск
                     RoundedRectangle(cornerRadius: r, style: .continuous)
@@ -333,17 +330,10 @@ private struct ParticlesLayer: View {
 
 #Preview {
     ZStack {
-        LinearGradient(
-            colors: [AppTheme.backgroundTop, AppTheme.backgroundBottom],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
-        .ignoresSafeArea()
-
         SmallLoader {
             print("Finished!")
         }
-        .preferredColorScheme(.dark)
+        .preferredColorScheme(.light)
         .padding(.vertical, 40)
     }
 }

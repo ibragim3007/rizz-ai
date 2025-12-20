@@ -61,6 +61,7 @@ struct crush_aiApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .preferredColorScheme(.light)
         }
         .modelContainer(container)
         .environment(\.appActions, AppActions(resetStore: { [weak _container = containerRef] in

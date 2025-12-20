@@ -39,25 +39,21 @@ struct FeatureUI: View {
                 VStack {
                     Text(title)
                         .font(.system(size: 32, weight: .bold, design: .rounded))
-                        .foregroundStyle(.white)
                         .multilineTextAlignment(.center)
-                        .shadow(color: .black.opacity(0.4), radius: 6, x: 0, y: 4)
                     
                     Text(highlightText)
                         .font(.system(size: 36, weight: .bold, design: .rounded))
                         .foregroundStyle(AppTheme.primaryGradient)
                         .multilineTextAlignment(.center)
-                        .shadow(color: .black.opacity(0.6), radius: 8, x: 0, y: 4)
-                        .shadow(color: AppTheme.primary.opacity(0.5), radius: 11)
                 }
                 
                 Text(subtitle)
                     .font(.system(size: 16, weight: .regular))
-                    .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
                     .frame(maxWidth: 330)
                     .padding(.top, 6)
             }
+            .foregroundColor(AppTheme.fontMain)
             .padding(.horizontal, 16)
         }
     }

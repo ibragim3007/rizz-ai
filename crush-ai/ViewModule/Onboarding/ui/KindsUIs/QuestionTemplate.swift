@@ -45,7 +45,7 @@ struct QuestionTemplate: View {
                             Spacer()
                             Image(systemName: "chevron.right")
                                 .font(.system(size: 14, weight: .semibold))
-                                .foregroundStyle(.white.opacity(0.55))
+                                .foregroundStyle(.white.opacity(0.8))
                                 .accessibilityHidden(true)
                         }
                         .contentShape(Rectangle())
@@ -69,6 +69,7 @@ struct QuestionTemplate: View {
                 showOptions = true
             }
         }
+        .foregroundColor(AppTheme.fontMain)
         .padding(.horizontal, 20)
         // Фон не задаём — он приходит сверху.
     }
@@ -84,18 +85,17 @@ private struct OptionRowButtonStyle: ButtonStyle {
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(
                 RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .fill(.ultraThinMaterial)
                     // лёгкий тинт фирменным цветом
                     .overlay(
                         RoundedRectangle(cornerRadius: 16, style: .continuous)
-                            .fill(AppTheme.primary.opacity(configuration.isPressed ? 0.14 : 0.06))
+                            .fill(AppTheme.primary.opacity(configuration.isPressed ? 1 : 0.9))
                     )
                     // тонкий «стеклянный» штрих
                     .overlay(
                         RoundedRectangle(cornerRadius: 16, style: .continuous)
                             .stroke(
                                 LinearGradient(
-                                    colors: [.white.opacity(0.22), .white.opacity(0.06)],
+                                    colors: [.white.opacity(0.52), .white.opacity(0.06)],
                                     startPoint: .topLeading,
                                     endPoint: .bottomTrailing
                                 ),
@@ -103,9 +103,6 @@ private struct OptionRowButtonStyle: ButtonStyle {
                             )
                     )
             )
-            // мягкие тени, без «тяжёлого» свечения
-            .shadow(color: AppTheme.glow.opacity(0.10), radius: 8, x: 0, y: 6)
-            .shadow(color: .black.opacity(0.18), radius: 10, x: 0, y: 8)
             .scaleEffect(configuration.isPressed ? 0.98 : 1.0)
             .animation(.spring(response: 0.24, dampingFraction: 0.9), value: configuration.isPressed)
     }
@@ -135,20 +132,12 @@ private struct ChoiceButtonBackground: View {
 
 #Preview {
     ZStack {
-        LinearGradient(
-            colors: [AppTheme.backgroundTop, AppTheme.backgroundBottom],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
-        .ignoresSafeArea()
-        
         QuestionTemplate(
             title: "What’s your age?",
             subtext: "Let us personalize your experience",
             variants: ["Under 18", "18–24", "25–34", "35–44", "45–55", "Over 55"],
             onAction: { print("Selected: \($0)") }
         )
-        .preferredColorScheme(.dark)
         .padding(.vertical, 24)
     }
 }

@@ -37,6 +37,7 @@ struct RateUsUI: View {
             Spacer(minLength: 0)
 
             header
+                .foregroundColor(AppTheme.fontMain)
             
             Spacer()
 
